@@ -2,6 +2,7 @@ package frc.robot.subsystems.canWatchdog;
 
 
 import frc.robot.subsystems.rgb.RGB.RGBMessages;
+import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
 
 public class CANWatchdog{
     private final Thread canWatchdogThread;
