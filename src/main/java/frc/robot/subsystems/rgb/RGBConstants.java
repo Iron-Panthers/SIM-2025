@@ -6,7 +6,7 @@ import frc.robot.subsystems.rgb.RGBConstants.RGBMessage.RGBColor;
 public class RGBConstants {
   public static final RGBConfig RGB_CONFIGS =
       switch (Constants.getRobotType()) {
-        case COMP -> new RGBConfig(2, 200);
+        case COMP -> new RGBConfig(34, 220);
         case ALPHA -> new RGBConfig(0, 0);
         case PROG -> new RGBConfig(0, 0);
         case SIM -> new RGBConfig(0, 0);
@@ -46,7 +46,8 @@ public class RGBConstants {
       F_L2,
       G_L3,
       H_L4,
-      I_CLIMB
+      I_CLIMB,
+      J_DEFAULT
     }
 
     public static class RGBColor {

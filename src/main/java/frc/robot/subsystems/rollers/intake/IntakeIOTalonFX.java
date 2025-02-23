@@ -5,12 +5,14 @@ import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import frc.robot.subsystems.rollers.GenericRollersIOTalonFX;
 
 public class IntakeIOTalonFX extends GenericRollersIOTalonFX implements IntakeIO {
-  private static final int id = CAN.at(
-      switch (Constants.getRobotType()) {
-        case COMP -> 0; // 14
-        case ALPHA -> 14;
-        default -> 0;
-      }, "Intake");
+  private static final int id =
+      CAN.at(
+          switch (Constants.getRobotType()) {
+            case COMP -> 0; // 14
+            case ALPHA -> 14;
+            default -> 0;
+          },
+          "Intake");
   private static final int currentLimitAmps =
       switch (Constants.getRobotType()) {
         case COMP -> 40;

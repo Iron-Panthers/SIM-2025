@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CANWatchdogConstants {
-    public static final String REQUEST = "http://localhost:1250/?action=getdevices";
-    public static final int SCAN_DELAY_MS = 100;
+  public static final String REQUEST = "http://localhost:1250/?action=getdevices";
+  public static final int SCAN_DELAY_MS = 100;
 
-    public class CAN {
+  public class CAN {
     private CAN() {}
 
     public record CANDevice(int id, String name) {}
@@ -16,17 +16,17 @@ public class CANWatchdogConstants {
     private static final Set<Integer> ids = new HashSet<>();
 
     public static int at(int id, String name) {
-        devices.add(new CANDevice(id, name));
-        ids.add(id);
-        return id;
+      devices.add(new CANDevice(id, name));
+      ids.add(id);
+      return id;
     }
 
     public static Set<CANDevice> getDevices() {
-        return devices;
+      return devices;
     }
 
     public static Set<Integer> getIds() {
-        return ids;
+      return ids;
     }
-    }
+  }
 }

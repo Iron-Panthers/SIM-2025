@@ -10,8 +10,6 @@ import com.ctre.phoenix.led.StrobeAnimation;
 import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 
-
-
 public class RGBIOCANdle implements RGBIO {
   private final CANdle candle;
 
@@ -45,7 +43,7 @@ public class RGBIOCANdle implements RGBIO {
       case RAINBOW -> candle.animate(
           new RainbowAnimation(.2, .5, RGBConstants.RGB_CONFIGS.numLEDs()));
       case FIRE -> candle.animate(
-          new FireAnimation(0.7, 0.4, RGBConstants.RGB_CONFIGS.numLEDs(), 0.7, 0.1));
+          new FireAnimation(0.7, 0.2, RGBConstants.RGB_CONFIGS.numLEDs(), 1, 0.1));
       case BOUNCE -> candle.animate(
           new LarsonAnimation(
               message.getColor().r,

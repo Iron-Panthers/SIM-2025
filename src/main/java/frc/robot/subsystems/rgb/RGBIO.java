@@ -1,8 +1,6 @@
 package frc.robot.subsystems.rgb;
 
-
 import frc.robot.subsystems.rgb.RGBConstants.RGBMessage;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface RGBIO {
