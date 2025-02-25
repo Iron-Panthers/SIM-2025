@@ -209,17 +209,31 @@ public class RobotContainer {
     //     .onTrue(
     //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
-    // driverB // GO TO L1
-    //     .povDown()
-    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
+    // L1
+    new Trigger(() -> rollers.intakeDetected() && driverB.povDown().getAsBoolean())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
+    // L2
+    new Trigger(() -> rollers.intakeDetected() && driverB.povRight().getAsBoolean())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
 
-    // driverB // GO TO L2
-    //     .povRight()
-    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
-    new Trigger(() -> rollers.intakeDetected() && driverB.povLeft().getAsBoolean())
+    new Trigger(
+            () ->
+                (rollers.intakeDetected()
+                        || superstructure.getTargetState() == SuperstructureState.SCORE_L3
+                        || superstructure.getTargetState() == SuperstructureState.SCORE_L4
+                        || superstructure.getTargetState() == SuperstructureState.SETUP_L3
+                        || superstructure.getTargetState() == SuperstructureState.SETUP_L4)
+                    && driverB.povLeft().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
 
-    new Trigger(() -> rollers.intakeDetected() && driverB.povUp().getAsBoolean())
+    new Trigger(
+            () ->
+                (rollers.intakeDetected()
+                        || superstructure.getTargetState() == SuperstructureState.SCORE_L3
+                        || superstructure.getTargetState() == SuperstructureState.SCORE_L4
+                        || superstructure.getTargetState() == SuperstructureState.SETUP_L3
+                        || superstructure.getTargetState() == SuperstructureState.SETUP_L4)
+                    && driverB.povUp().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
     driverB // ZERO our mechanism
@@ -261,9 +275,25 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+    // eject
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.L1)
+                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.INTAKE)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
 
-    driverB
-        .rightTrigger() // eject
+    new Trigger(
+            () ->
+                !(superstructure.getTargetState().equals(SuperstructureState.L1)
+                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                    && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
                 .setTargetCommand(RollerState.EJECT)
@@ -271,6 +301,7 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(
