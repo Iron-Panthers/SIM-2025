@@ -27,7 +27,7 @@ public class CANWatchdog extends SubsystemBase {
 
   public void matchStarting() {
     io.matchStarting();
-    // CommandScheduler.getInstance().schedule(rgb.endMessageCommand(RGBMessages.MISSING_CAN_DEVICE));
+    RGBMessages.MISSING_CAN_DEVICE.setIsExpired(true);
   }
 
   public boolean hasAllDevices() {
