@@ -158,11 +158,13 @@ public class RobotContainer {
     superstructure = new Superstructure(elevator, pivot, tongue);
 
     // Register Command Names
-    NamedCommands.registerCommand("Intake", 
-            new SequentialCommandGroup(
-                superstructure.goToStateCommand(SuperstructureState.INTAKE),
-                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
-    NamedCommands.registerCommand("Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+    NamedCommands.registerCommand(
+        "Intake",
+        new SequentialCommandGroup(
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+    NamedCommands.registerCommand(
+        "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
     configureBindings();
     configureAutos();
