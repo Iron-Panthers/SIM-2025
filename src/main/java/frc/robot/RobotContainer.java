@@ -275,7 +275,7 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
-    // eject
+    driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.TOP));
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L1)

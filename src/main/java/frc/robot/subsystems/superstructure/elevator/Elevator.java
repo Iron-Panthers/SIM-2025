@@ -6,12 +6,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
   public enum ElevatorTarget implements GenericSuperstructure.PositionTarget {
-    BOTTOM(0), // 25 and 7.25, made it a bit bigger
+    BOTTOM(0.6), // 25 and 7.25, made it a bit bigger
     L1(11.8), // FIXME: 26 and 21.5
     L2(20), // 24 and 53.75
-    L3(4), // 0 and 53.75
+    L3(10), // 0 and 53.75
     SETUP_L4(31.6),
-    SCORE_L4(29),
+    SCORE_L4(30),
     TOP(31),
     INTAKE(0);
     // TEST_BOTTOM(2),
