@@ -4,8 +4,11 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
-import frc.robot.autonomous.PathCommand;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -90,7 +92,7 @@ public class RobotContainer {
           intake = new Intake(new IntakeIOTalonFX());
           // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
-          pivot = new Pivot(new PivotIOTalonFX());
+          // pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
         }
         case PROG -> {
@@ -156,8 +158,8 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
-    configureBindings();
     configureAutos();
+    configureBindings();
   }
 
   private void configureBindings() {
@@ -197,12 +199,25 @@ public class RobotContainer {
 
     driverA
         .x()
+        .whileTrue(
+            RobotState.generateOTFPoseCommand(
+                RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
+    driverA
+        .b()
+        .whileTrue(
+            RobotState.generateOTFPoseCommand(
+                FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
+
+    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
+
+    /*driverA
+        .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
         .b()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
 
     // driverA
     //     .y()
@@ -304,7 +319,6 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-
     RobotConfig robotConfig;
     try {
       robotConfig = RobotConfig.fromGUISettings();
@@ -328,12 +342,17 @@ public class RobotContainer {
           return false;
         };
 
-    AutoBuilder.configureCustom(
-        (path) -> new PathCommand(path, flipAlliance, swerve, passRobotConfig),
+    AutoBuilder.configure(
         () -> RobotState.getInstance().getEstimatedPose(),
         (pose) -> RobotState.getInstance().resetPose(pose),
+        () -> swerve.getRobotSpeeds(),
+        (speeds) -> {
+          swerve.setTrajectorySpeeds(speeds);
+        },
+        DriveConstants.HOLONOMIC_DRIVE_CONTROLLER,
+        passRobotConfig,
         flipAlliance,
-        true);
+        swerve);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
