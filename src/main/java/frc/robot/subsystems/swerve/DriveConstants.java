@@ -27,7 +27,7 @@ public class DriveConstants {
   public static final DrivebaseConfig DRIVE_CONFIG =
       switch (getRobotType()) {
         case COMP -> new DrivebaseConfig(
-            Units.inchesToMeters(2),
+            Units.inchesToMeters(1.925),
             Units.inchesToMeters(22.5),
             Units.inchesToMeters(34),
             Units.inchesToMeters(34),
@@ -70,12 +70,11 @@ public class DriveConstants {
   // fl, fr, bl, br; negate offsets
   public static final ModuleConfig[] MODULE_CONFIGS =
       switch (getRobotType()) {
-          // FIXME
         case COMP -> new ModuleConfig[] {
-          new ModuleConfig(19, 18, 2, new Rotation2d(-1.148), true, false),
-          new ModuleConfig(17, 16, 1, new Rotation2d(-0.405), true, true),
-          new ModuleConfig(21, 20, 3, new Rotation2d(1.012), true, false),
-          new ModuleConfig(23, 22, 4, new Rotation2d(-2.831), true, true)
+          new ModuleConfig(19, 18, 2, new Rotation2d(-1.1566), true, false),
+          new ModuleConfig(17, 16, 1, new Rotation2d(-0.4049), true, true),
+          new ModuleConfig(21, 20, 3, new Rotation2d(1.0139), true, false),
+          new ModuleConfig(23, 22, 4, new Rotation2d(-2.8148), true, true)
         };
         case PROG -> new ModuleConfig[] {
           new ModuleConfig(5, 6, 1, new Rotation2d(-0.1503), false, false),
@@ -102,7 +101,7 @@ public class DriveConstants {
         case COMP -> new ModuleConstants(
             new Gains(0.25, 2.26, 0, 50, 0, 0),
             new MotionProfileGains(4, 64, 640),
-            new Gains(0.3, 0.63, 0, 1.5, 0, 0), // FIXME diff gear ratio
+            new Gains(0.16, 0.67, 0, 1.5, 0, 0),
             (45.0 / 15) * (17.0 / 27) * (50.0 / 16), // MK4i L2.5 16 tooth
             150.0 / 7,
             3.125);
@@ -125,7 +124,7 @@ public class DriveConstants {
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
-            new PIDConstants(0, 0), new PIDConstants(0, 0));
+            new PIDConstants(13, 0), new PIDConstants(11, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
