@@ -263,6 +263,8 @@ public class RobotContainer {
             );
 
     driverB.b().onTrue(climbController.setPositionTargetCommand(ClimbTarget.BOTTOM));
+
+    driverB.rightTrigger().onTrue(climbController.clearCoral());
   }
 
   private void configureAutos() {

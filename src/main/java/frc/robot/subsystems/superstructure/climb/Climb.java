@@ -8,8 +8,18 @@ import org.littletonrobotics.junction.Logger;
 
 public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
   public enum ClimbTarget implements GenericSuperstructure.PositionTarget {
+
+    // "Bottom" is ready to ram into cage
     BOTTOM(0.15), // FIXME: Just a placeholder value
-    TOP(0.25); // FIXME: Just a placeholder value
+
+    // "Top" is apex of climb
+    TOP(0.25), // FIXME: Just a placeholder value
+
+    // To get coral out
+    CLEAR(-0.15), // FIXME: Just a placeholder value
+
+    // When not climbing
+    STOW(0.27); // FIXME: Just a placeholder value
     private double position = 0;
 
     private ClimbTarget(double position) {
@@ -17,7 +27,6 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     }
 
     public double getPosition() {
-
       return position;
     }
   }

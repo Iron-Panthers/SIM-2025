@@ -5,7 +5,9 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.climb.Climb;
 import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
@@ -32,6 +34,25 @@ public class ClimbController extends SubsystemBase {
         });
   }
 
+  // Flick the climb to let coral fall out
+  public Command clearCoral() {
+    return new SequentialCommandGroup(
+        // Wait until we get to the clear position
+        new FunctionalCommand(
+            () -> {
+              climb.setPositionTarget(ClimbTarget.CLEAR);
+            },
+            () -> {},
+            (e) -> {},
+            climb::reachedTarget),
+
+        // Then just go back up to stow
+        new InstantCommand(
+            () -> {
+              climb.setPositionTarget(ClimbTarget.STOW);
+            }));
+  }
+ 
   public boolean climbHitCage() {
     return climb.hitCage();
   }
