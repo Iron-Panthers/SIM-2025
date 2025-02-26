@@ -9,7 +9,11 @@ public interface CANWatchdogIO {
     return Stream.of(0);
   }
 
-  default int[] checkForMissingIds() {
+  default void threadFn() {}
+
+  default int[] missingDevices() {
     return new int[0];
   }
+
+  default void matchStarting() {}
 }

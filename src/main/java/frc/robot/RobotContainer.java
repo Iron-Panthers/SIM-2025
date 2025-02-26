@@ -173,6 +173,11 @@ public class RobotContainer {
     configureAutos();
   }
 
+  public void containerMatchStarting() {
+    //runs when match starts
+    canWatchdog.matchStarting();
+  }
+
   private void configureBindings() {
 
     // -----Driver Controls-----

@@ -50,10 +50,14 @@ public class RGB extends SubsystemBase {
   @Override
   public void periodic() {
     currentMessage = Optional.empty();
+    int total = 0;
     for (RGBMessages message : RGBMessages.values()) {
-      if (!message.rgbMessage.getIsExpired()) {
+      if (!message.rgbMessage.getIsExpired()
+          && (currentMessage.isPresent()
+              ? currentMessage.get().getPriority().compareTo(message.rgbMessage.getPriority()) > 0
+              : true)) {
         currentMessage = Optional.of(message.rgbMessage);
-        break;
+        total++;
       }
     }
     if (currentMessage.isPresent()) {
@@ -63,7 +67,7 @@ public class RGB extends SubsystemBase {
     }
     rgbIO.updateInputs(inputs);
     Logger.processInputs("RGB", inputs);
-
+    Logger.recordOutput("RGB/Total messages not expired", total);
     Logger.recordOutput(
         "RGB/Message",
         currentMessage.isPresent() ? currentMessage.get().getPriority().name() : "None");

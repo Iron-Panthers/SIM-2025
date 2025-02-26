@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class CANWatchdogConstants {
   public static final String REQUEST = "http://localhost:1250/?action=getdevices";
-  public static final int SCAN_DELAY_MS = 100;
+  public static final int SCAN_DELAY_MS = 97;
 
   public class CAN {
     private CAN() {}

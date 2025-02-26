@@ -33,6 +33,7 @@ public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
 
   private Command autoCommand;
+  private boolean matchStartingMethodCalled = false;
 
   public Robot() {
     // Record metadata
@@ -102,6 +103,11 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    if (!matchStartingMethodCalled) {
+      matchStartingMethodCalled = true;
+      robotContainer.containerMatchStarting();
+    }
+
     autoCommand = robotContainer.getAutoCommand();
     if (autoCommand != null) {
       autoCommand.schedule();
@@ -115,6 +121,10 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    if (!matchStartingMethodCalled) {
+      matchStartingMethodCalled = true;
+      robotContainer.containerMatchStarting();
+    }
     if (autoCommand != null) {
       autoCommand.cancel();
     }
