@@ -168,6 +168,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
+    configureAutos();
     configureBindings();
   }
 

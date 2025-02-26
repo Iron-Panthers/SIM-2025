@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Zero"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -30,27 +24,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Setup Intake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "IQ"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake"
           }
         },
         {
@@ -73,12 +49,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "JQ"
@@ -87,7 +57,7 @@
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }
