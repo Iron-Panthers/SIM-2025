@@ -4,12 +4,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -18,8 +20,11 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.DriveConstants;
+import frc.robot.subsystems.swerve.DriveConstants.ApproachPose;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /* based on wpimath/../PoseEstimator.java */
 public class RobotState {
@@ -35,7 +40,7 @@ public class RobotState {
   private static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
   private static final Pose2d initialPose =
       DriverStation.getAlliance().get() == Alliance.Red
-          ? mirrorPose(DriveConstants.INITAL_POSE)
+          ? FlippingUtil.flipFieldPose(DriveConstants.INITAL_POSE)
           : DriveConstants.INITAL_POSE;
 
   private final Matrix<N3, N1> matrixQ = new Matrix<>(Nat.N3(), Nat.N1());
@@ -136,6 +141,7 @@ public class RobotState {
 
     // apply Kalman-scaled vision adjustment, replay odometry data to get current estimate
     estimatedPose = sample.get().exp(scaledTwist).exp(sampleToOdometry);
+    odometryPose = estimatedPose;
   }
 
   public void addVisionMeasurement(VisionMeasurement measurement, Matrix<N3, N1> visionStdDevs) {
@@ -159,9 +165,43 @@ public class RobotState {
     return estimatedPose;
   }
 
-  public static Pose2d mirrorPose(Pose2d pose) {
-    return new Pose2d(
-        new Translation2d(fieldSizeX - pose.getX(), pose.getY()),
-        Rotation2d.kPi.minus(pose.getRotation()));
+  public ApproachPose findApproachPose() {
+    Pose2d currentPose = getEstimatedPose();
+
+    int closestIndex = 0;
+    // absolutely not
+    for (int i = 0; i < DriveConstants.REEF_APPROACH_POSES.length; ++i) {
+      if (currentPose
+              .getTranslation()
+              .getDistance(DriveConstants.REEF_APPROACH_POSES[i].getAlliancePose().getTranslation())
+          < currentPose
+              .getTranslation()
+              .getDistance(
+                  DriveConstants.REEF_APPROACH_POSES[closestIndex]
+                      .getAlliancePose()
+                      .getTranslation())) {
+        closestIndex = i;
+      }
+    }
+
+    Logger.recordOutput(
+        "RobotState/ApproachPose",
+        DriveConstants.REEF_APPROACH_POSES[closestIndex].getAlliancePose());
+
+    return DriveConstants.REEF_APPROACH_POSES[closestIndex];
+  }
+
+  public Command approachReefCommand() {
+    ApproachPose approachPose = findApproachPose();
+
+    return generateOTFPoseCommand(approachPose.getAlliancePose());
+  }
+
+  public static Command generateOTFPoseCommand(Pose2d pose) {
+    return AutoBuilder.pathfindToPose(pose, DriveConstants.PP_PATH_CONSTRAINTS);
+  }
+
+  public static Command generateOTFPathCommand(PathPlannerPath path) {
+    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.PP_PATH_CONSTRAINTS);
   }
 }

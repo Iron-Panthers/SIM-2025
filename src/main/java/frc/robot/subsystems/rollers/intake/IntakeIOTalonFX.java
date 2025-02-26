@@ -6,13 +6,11 @@ import frc.robot.subsystems.rollers.GenericRollersIOTalonFX;
 
 public class IntakeIOTalonFX extends GenericRollersIOTalonFX implements IntakeIO {
   private static final int id =
-      CAN.at(
-          switch (Constants.getRobotType()) {
-            case COMP -> 0; // 14
-            case ALPHA -> 14;
-            default -> 0;
-          },
-          "Intake");
+      switch (Constants.getRobotType()) {
+        case COMP -> 30;
+        case ALPHA -> 14;
+        default -> 0;
+      };
   private static final int currentLimitAmps =
       switch (Constants.getRobotType()) {
         case COMP -> 40;
