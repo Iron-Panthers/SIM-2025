@@ -31,7 +31,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
   public Climb(ClimbIO io) {
     super("Climb", io);
     inductionSensor = new DigitalInput(INDUCTION_PORT_NUMBER);
-    setPositionTarget(ClimbTarget.BOTTOM);
+    setPositionTarget(ClimbTarget.STOW);
     setControlMode(ControlMode.STOP);
   }
 

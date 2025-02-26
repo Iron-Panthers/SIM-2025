@@ -23,7 +23,6 @@ public class ClimbController extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     climb.periodic();
-    climb.setPositionTarget(ClimbTarget.TOP);
   }
 
   public Command setPositionTargetCommand(ClimbTarget target) {
