@@ -163,14 +163,15 @@ public class RobotContainer {
     if (pivot == null) {
       pivot = new Pivot(new PivotIO() {});
     }
-    }
+    
     if (canWatchdog == null) {
-
-    }
-      rgb = new RGB(new RGBIO() {});
-    if (rgb == null) {
-
       canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
+    }
+      
+    if (rgb == null) {
+      rgb = new RGB(new RGBIO() {});
+    }
+
     if (tongue == null) {
       tongue = new Tongue(new TongueIO() {});
     }
