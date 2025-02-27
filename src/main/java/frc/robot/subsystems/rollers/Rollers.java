@@ -18,7 +18,7 @@ public class Rollers extends SubsystemBase {
 
   private final Intake intake;
   private final RollerSensorsIO sensorsIO;
-  private double ejectTime = 0;
+  // private double ejectTime = 0;
   private double intakeTime = 0;
 
   private RollerState targetState = RollerState.IDLE;
@@ -57,12 +57,12 @@ public class Rollers extends SubsystemBase {
         intake.setVoltageTarget(Intake.Target.HOLD);
       }
       case EJECT -> {
-        ejectTime += 0.02;
+        // ejectTime += 0.02;
         intake.setVoltageTarget(Intake.Target.EJECT);
-        if (ejectTime > 0.5) {
-          this.targetState = RollerState.IDLE;
-          ejectTime = 0;
-        }
+        // if (ejectTime > 0.5) {
+        //   this.targetState = RollerState.IDLE;
+        //   ejectTime = 0;
+        // }
       }
     }
 

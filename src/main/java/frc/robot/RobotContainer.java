@@ -210,11 +210,29 @@ public class RobotContainer {
     //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
     // L1
-    new Trigger(() -> rollers.intakeDetected() && driverB.povDown().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
+    new Trigger(
+            () ->
+                (rollers.intakeDetected()
+                        || superstructure.getTargetState() == SuperstructureState.L2)
+                    && driverB.povDown().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L1)
+                .andThen(
+                    new InstantCommand(
+                        () -> superstructure.setCurrentState(SuperstructureState.L1))));
     // L2
-    new Trigger(() -> rollers.intakeDetected() && driverB.povRight().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
+    new Trigger(
+            () ->
+                (rollers.intakeDetected()
+                        || superstructure.getTargetState() == SuperstructureState.L1)
+                    && driverB.povRight().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L2)
+                .andThen(
+                    new InstantCommand(
+                        () -> superstructure.setCurrentState(SuperstructureState.L2))));
 
     new Trigger(
             () ->
@@ -275,7 +293,9 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+
     driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.TOP));
+
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L1)
