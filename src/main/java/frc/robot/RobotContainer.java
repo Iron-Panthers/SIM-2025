@@ -5,6 +5,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -93,7 +94,7 @@ public class RobotContainer {
           intake = new Intake(new IntakeIOTalonFX());
           // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
-          // pivot = new Pivot(new PivotIOTalonFX());
+          pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
         }
         case PROG -> {
@@ -159,13 +160,12 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
-
     nameCommands();
     configureAutos();
     configureBindings();
   }
 
-  private void nameCommands(){
+  private void nameCommands() {
     // Register Command Names
     NamedCommands.registerCommand(
         "Intake",
@@ -175,6 +175,14 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
+    new EventTrigger("Score_L4")
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+
+    new EventTrigger("Intake")
+        .onTrue(
+            new SequentialCommandGroup(
+                superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                rollers.setTargetCommand(RollerState.INTAKE)));
   }
 
   private void configureBindings() {
