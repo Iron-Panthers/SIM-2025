@@ -206,7 +206,7 @@ public class RobotContainer {
         .b()
         .whileTrue(
             RobotState.generateOTFPoseCommand(
-                FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
+                FlippingUtil.flipFieldPose(new Pose2d(2.95, 3.85, Rotation2d.kPi))));
 
     driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
 
