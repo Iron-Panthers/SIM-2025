@@ -11,15 +11,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "New New New Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New New New Path"
+                }
+              }
+            ]
           }
         },
         {

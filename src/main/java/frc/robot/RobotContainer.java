@@ -171,7 +171,7 @@ public class RobotContainer {
         "Intake",
         new SequentialCommandGroup(
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
-            rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+            rollers.setTargetCommand(RollerState.INTAKE)));
     NamedCommands.registerCommand(
         "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
@@ -290,7 +290,7 @@ public class RobotContainer {
         .onTrue(
             new SequentialCommandGroup(
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
-                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+                rollers.setTargetCommand(RollerState.INTAKE)));
 
     driverB
         .rightTrigger() // eject
