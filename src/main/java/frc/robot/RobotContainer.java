@@ -212,45 +212,33 @@ public class RobotContainer {
     // L1
     new Trigger(
             () ->
-                (rollers.intakeDetected()
-                        || superstructure.getTargetState() == SuperstructureState.L2)
+                ((rollers.intakeDetected()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povDown().getAsBoolean())
         .onTrue(
             superstructure
-                .goToStateCommand(SuperstructureState.L1)
-                .andThen(
-                    new InstantCommand(
-                        () -> superstructure.setCurrentState(SuperstructureState.L1))));
+                .goToStateCommand(SuperstructureState.L1));
     // L2
     new Trigger(
             () ->
-                (rollers.intakeDetected()
-                        || superstructure.getTargetState() == SuperstructureState.L1)
+                ((rollers.intakeDetected()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povRight().getAsBoolean())
         .onTrue(
             superstructure
-                .goToStateCommand(SuperstructureState.L2)
-                .andThen(
-                    new InstantCommand(
-                        () -> superstructure.setCurrentState(SuperstructureState.L2))));
-
+                .goToStateCommand(SuperstructureState.L2));
+    //Go to L3
     new Trigger(
             () ->
-                (rollers.intakeDetected()
-                        || superstructure.getTargetState() == SuperstructureState.SCORE_L3
-                        || superstructure.getTargetState() == SuperstructureState.SCORE_L4
-                        || superstructure.getTargetState() == SuperstructureState.SETUP_L3
-                        || superstructure.getTargetState() == SuperstructureState.SETUP_L4)
+                ((rollers.intakeDetected()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povLeft().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
-
+    //Go to L4
     new Trigger(
             () ->
-                (rollers.intakeDetected()
-                        || superstructure.getTargetState() == SuperstructureState.SCORE_L3
-                        || superstructure.getTargetState() == SuperstructureState.SCORE_L4
-                        || superstructure.getTargetState() == SuperstructureState.SETUP_L3
-                        || superstructure.getTargetState() == SuperstructureState.SETUP_L4)
+                ((rollers.intakeDetected()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povUp().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
@@ -262,12 +250,8 @@ public class RobotContainer {
                   superstructure.setCurrentState(SuperstructureState.ZERO);
                 },
                 superstructure));
-    // new ParallelCommandGroup(
-    //     elevator
-    //         .zeroingCommand()
-    //         .andThen(elevator.goToPositionCommand(ElevatorTarget.BOTTOM)),
-    //     pivot.zeroingCommand().andThen(pivot.goToPositionCommand(PivotTarget.TOP))));
-
+  
+    //Stop everything
     driverB
         .x()
         .onTrue(
@@ -278,14 +262,15 @@ public class RobotContainer {
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
-    driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
+    //kinda manual commands
+    driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
+    driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.TOP).alongWith(superstructure.oneTimeOverrideCommand()));
 
     // Manual override
     driverB
         .y()
         .onTrue(
-            new InstantCommand(
-                () -> superstructure.setCurrentState(superstructure.getTargetState())));
+          superstructure.oneTimeOverrideCommand());
 
     driverB // intake
         .leftTrigger()
@@ -294,8 +279,7 @@ public class RobotContainer {
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
 
-    driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.TOP));
-
+    //Eject on L1 and L2
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L1)
@@ -308,7 +292,7 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-
+    //Eject if not at L1 or L2
     new Trigger(
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
@@ -321,7 +305,7 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-
+    //Eject on L4 with sensors
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(
@@ -330,7 +314,7 @@ public class RobotContainer {
                 new WaitCommand(0.2),
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 new WaitCommand(0.9),
-                rollers.setTargetCommand(RollerState.INTAKE)));
+                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
     // new SequentialCommandGroup(
     //     new ParallelCommandGroup(
     //         elevator.goToPositionCommand(ElevatorTarget.SETUP_INTAKE),

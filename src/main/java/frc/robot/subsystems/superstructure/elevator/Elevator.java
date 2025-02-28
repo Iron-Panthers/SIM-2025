@@ -14,9 +14,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
     SCORE_L4(30),
     TOP(31),
     INTAKE(0);
-    // TEST_BOTTOM(2),
-    // TEST_TOP(31),
-    // TEST_MIDDLE(15); // FIXME
+
     private double position = 0;
 
     private ElevatorTarget(double position) {
@@ -36,7 +34,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
 
   public Elevator(ElevatorIO io) {
     super("Elevator", io);
-    setPositionTarget(ElevatorTarget.L3);
+    setPositionTarget(ElevatorTarget.INTAKE);
     setControlMode(ControlMode.STOP);
 
     // setup the linear filter

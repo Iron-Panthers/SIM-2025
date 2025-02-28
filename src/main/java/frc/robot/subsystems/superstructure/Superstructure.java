@@ -2,6 +2,7 @@ package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -34,6 +35,8 @@ public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final Pivot pivot;
   private final Tongue tongue;
+
+  private boolean overrideIsAtTarget = false;
 
   public Superstructure(Elevator elevator, Pivot pivot, Tongue tongue) {
     this.elevator = elevator;
@@ -320,9 +323,20 @@ public class Superstructure extends SubsystemBase {
    * @return if both subsystems in the superstructure have reached their target
    */
   public boolean superstructureReachedTarget() {
-    return elevator.reachedTarget()
-        && pivot.reachedTarget()
-        && currentState != SuperstructureState.ZERO;
+    boolean output = (elevator.reachedTarget()
+    && pivot.reachedTarget()
+    && currentState != SuperstructureState.ZERO) || overrideIsAtTarget;
+
+    overrideIsAtTarget = false;
+    return output;
+  }
+
+  public void oneTimeOverride(){
+    overrideIsAtTarget = true;
+  }
+
+  public Command oneTimeOverrideCommand(){
+    return new InstantCommand(()->oneTimeOverride());
   }
 
   public boolean tonguePoleDetected() {
