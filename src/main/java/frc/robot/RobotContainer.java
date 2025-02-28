@@ -159,6 +159,13 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
+
+    nameCommands();
+    configureAutos();
+    configureBindings();
+  }
+
+  private void nameCommands(){
     // Register Command Names
     NamedCommands.registerCommand(
         "Intake",
@@ -168,8 +175,6 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
-    configureAutos();
-    configureBindings();
   }
 
   private void configureBindings() {
