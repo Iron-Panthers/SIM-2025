@@ -166,15 +166,13 @@ public class RobotState {
   }
 
   public ApproachPose findApproachPose() {
-    Pose2d currentPose = getEstimatedPose();
-
     int closestIndex = 0;
     // absolutely not
     for (int i = 0; i < DriveConstants.REEF_APPROACH_POSES.length; ++i) {
-      if (currentPose
+      if (getEstimatedPose()
               .getTranslation()
               .getDistance(DriveConstants.REEF_APPROACH_POSES[i].getAlliancePose().getTranslation())
-          < currentPose
+          < getEstimatedPose()
               .getTranslation()
               .getDistance(
                   DriveConstants.REEF_APPROACH_POSES[closestIndex]
@@ -187,14 +185,13 @@ public class RobotState {
     Logger.recordOutput(
         "RobotState/ApproachPose",
         DriveConstants.REEF_APPROACH_POSES[closestIndex].getAlliancePose());
+    Logger.recordOutput("RobotState/ApproachPoseIndex", closestIndex);
 
     return DriveConstants.REEF_APPROACH_POSES[closestIndex];
   }
 
   public Command approachReefCommand() {
-    ApproachPose approachPose = findApproachPose();
-
-    return generateOTFPoseCommand(approachPose.getAlliancePose());
+    return generateOTFPoseCommand(findApproachPose().getAlliancePose());
   }
 
   public static Command generateOTFPoseCommand(Pose2d pose) {

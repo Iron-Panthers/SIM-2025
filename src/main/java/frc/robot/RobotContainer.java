@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.ApproachReef;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -197,27 +198,16 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA
-        .x()
-        .whileTrue(
-            RobotState.generateOTFPoseCommand(
-                RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
-    driverA
-        .b()
-        .whileTrue(
-            RobotState.generateOTFPoseCommand(
-                FlippingUtil.flipFieldPose(new Pose2d(2.95, 3.85, Rotation2d.kPi))));
+    driverA.y().whileTrue(new ApproachReef());
 
-    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
-
-    /*driverA
+    driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
         .b()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
     // driverA
     //     .y()
