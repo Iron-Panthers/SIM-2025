@@ -68,12 +68,11 @@ public class Rollers extends SubsystemBase {
       case EJECT_L2 -> {
         intake.setVoltageTarget(Intake.Target.EJECT_L2);
       }
-  }
-    if (intakeDetected()){
-      timeSinceStopped +=0.02;
     }
-    else{
-      timeSinceStopped =0;
+    if (intakeDetected()) {
+      timeSinceStopped += 0.02;
+    } else {
+      timeSinceStopped = 0;
     }
 
     intake.periodic();
@@ -100,7 +99,7 @@ public class Rollers extends SubsystemBase {
     return sensorsInputs.intakeDetected;
   }
 
-  public boolean readyToRaise(){
-    return intakeDetected() && timeSinceStopped>0.1;
+  public boolean readyToRaise() {
+    return intakeDetected() && timeSinceStopped > 0.1;
   }
 }

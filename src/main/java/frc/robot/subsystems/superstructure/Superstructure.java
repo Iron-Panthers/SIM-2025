@@ -323,20 +323,22 @@ public class Superstructure extends SubsystemBase {
    * @return if both subsystems in the superstructure have reached their target
    */
   public boolean superstructureReachedTarget() {
-    boolean output = (elevator.reachedTarget()
-    && pivot.reachedTarget()
-    && currentState != SuperstructureState.ZERO) || overrideIsAtTarget;
+    boolean output =
+        (elevator.reachedTarget()
+                && pivot.reachedTarget()
+                && currentState != SuperstructureState.ZERO)
+            || overrideIsAtTarget;
 
     overrideIsAtTarget = false;
     return output;
   }
 
-  public void oneTimeOverride(){
+  public void oneTimeOverride() {
     overrideIsAtTarget = true;
   }
 
-  public Command oneTimeOverrideCommand(){
-    return new InstantCommand(()->oneTimeOverride());
+  public Command oneTimeOverrideCommand() {
+    return new InstantCommand(() -> oneTimeOverride());
   }
 
   public boolean tonguePoleDetected() {
