@@ -4,19 +4,23 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
-import frc.robot.autonomous.PathCommand;
+import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
@@ -59,7 +63,6 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
-  private final Joystick joystick = new Joystick(2);
 
   private Drive swerve;
   private Vision vision;
@@ -74,6 +77,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     intake = null;
+
     if (Constants.getRobotMode() != Mode.REPLAY) {
       switch (Constants.getRobotType()) {
         case COMP -> {
@@ -84,10 +88,17 @@ public class RobotContainer {
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
-          vision = new Vision();
+          vision =
+              new Vision(
+                  new VisionIOPhotonvision(1),
+                  new VisionIOPhotonvision(2),
+                  new VisionIOPhotonvision(3),
+                  new VisionIOPhotonvision(4),
+                  new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
+          // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
-          pivot = new Pivot(new PivotIOTalonFX());
+          // pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
           climb = new Climb(new ClimbOTalonFX());
         }
@@ -111,11 +122,6 @@ public class RobotContainer {
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
-          vision =
-              new Vision(
-                  new VisionIOPhotonvision(1),
-                  new VisionIOPhotonvision(2),
-                  new VisionIOPhotonvision(3));
           intake = new Intake(new IntakeIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           elevator = new Elevator(new ElevatorIOTalonFX());
@@ -146,7 +152,7 @@ public class RobotContainer {
       vision = new Vision();
     }
 
-    rollers = new Rollers(intake);
+    rollers = new Rollers(intake, new RollerSensorsIOComp());
 
     if (elevator == null) {
       elevator = new Elevator(new ElevatorIO() {});
@@ -165,7 +171,6 @@ public class RobotContainer {
     climbController = new ClimbController(climb);
 
     configureBindings();
-    configureAutos();
   }
 
   private void configureBindings() {
@@ -205,39 +210,50 @@ public class RobotContainer {
 
     driverA
         .x()
+        .whileTrue(
+            RobotState.generateOTFPoseCommand(
+                RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
+    driverA
+        .b()
+        .whileTrue(
+            RobotState.generateOTFPoseCommand(
+                FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
+
+    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
+
+    /*driverA
+        .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
         .b()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
 
     // driverA
     //     .y()
     //     .onTrue(
     //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
-    driverB // GO TO BOTTOM
-        .povDown()
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
+    // driverB // GO TO L1
+    //     .povDown()
+    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
 
-    driverB // GO TO L2
-        .povRight()
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
-    driverB // GO TO L3
-        .povLeft()
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L3));
+    // driverB // GO TO L2
+    //     .povRight()
+    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
+    new Trigger(() -> rollers.intakeDetected() && driverB.povLeft().getAsBoolean())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
 
-    driverB // GO TO L4
-        .povUp()
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L4));
+    new Trigger(() -> rollers.intakeDetected() && driverB.povUp().getAsBoolean())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
     driverB // ZERO our mechanism
         .a()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  superstructure.setTargetState(SuperstructureState.ZERO);
+                  superstructure.setCurrentState(SuperstructureState.ZERO);
                 },
                 superstructure));
     // new ParallelCommandGroup(
@@ -251,7 +267,8 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  // superstructure.setTargetState(SuperstructureState.STOP);
+                  superstructure.setStopped(true);
+                  ;
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
@@ -273,7 +290,6 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-
     RobotConfig robotConfig;
     try {
       robotConfig = RobotConfig.fromGUISettings();
@@ -297,12 +313,17 @@ public class RobotContainer {
           return false;
         };
 
-    AutoBuilder.configureCustom(
-        (path) -> new PathCommand(path, flipAlliance, swerve, passRobotConfig),
+    AutoBuilder.configure(
         () -> RobotState.getInstance().getEstimatedPose(),
         (pose) -> RobotState.getInstance().resetPose(pose),
+        () -> swerve.getRobotSpeeds(),
+        (speeds) -> {
+          swerve.setTrajectorySpeeds(speeds);
+        },
+        DriveConstants.HOLONOMIC_DRIVE_CONTROLLER,
+        passRobotConfig,
         flipAlliance,
-        true);
+        swerve);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
