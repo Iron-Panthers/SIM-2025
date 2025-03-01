@@ -12,7 +12,9 @@ public class Rollers extends SubsystemBase {
     IDLE,
     INTAKE,
     FORCE_INTAKE,
-    EJECT,
+    EJECT_TOP,
+    EJECT_L1,
+    EJECT_L2,
     HOLD
   }
 
@@ -57,13 +59,14 @@ public class Rollers extends SubsystemBase {
       case HOLD -> {
         intake.setVoltageTarget(Intake.Target.HOLD);
       }
-      case EJECT -> {
-        // ejectTime += 0.02;
-        intake.setVoltageTarget(Intake.Target.EJECT);
-        // if (ejectTime > 0.5) {
-        //   this.targetState = RollerState.IDLE;
-        //   ejectTime = 0;
-        // }
+      case EJECT_TOP -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_TOP);
+      }
+      case EJECT_L1 -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_L1);
+      }
+      case EJECT_L2 -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_L2);
       }
   }
     if (intakeDetected()){

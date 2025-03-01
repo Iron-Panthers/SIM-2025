@@ -279,19 +279,30 @@ public class RobotContainer {
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
 
-    //Eject on L1 and L2
+    //Eject on L1
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L1)
-                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                (superstructure.getTargetState().equals(SuperstructureState.L1))
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
-                .setTargetCommand(RollerState.INTAKE)
+                .setTargetCommand(RollerState.EJECT_L1)
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    //Eject L2
+    new Trigger(
+      () ->
+          (superstructure.getTargetState().equals(SuperstructureState.L2))
+              && driverB.rightTrigger().getAsBoolean())
+          .onTrue(
+              rollers
+                  .setTargetCommand(RollerState.EJECT_L2)
+                  .andThen(
+                      new WaitCommand(0.5)
+                          .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                          .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
     //Eject if not at L1 or L2
     new Trigger(
             () ->
@@ -300,7 +311,7 @@ public class RobotContainer {
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
-                .setTargetCommand(RollerState.EJECT)
+                .setTargetCommand(RollerState.EJECT_TOP)
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
@@ -310,7 +321,7 @@ public class RobotContainer {
         .onTrue(
             new SequentialCommandGroup(
                 new WaitCommand(0.1),
-                rollers.setTargetCommand(RollerState.EJECT),
+                rollers.setTargetCommand(RollerState.EJECT_TOP),
                 new WaitCommand(0.2),
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 new WaitCommand(0.9),
