@@ -124,7 +124,7 @@ public class DriveConstants {
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
-            new PIDConstants(13, 0), new PIDConstants(11, 0));
+            new PIDConstants(8, 0), new PIDConstants(11, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
@@ -150,6 +150,12 @@ public class DriveConstants {
   public static final PathConstraints PP_PATH_CONSTRAINTS =
       new PathConstraints(
           3, 3, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+
+  public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
+      new PathConstraints(
+          0.75, 2, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+
+  public static final Translation2d BLUE_REEF_ORIGIN = new Translation2d(4.5, 4.025);
 
   // blue alliance, will automatically flip, clockwise from top right (vertical)
   public static final ApproachPose[] REEF_APPROACH_POSES =

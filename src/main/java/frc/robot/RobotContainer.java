@@ -4,11 +4,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -198,16 +195,17 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA.y().whileTrue(new ApproachReef());
+    driverA.a().whileTrue(new ApproachReef(0.3048, false));
+    driverA.b().whileTrue(new ApproachReef(0.3048, true));
 
-    driverA
+    /*driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
         .b()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
 
     // driverA
     //     .y()
