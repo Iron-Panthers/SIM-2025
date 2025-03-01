@@ -88,9 +88,8 @@ public class RobotContainer {
                   new VisionIOPhotonvision(4),
                   new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
-          // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
-          // pivot = new Pivot(new PivotIOTalonFX());
+          pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
         }
         case PROG -> {
@@ -198,14 +197,14 @@ public class RobotContainer {
     driverA.a().whileTrue(new ApproachReef(0.3048, false));
     driverA.b().whileTrue(new ApproachReef(0.3048, true));
 
-    /*driverA
+    driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
-        .b()
+        .y()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
     // driverA
     //     .y()
