@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
-import frc.robot.autonomous.PathCommand;
+import frc.robot.commands.ApproachReef;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -88,7 +88,6 @@ public class RobotContainer {
                   new VisionIOPhotonvision(4),
                   new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
-          // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
@@ -156,8 +155,8 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
-    configureBindings();
     configureAutos();
+    configureBindings();
   }
 
   private void configureBindings() {
@@ -195,12 +194,15 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
+    driverA.a().whileTrue(new ApproachReef(0.3048, false));
+    driverA.b().whileTrue(new ApproachReef(0.3048, true));
+
     driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
-        .b()
+        .y()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
@@ -212,32 +214,28 @@ public class RobotContainer {
     // L1
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povDown().getAsBoolean())
-        .onTrue(
-            superstructure
-                .goToStateCommand(SuperstructureState.L1));
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
     // L2
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povRight().getAsBoolean())
-        .onTrue(
-            superstructure
-                .goToStateCommand(SuperstructureState.L2));
-    //Go to L3
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
+    // Go to L3
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povLeft().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
-    //Go to L4
+    // Go to L4
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povUp().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
@@ -250,8 +248,8 @@ public class RobotContainer {
                   superstructure.setCurrentState(SuperstructureState.ZERO);
                 },
                 superstructure));
-  
-    //Stop everything
+
+    // Stop everything
     driverB
         .x()
         .onTrue(
@@ -262,15 +260,17 @@ public class RobotContainer {
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
-    //kinda manual commands
+    // kinda manual commands
     driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
-    driverB.b().onTrue(superstructure.goToStateCommand(SuperstructureState.TOP).alongWith(superstructure.oneTimeOverrideCommand()));
+    driverB
+        .b()
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.TOP)
+                .alongWith(superstructure.oneTimeOverrideCommand()));
 
     // Manual override
-    driverB
-        .y()
-        .onTrue(
-          superstructure.oneTimeOverrideCommand());
+    driverB.y().onTrue(superstructure.oneTimeOverrideCommand());
 
     driverB // intake
         .leftTrigger()
@@ -279,20 +279,31 @@ public class RobotContainer {
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
 
-    //Eject on L1 and L2
+    // Eject on L1
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L1)
-                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                (superstructure.getTargetState().equals(SuperstructureState.L1))
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
-                .setTargetCommand(RollerState.INTAKE)
+                .setTargetCommand(RollerState.EJECT_L1)
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    //Eject if not at L1 or L2
+    // Eject L2
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.L2))
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_L2)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2
     new Trigger(
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
@@ -300,17 +311,17 @@ public class RobotContainer {
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
-                .setTargetCommand(RollerState.EJECT)
+                .setTargetCommand(RollerState.EJECT_TOP)
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    //Eject on L4 with sensors
+    // Eject on L4 with sensors
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(
                 new WaitCommand(0.1),
-                rollers.setTargetCommand(RollerState.EJECT),
+                rollers.setTargetCommand(RollerState.EJECT_TOP),
                 new WaitCommand(0.2),
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 new WaitCommand(0.9),
@@ -339,7 +350,6 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-
     RobotConfig robotConfig;
     try {
       robotConfig = RobotConfig.fromGUISettings();
@@ -363,12 +373,17 @@ public class RobotContainer {
           return false;
         };
 
-    AutoBuilder.configureCustom(
-        (path) -> new PathCommand(path, flipAlliance, swerve, passRobotConfig),
+    AutoBuilder.configure(
         () -> RobotState.getInstance().getEstimatedPose(),
         (pose) -> RobotState.getInstance().resetPose(pose),
+        () -> swerve.getRobotSpeeds(),
+        (speeds) -> {
+          swerve.setTrajectorySpeeds(speeds);
+        },
+        DriveConstants.HOLONOMIC_DRIVE_CONTROLLER,
+        passRobotConfig,
         flipAlliance,
-        true);
+        swerve);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

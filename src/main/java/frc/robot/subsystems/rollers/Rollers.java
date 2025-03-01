@@ -12,7 +12,9 @@ public class Rollers extends SubsystemBase {
     IDLE,
     INTAKE,
     FORCE_INTAKE,
-    EJECT,
+    EJECT_TOP,
+    EJECT_L1,
+    EJECT_L2,
     HOLD
   }
 
@@ -20,6 +22,7 @@ public class Rollers extends SubsystemBase {
   private final RollerSensorsIO sensorsIO;
   // private double ejectTime = 0;
   private double intakeTime = 0;
+  private double timeSinceStopped = 0;
 
   private RollerState targetState = RollerState.IDLE;
   private RollerSensorsIOInputsAutoLogged sensorsInputs = new RollerSensorsIOInputsAutoLogged();
@@ -56,14 +59,20 @@ public class Rollers extends SubsystemBase {
       case HOLD -> {
         intake.setVoltageTarget(Intake.Target.HOLD);
       }
-      case EJECT -> {
-        // ejectTime += 0.02;
-        intake.setVoltageTarget(Intake.Target.EJECT);
-        // if (ejectTime > 0.5) {
-        //   this.targetState = RollerState.IDLE;
-        //   ejectTime = 0;
-        // }
+      case EJECT_TOP -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_TOP);
       }
+      case EJECT_L1 -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_L1);
+      }
+      case EJECT_L2 -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_L2);
+      }
+    }
+    if (intakeDetected()) {
+      timeSinceStopped += 0.02;
+    } else {
+      timeSinceStopped = 0;
     }
 
     intake.periodic();
@@ -88,5 +97,9 @@ public class Rollers extends SubsystemBase {
 
   public boolean intakeDetected() {
     return sensorsInputs.intakeDetected;
+  }
+
+  public boolean readyToRaise() {
+    return intakeDetected() && timeSinceStopped > 0.1;
   }
 }
