@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
-import frc.robot.autonomous.PathCommand;
+import frc.robot.commands.ApproachReef;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -88,7 +88,6 @@ public class RobotContainer {
                   new VisionIOPhotonvision(4),
                   new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
-          // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
@@ -156,8 +155,8 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
-    configureBindings();
     configureAutos();
+    configureBindings();
   }
 
   private void configureBindings() {
@@ -195,12 +194,15 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
+    driverA.a().whileTrue(new ApproachReef(0.3048, false));
+    driverA.b().whileTrue(new ApproachReef(0.3048, true));
+
     driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
-        .b()
+        .y()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
@@ -348,7 +350,6 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-
     RobotConfig robotConfig;
     try {
       robotConfig = RobotConfig.fromGUISettings();
@@ -372,12 +373,17 @@ public class RobotContainer {
           return false;
         };
 
-    AutoBuilder.configureCustom(
-        (path) -> new PathCommand(path, flipAlliance, swerve, passRobotConfig),
+    AutoBuilder.configure(
         () -> RobotState.getInstance().getEstimatedPose(),
         (pose) -> RobotState.getInstance().resetPose(pose),
+        () -> swerve.getRobotSpeeds(),
+        (speeds) -> {
+          swerve.setTrajectorySpeeds(speeds);
+        },
+        DriveConstants.HOLONOMIC_DRIVE_CONTROLLER,
+        passRobotConfig,
         flipAlliance,
-        true);
+        swerve);
 
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

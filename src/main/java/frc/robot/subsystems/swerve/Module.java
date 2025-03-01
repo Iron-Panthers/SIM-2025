@@ -26,16 +26,8 @@ public class Module {
     targetState.cosineScale(getSteerHeading());
     moduleIO.runSteerPositionSetpoint(targetState.angle.getRadians());
 
-    /* Back out the expected shimmy the drive motor will see */
-    /* Find the angular rate to determine what to back out */
-    double azimuthTurnRps = inputs.steerVelocityRadsPerSec;
-    /* Azimuth turn rate multiplied by coupling ratio provides back-out rps */
-    double driveRateBackOut = 0;
-    //        azimuthTurnRps * DriveConstants.MODULE_CONSTANTS.couplingGearReduction();
-
     double driveVelocityRads =
-        ((targetState.speedMetersPerSecond) / DriveConstants.DRIVE_CONFIG.wheelRadius())
-            + driveRateBackOut;
+        ((targetState.speedMetersPerSecond) / DriveConstants.DRIVE_CONFIG.wheelRadius());
 
     moduleIO.runDriveVelocitySetpoint(driveVelocityRads);
 

@@ -13,6 +13,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -35,6 +40,16 @@ public class Robot extends LoggedRobot {
   private Command autoCommand;
 
   public Robot() {
+    Pathfinding.setPathfinder(new LocalADStarAK());
+
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (pose) -> Logger.recordOutput("PathPlanner/TargetPose", pose));
+    PathPlannerLogging.setLogCurrentPoseCallback(
+        (pose) -> Logger.recordOutput("PathPlanner/CurrentPose", pose));
+    PathPlannerLogging.setLogActivePathCallback(
+        (path) ->
+            Logger.recordOutput("PathPlanner/ActivePath", path.toArray(new Pose2d[path.size()])));
+
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -79,6 +94,9 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     robotContainer = new RobotContainer();
+
+    FollowPathCommand.warmupCommand().schedule();
+    PathfindingCommand.warmupCommand().schedule();
   }
 
   /** This function is called periodically during all modes. */
