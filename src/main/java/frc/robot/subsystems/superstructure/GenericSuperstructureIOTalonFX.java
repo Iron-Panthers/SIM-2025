@@ -69,6 +69,7 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
       double supplyCurrentLimit,
       Optional<Integer> canCoderID,
       Optional<Double> canCoderOffset,
+      Optional<SensorDirectionValue> direction,
       double reduction,
       Optional<Double> upperLimit,
       Optional<Double> lowerLimit,
@@ -121,7 +122,10 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
               new CANcoderConfiguration()
                   .withMagnetSensor(
                       new MagnetSensorConfigs()
-                          .withSensorDirection(SensorDirectionValue.Clockwise_Positive)
+                          .withSensorDirection(
+                              direction.isPresent()
+                                  ? direction.get()
+                                  : SensorDirectionValue.Clockwise_Positive)
                           .withMagnetOffset(
                               canCoderOffset.isPresent() ? canCoderOffset.get() : 0)));
 

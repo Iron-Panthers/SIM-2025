@@ -52,7 +52,7 @@ public class ClimbController extends SubsystemBase {
               climb.setPositionTarget(ClimbTarget.STOW);
             }));
   }
- 
+
   public boolean climbHitCage() {
     return climb.hitCage();
   }

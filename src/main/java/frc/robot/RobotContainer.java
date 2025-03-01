@@ -251,7 +251,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  superstructure.setTargetState(SuperstructureState.STOP);
+                  // superstructure.setTargetState(SuperstructureState.STOP);
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
@@ -262,9 +262,14 @@ public class RobotContainer {
                 ClimbTarget.TOP) // FIXME: We need to add elevator position up
             );
 
-    driverB.b().onTrue(climbController.setPositionTargetCommand(ClimbTarget.BOTTOM));
+    driverB
+        .b()
+        .onTrue(
+            climbController
+                .setPositionTargetCommand(ClimbTarget.BOTTOM)
+                .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
 
-    driverB.rightTrigger().onTrue(climbController.clearCoral());
+    // driverB.rightTrigger().onTrue(climbController.clearCoral());
   }
 
   private void configureAutos() {

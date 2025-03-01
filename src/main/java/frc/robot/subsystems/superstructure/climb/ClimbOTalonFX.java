@@ -16,6 +16,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         SUPPLY_CURRENT_LIMIT,
         CLIMB_CONFIG.canCoderID(),
         CLIMB_CONFIG.canCoderOffset(),
+        CANCODER_DIRECTION,
         CLIMB_CONFIG.reduction(),
         UPPER_EXTENSION_LIMIT,
         LOWER_EXTENSION_LIMIT,

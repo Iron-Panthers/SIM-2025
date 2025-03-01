@@ -22,6 +22,7 @@ public class Superstructure extends SubsystemBase {
     TOP, // Apex
     INTAKE,
     STOW, // Going to the lowest position
+    CLIMB,
     ZERO, // Zero the motor
     STOP; // Stop the superstructure
   }
@@ -124,6 +125,8 @@ public class Superstructure extends SubsystemBase {
           } else if (targetState == SuperstructureState.L1
               || targetState == SuperstructureState.L2) {
             this.currentState = SuperstructureState.L1;
+          } else if (targetState == SuperstructureState.CLIMB) {
+            this.currentState = SuperstructureState.CLIMB;
           } else if (targetState != currentState) {
             this.currentState = SuperstructureState.TOP;
           }
@@ -135,6 +138,17 @@ public class Superstructure extends SubsystemBase {
         tongue.setPositionTarget(TongueTarget.INTAKE);
 
         // check for state transitions
+        if (this.superstructureReachedTarget()) {
+          if (targetState != currentState) {
+            this.currentState = SuperstructureState.STOW;
+          }
+        }
+      }
+      case CLIMB -> {
+        elevator.setPositionTarget(ElevatorTarget.CLIMB);
+        pivot.setPositionTarget(PivotTarget.INTAKE);
+        tongue.setPositionTarget(TongueTarget.INTAKE);
+
         if (this.superstructureReachedTarget()) {
           if (targetState != currentState) {
             this.currentState = SuperstructureState.STOW;

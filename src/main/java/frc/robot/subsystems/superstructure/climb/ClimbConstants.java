@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure.climb;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.robot.Constants;
 import java.util.Optional;
 
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class ClimbConstants {
   public static final ClimbConfig CLIMB_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new ClimbConfig(37, 2.5, Optional.of(29), Optional.of(0.65)); // FIXME
+        case COMP -> new ClimbConfig(37, 2.5, Optional.of(29), Optional.of(0d)); // FIXME
         case PROG -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
         case ALPHA -> new ClimbConfig(0, 0, Optional.empty(), Optional.empty()); // FIXME
         case SIM -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty()); // FIXME
@@ -48,6 +49,8 @@ public class ClimbConstants {
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
   public static final boolean INVERT_MOTOR = true;
+  public static final Optional<SensorDirectionValue> CANCODER_DIRECTION =
+      Optional.of(SensorDirectionValue.CounterClockwise_Positive);
 
   public static final double POSITION_TARGET_EPSILON = 0.03;
 

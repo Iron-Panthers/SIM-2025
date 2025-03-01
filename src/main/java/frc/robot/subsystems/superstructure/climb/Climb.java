@@ -10,7 +10,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
   public enum ClimbTarget implements GenericSuperstructure.PositionTarget {
 
     // "Bottom" is ready to ram into cage
-    BOTTOM(0.15), // FIXME: Just a placeholder value
+    BOTTOM(0.07), // FIXME: Just a placeholder value
 
     // "Top" is apex of climb
     TOP(0.25), // FIXME: Just a placeholder value
