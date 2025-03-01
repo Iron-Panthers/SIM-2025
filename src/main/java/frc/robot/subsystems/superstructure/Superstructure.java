@@ -230,8 +230,14 @@ public class Superstructure extends SubsystemBase {
             elevator.setControlMode(ControlMode.POSITION);
             elevator.setZeroing(false);
 
-            setTargetState(SuperstructureState.STOW);
-            setCurrentState(SuperstructureState.STOW);
+            if(pivot.getPositionTarget() == PivotTarget.ZERO_HIGH){
+              setTargetState(SuperstructureState.TOP);
+              setCurrentState(SuperstructureState.TOP);
+            }else{
+              setTargetState(SuperstructureState.STOW);
+              setCurrentState(SuperstructureState.STOW);
+            }
+
           }
         }
       }

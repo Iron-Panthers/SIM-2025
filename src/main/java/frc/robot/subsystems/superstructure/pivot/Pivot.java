@@ -14,7 +14,7 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     SCORE_L3(111),
     SETUP_L3(90),
     ZERO_LOW(-95.2),
-    ZERO_HIGH(90);
+    ZERO_HIGH(90),
     SETUP_L4(146),
     SCORE_L4(149);
 
