@@ -13,6 +13,8 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     L2(-110),
     SCORE_L3(111),
     SETUP_L3(90),
+    ZERO_LOW(-95.2),
+    ZERO_HIGH(90);
     SETUP_L4(146),
     SCORE_L4(149);
 
@@ -41,5 +43,9 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
   public boolean reachedTarget() {
     return Math.abs(super.getPosition() - (super.getPositionTarget().getPosition() / 360d))
         <= superstructureIO.getPositionTargetEpsilon();
+  }
+
+  public double getPosition(){
+    return super.getPosition() * 360.0;
   }
 }

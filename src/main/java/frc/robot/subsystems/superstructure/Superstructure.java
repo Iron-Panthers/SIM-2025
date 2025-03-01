@@ -9,6 +9,7 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.pivot.Pivot;
+import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.pivot.Pivot.PivotTarget;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
@@ -203,9 +204,24 @@ public class Superstructure extends SubsystemBase {
           }
         }
         case ZERO -> {
-          pivot.setPositionTarget(PivotTarget.STOW);
-          elevator.setZeroing(true);
+          // zeroing system for not killing the robot on zero
+          
+          // set our pivot pos
+          if(pivot.getPosition() < PivotConstants.ZEROING_HIGH_THRESHOLD){
+            pivot.setPositionTarget(PivotTarget.ZERO_LOW);
+          }else{
+            pivot.setPositionTarget(PivotTarget.ZERO_HIGH);
+          }
           tongue.setPositionTarget(TongueTarget.STOW);
+
+          // wait for pivot to go to safe pos before zeroing
+          if(pivot.reachedTarget()){
+            elevator.setZeroing(true);
+          }else{
+            elevator.setZeroing(false);
+          }
+
+          // check if we have have hit our hardstop, if so we can zero the elevator
           if (elevator.getFilteredSupplyCurrentAmps()
               > ElevatorConstants
                   .ZEROING_VOLTAGE_THRESHOLD) { // check if the elevator is done zeroing and set
