@@ -212,7 +212,7 @@ public class RobotContainer {
     // L1
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povDown().getAsBoolean())
         .onTrue(
@@ -221,7 +221,7 @@ public class RobotContainer {
     // L2
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povRight().getAsBoolean())
         .onTrue(
@@ -230,14 +230,14 @@ public class RobotContainer {
     //Go to L3
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povLeft().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
     //Go to L4
     new Trigger(
             () ->
-                ((rollers.intakeDetected()
+                ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povUp().getAsBoolean())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));

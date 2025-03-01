@@ -20,6 +20,7 @@ public class Rollers extends SubsystemBase {
   private final RollerSensorsIO sensorsIO;
   // private double ejectTime = 0;
   private double intakeTime = 0;
+  private double timeSinceStopped = 0;
 
   private RollerState targetState = RollerState.IDLE;
   private RollerSensorsIOInputsAutoLogged sensorsInputs = new RollerSensorsIOInputsAutoLogged();
@@ -64,6 +65,12 @@ public class Rollers extends SubsystemBase {
         //   ejectTime = 0;
         // }
       }
+  }
+    if (intakeDetected()){
+      timeSinceStopped +=0.02;
+    }
+    else{
+      timeSinceStopped =0;
     }
 
     intake.periodic();
@@ -88,5 +95,9 @@ public class Rollers extends SubsystemBase {
 
   public boolean intakeDetected() {
     return sensorsInputs.intakeDetected;
+  }
+
+  public boolean readyToRaise(){
+    return intakeDetected() && timeSinceStopped>0.1;
   }
 }
