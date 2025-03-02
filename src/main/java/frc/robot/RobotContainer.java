@@ -10,11 +10,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
+import frc.robot.commands.ApproachReef;
+import frc.robot.commands.VibrateHIDCommand;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -91,7 +97,6 @@ public class RobotContainer {
                   new VisionIOPhotonvision(4),
                   new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
-          // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
@@ -204,27 +209,18 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    // driverA
-    //     .x()
-    //     .whileTrue(
-    //         RobotState.generateOTFPoseCommand(
-    //             RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
-    // driverA
-    //     .b()
-    //     .whileTrue(
-    //         RobotState.generateOTFPoseCommand(
-    //             FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
+    driverA.rightBumper().whileTrue(new ApproachReef(0.3048, false));
+    driverA.leftBumper().whileTrue(new ApproachReef(0.3048, true));
 
-    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
-
-    /*driverA
+    driverA
         .x()
+    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
         .b()
         .onTrue(
-            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));*/
+            new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
     // driverA
     //     .y()
@@ -327,6 +323,19 @@ public class RobotContainer {
 
   public Command getAutoCommand() {
     return autoChooser.getSelected();
+  }
+
+  public void teleopInit() {
+    // runs when teleop happens
+    CommandScheduler.getInstance()
+        .schedule(new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 5, .5)));
+
+    // vibrate controller at 30 seconds left
+    CommandScheduler.getInstance()
+        .schedule(
+            new WaitCommand(105)
+                .andThen(
+                    new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 3, 0.4))));
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {

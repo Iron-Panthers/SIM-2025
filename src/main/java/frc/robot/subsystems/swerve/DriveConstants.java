@@ -124,7 +124,7 @@ public class DriveConstants {
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
-            new PIDConstants(13, 0), new PIDConstants(11, 0));
+            new PIDConstants(8, 0), new PIDConstants(11, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
@@ -151,10 +151,27 @@ public class DriveConstants {
       new PathConstraints(
           3, 3, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
 
-  // blue alliance, will automatically flip
+  public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
+      new PathConstraints(
+          0.75, 2, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+
+  public static final Translation2d BLUE_REEF_ORIGIN = new Translation2d(4.5, 4.025);
+
+  // blue alliance, will automatically flip, clockwise from top right (vertical)
   public static final ApproachPose[] REEF_APPROACH_POSES =
       ApproachPose.fromPose2ds(
-          new Pose2d(5.65, 4.175, Rotation2d.kPi), new Pose2d(5.65, 3.85, Rotation2d.kPi));
+          new Pose2d(6.05, 4.175, Rotation2d.kZero),
+          new Pose2d(6.05, 3.85, Rotation2d.kZero),
+          new Pose2d(5.4, 2.775, Rotation2d.fromDegrees(-60)),
+          new Pose2d(5.1, 2.6, Rotation2d.fromDegrees(-60)),
+          new Pose2d(3.85, 2.625, Rotation2d.fromDegrees(-120)),
+          new Pose2d(3.575, 2.775, Rotation2d.fromDegrees(-120)),
+          new Pose2d(2.95, 3.85, Rotation2d.kPi),
+          new Pose2d(2.95, 4.175, Rotation2d.kPi),
+          new Pose2d(3.575, 5.275, Rotation2d.fromDegrees(120)),
+          new Pose2d(3.85, 5.45, Rotation2d.fromDegrees(120)),
+          new Pose2d(5.1, 5.45, Rotation2d.fromDegrees(60)),
+          new Pose2d(5.4, 5.275, Rotation2d.fromDegrees(60)));
 
   public record DrivebaseConfig(
       double wheelRadius,
