@@ -45,7 +45,7 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
         <= superstructureIO.getPositionTargetEpsilon();
   }
 
-  public double getPosition(){
+  public double getPosition() {
     return super.getPosition() * 360.0;
   }
 }

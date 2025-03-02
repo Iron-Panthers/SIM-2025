@@ -320,7 +320,7 @@ public class RobotContainer {
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(
-                new WaitCommand(0.1),
+                // new WaitCommand(0.1),
                 rollers.setTargetCommand(RollerState.EJECT_TOP),
                 new WaitCommand(0.2),
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),

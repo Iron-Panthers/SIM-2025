@@ -9,8 +9,8 @@ import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.pivot.Pivot;
-import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.pivot.Pivot.PivotTarget;
+import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
 import org.littletonrobotics.junction.Logger;
@@ -205,19 +205,19 @@ public class Superstructure extends SubsystemBase {
         }
         case ZERO -> {
           // zeroing system for not killing the robot on zero
-          
+
           // set our pivot pos
-          if(pivot.getPosition() < PivotConstants.ZEROING_HIGH_THRESHOLD){
+          if (pivot.getPosition() < PivotConstants.ZEROING_HIGH_THRESHOLD) {
             pivot.setPositionTarget(PivotTarget.ZERO_LOW);
-          }else{
+          } else {
             pivot.setPositionTarget(PivotTarget.ZERO_HIGH);
           }
           tongue.setPositionTarget(TongueTarget.STOW);
 
           // wait for pivot to go to safe pos before zeroing
-          if(pivot.reachedTarget()){
+          if (pivot.reachedTarget()) {
             elevator.setZeroing(true);
-          }else{
+          } else {
             elevator.setZeroing(false);
           }
 
@@ -230,14 +230,13 @@ public class Superstructure extends SubsystemBase {
             elevator.setControlMode(ControlMode.POSITION);
             elevator.setZeroing(false);
 
-            if(pivot.getPositionTarget() == PivotTarget.ZERO_HIGH){
-              setTargetState(SuperstructureState.TOP);
+            if (pivot.getPositionTarget() == PivotTarget.ZERO_HIGH) {
+              setTargetState(SuperstructureState.STOW);
               setCurrentState(SuperstructureState.TOP);
-            }else{
+            } else {
               setTargetState(SuperstructureState.STOW);
               setCurrentState(SuperstructureState.STOW);
             }
-
           }
         }
       }
