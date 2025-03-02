@@ -170,25 +170,15 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.INTAKE) {
-              setCurrentState(SuperstructureState.INTAKE);
-            } else if (targetState == SuperstructureState.L1) {
-              setCurrentState(SuperstructureState.L1);
-            } else if (targetState == SuperstructureState.L2) {
-              setCurrentState(SuperstructureState.L2);
+              this.currentState = SuperstructureState.INTAKE;
+            } else if (targetState == SuperstructureState.L1
+                || targetState == SuperstructureState.L2) {
+              this.currentState = SuperstructureState.L1;
+            } else if (targetState == SuperstructureState.CLIMB) {
+              this.currentState = SuperstructureState.CLIMB;
             } else if (targetState != currentState) {
-              setCurrentState(SuperstructureState.TOP);
+              this.currentState = SuperstructureState.TOP;
             }
-        // check for state transitions
-        if (this.superstructureReachedTarget()) {
-          if (targetState == SuperstructureState.INTAKE) {
-            this.currentState = SuperstructureState.INTAKE;
-          } else if (targetState == SuperstructureState.L1
-              || targetState == SuperstructureState.L2) {
-            this.currentState = SuperstructureState.L1;
-          } else if (targetState == SuperstructureState.CLIMB) {
-            this.currentState = SuperstructureState.CLIMB;
-          } else if (targetState != currentState) {
-            this.currentState = SuperstructureState.TOP;
           }
         }
         case INTAKE -> {
@@ -208,18 +198,17 @@ public class Superstructure extends SubsystemBase {
             }
           }
         }
-      }
-      case CLIMB -> {
-        elevator.setPositionTarget(ElevatorTarget.CLIMB);
-        pivot.setPositionTarget(PivotTarget.INTAKE);
-        tongue.setPositionTarget(TongueTarget.INTAKE);
+        case CLIMB -> {
+          elevator.setPositionTarget(ElevatorTarget.CLIMB);
+          pivot.setPositionTarget(PivotTarget.INTAKE);
+          tongue.setPositionTarget(TongueTarget.INTAKE);
 
-        if (this.superstructureReachedTarget()) {
-          if (targetState != currentState) {
-            this.currentState = SuperstructureState.STOW;
+          if (this.superstructureReachedTarget()) {
+            if (targetState != currentState) {
+              this.currentState = SuperstructureState.STOW;
+            }
           }
         }
-      }
         case ZERO -> {
           pivot.setPositionTarget(PivotTarget.STOW);
           elevator.setZeroing(true);

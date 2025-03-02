@@ -4,19 +4,14 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
@@ -170,6 +165,7 @@ public class RobotContainer {
     }
     climbController = new ClimbController(climb);
 
+    configureAutos();
     configureBindings();
   }
 
@@ -208,16 +204,16 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA
-        .x()
-        .whileTrue(
-            RobotState.generateOTFPoseCommand(
-                RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
-    driverA
-        .b()
-        .whileTrue(
-            RobotState.generateOTFPoseCommand(
-                FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
+    // driverA
+    //     .x()
+    //     .whileTrue(
+    //         RobotState.generateOTFPoseCommand(
+    //             RobotState.getInstance().getEstimatedPose().exp(new Twist2d(1, 0, 0))));
+    // driverA
+    //     .b()
+    //     .whileTrue(
+    //         RobotState.generateOTFPoseCommand(
+    //             FlippingUtil.flipFieldPose(new Pose2d(6, 4, Rotation2d.kZero))));
 
     driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
 
