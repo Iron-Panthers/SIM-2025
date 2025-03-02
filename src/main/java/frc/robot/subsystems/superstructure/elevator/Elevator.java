@@ -14,7 +14,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
     SCORE_L4(28),
     TOP(31),
     INTAKE(0),
-    CLIMB(16);
+    CLIMB(13.5);
     private double position = 0;
 
     private ElevatorTarget(double position) {

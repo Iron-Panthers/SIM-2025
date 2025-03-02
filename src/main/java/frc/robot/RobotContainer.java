@@ -93,7 +93,7 @@ public class RobotContainer {
           intake = new Intake(new IntakeIOTalonFX());
           // superstructure stuff
           elevator = new Elevator(new ElevatorIOTalonFX());
-          // pivot = new Pivot(new PivotIOTalonFX());
+          pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
           climb = new Climb(new ClimbOTalonFX());
         }

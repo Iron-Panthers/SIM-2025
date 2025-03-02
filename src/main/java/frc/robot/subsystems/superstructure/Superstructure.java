@@ -175,7 +175,7 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.L2) {
               this.currentState = SuperstructureState.L1;
             } else if (targetState == SuperstructureState.CLIMB) {
-              this.currentState = SuperstructureState.CLIMB;
+              setCurrentState(SuperstructureState.CLIMB);
             } else if (targetState != currentState) {
               this.currentState = SuperstructureState.TOP;
             }
@@ -200,8 +200,8 @@ public class Superstructure extends SubsystemBase {
         }
         case CLIMB -> {
           elevator.setPositionTarget(ElevatorTarget.CLIMB);
-          pivot.setPositionTarget(PivotTarget.INTAKE);
-          tongue.setPositionTarget(TongueTarget.INTAKE);
+          pivot.setPositionTarget(PivotTarget.CLIMB);
+          tongue.setPositionTarget(TongueTarget.CLIMB);
 
           if (this.superstructureReachedTarget()) {
             if (targetState != currentState) {

@@ -13,7 +13,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     BOTTOM(0.07), // FIXME: Just a placeholder value
 
     // "Top" is apex of climb
-    TOP(0.25), // FIXME: Just a placeholder value
+    TOP(0.33), // FIXME: Just a placeholder value
 
     // To get coral out
     CLEAR(-0.15), // FIXME: Just a placeholder value
@@ -41,7 +41,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     super("Climb", io);
     inductionSensor = new DigitalInput(INDUCTION_PORT_NUMBER);
     setPositionTarget(ClimbTarget.STOW);
-    setControlMode(ControlMode.STOP);
+    setControlMode(ControlMode.POSITION);
   }
 
   // checks if the sensor has hit the cage
