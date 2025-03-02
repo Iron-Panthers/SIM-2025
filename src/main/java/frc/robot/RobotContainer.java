@@ -6,7 +6,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -174,7 +173,18 @@ public class RobotContainer {
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
             rollers.setTargetCommand(RollerState.INTAKE)));
     NamedCommands.registerCommand(
-        "Score_L4", superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+        "Score_L4", superstructure.goToStateCommand(SuperstructureState.SETUP_L4));
+
+    NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT));
+
+    NamedCommands.registerCommand(
+        "Eject_L4",
+        new SequentialCommandGroup(
+            rollers.setTargetCommand(RollerState.EJECT),
+            new WaitCommand(0.2),
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            new WaitCommand(0.9),
+            rollers.setTargetCommand(RollerState.INTAKE)));
 
     new EventTrigger("Score_L4")
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
@@ -300,6 +310,7 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(

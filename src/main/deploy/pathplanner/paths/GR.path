@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 6.23517076333992,
-        "y": 2.616621170948615
+        "y": 2.6166211709486147
       },
       "isLocked": false,
       "linkedName": "G Score"
@@ -45,7 +45,7 @@
     "rotation": -125.48
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Autos",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
