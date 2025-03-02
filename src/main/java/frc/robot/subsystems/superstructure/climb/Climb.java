@@ -41,7 +41,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     super("Climb", io);
     inductionSensor = new DigitalInput(INDUCTION_PORT_NUMBER);
     setPositionTarget(ClimbTarget.STOW);
-    setControlMode(ControlMode.POSITION);
+    setControlMode(ControlMode.STOP);
   }
 
   // checks if the sensor has hit the cage
