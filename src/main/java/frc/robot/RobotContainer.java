@@ -194,15 +194,15 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA.a().whileTrue(new ApproachReef(0.3048, false));
-    driverA.b().whileTrue(new ApproachReef(0.3048, true));
+    driverA.rightBumper().whileTrue(new ApproachReef(0.3048, false));
+    driverA.leftBumper().whileTrue(new ApproachReef(0.3048, true));
 
     driverA
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
     driverA
-        .y()
+        .b()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
