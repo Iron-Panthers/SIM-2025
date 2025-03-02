@@ -136,6 +136,8 @@ public class Robot extends LoggedRobot {
     if (autoCommand != null) {
       autoCommand.cancel();
     }
+
+    robotContainer.teleopInit();
   }
 
   /** This function is called periodically during operator control. */
