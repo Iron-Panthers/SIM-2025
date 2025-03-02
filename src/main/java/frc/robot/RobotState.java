@@ -12,6 +12,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -23,6 +24,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.DriveConstants.ApproachPose;
+import java.util.ArrayList;
+import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -60,6 +63,9 @@ public class RobotState {
         new SwerveModulePosition()
       };
   private Rotation2d lastGyroAngle = new Rotation2d();
+
+  private ApproachPose[] approachPoses = generateApproachPoses(12);
+  private double lastApproachOffset = 12;
 
   private static RobotState instance;
 
@@ -165,21 +171,39 @@ public class RobotState {
     return estimatedPose;
   }
 
-  public ApproachPose findApproachPose() {
-    Pose2d currentPose = getEstimatedPose();
+  // returns 12 approach poses, corresponding offset from reef wall, in metres
+  private ApproachPose[] generateApproachPoses(double offset) {
+    Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
+    List<Pose2d> poses = new ArrayList<Pose2d>();
 
-    int closestIndex = 0;
+    for (int i = 0; i < 6; ++i) {
+      Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
+      Pose2d directPose = offsetByVector(origin, (offset + 1.285), initialTheta);
+      Pose2d poseA = translateByVector(directPose, 0.165, Rotation2d.kCCW_Pi_2);
+      Pose2d poseB = translateByVector(directPose, 0.165, Rotation2d.kCW_Pi_2);
+
+      poses.add(poseA);
+      poses.add(poseB);
+    }
+
+    var poseArray = poses.toArray(new Pose2d[poses.size()]);
+    Logger.recordOutput("RobotState/BlueApproachPoses", poseArray);
+
+    return ApproachPose.fromPose2ds(poseArray);
+  }
+
+  public ApproachPose findApproachPose(double offset, boolean bSide) {
+    if (lastApproachOffset != offset) approachPoses = generateApproachPoses(offset);
+
+    int closestIndex = bSide ? 1 : 0;
     // absolutely not
-    for (int i = 0; i < DriveConstants.REEF_APPROACH_POSES.length; ++i) {
-      if (currentPose
+    for (int i = closestIndex; i < approachPoses.length; i += 2) {
+      if (getEstimatedPose()
               .getTranslation()
-              .getDistance(DriveConstants.REEF_APPROACH_POSES[i].getAlliancePose().getTranslation())
-          < currentPose
+              .getDistance(approachPoses[i].getAlliancePose().getTranslation())
+          < getEstimatedPose()
               .getTranslation()
-              .getDistance(
-                  DriveConstants.REEF_APPROACH_POSES[closestIndex]
-                      .getAlliancePose()
-                      .getTranslation())) {
+              .getDistance(approachPoses[closestIndex].getAlliancePose().getTranslation())) {
         closestIndex = i;
       }
     }
@@ -187,21 +211,33 @@ public class RobotState {
     Logger.recordOutput(
         "RobotState/ApproachPose",
         DriveConstants.REEF_APPROACH_POSES[closestIndex].getAlliancePose());
+    Logger.recordOutput("RobotState/ApproachPoseIndex", closestIndex);
 
     return DriveConstants.REEF_APPROACH_POSES[closestIndex];
   }
 
-  public Command approachReefCommand() {
-    ApproachPose approachPose = findApproachPose();
-
-    return generateOTFPoseCommand(approachPose.getAlliancePose());
+  public Command approachReefCommand(double offset, boolean bSide) {
+    return generateOTFPoseCommand(findApproachPose(offset, bSide).getAlliancePose());
   }
 
   public static Command generateOTFPoseCommand(Pose2d pose) {
-    return AutoBuilder.pathfindToPose(pose, DriveConstants.PP_PATH_CONSTRAINTS);
+    return AutoBuilder.pathfindToPose(pose, DriveConstants.ALIGN_PATH_CONSTRAINTS);
   }
 
   public static Command generateOTFPathCommand(PathPlannerPath path) {
-    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.PP_PATH_CONSTRAINTS);
+    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.ALIGN_PATH_CONSTRAINTS);
+  }
+
+  public static Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {
+    double scalarX = theta.getCos() * mag;
+    double scalarY = theta.getSin() * mag;
+
+    Transform2d transform = new Transform2d(scalarX, scalarY, Rotation2d.kZero);
+    return pose.transformBy(transform);
+  }
+
+  // translate + rotate
+  public static Pose2d offsetByVector(Pose2d pose, double mag, Rotation2d theta) {
+    return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
   }
 }
