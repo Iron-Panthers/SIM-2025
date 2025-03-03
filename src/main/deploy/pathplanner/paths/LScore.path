@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 3.549886363636363,
+        "y": 5.336264204545455
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 3.6967366808730886,
+        "y": 5.1339402456886924
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "L Approach"
     },
     {
       "anchor": {
-        "x": 6.0,
-        "y": 7.0
+        "x": 3.6695454545454544,
+        "y": 5.1966619318181815
       },
       "prevControl": {
-        "x": 5.0,
-        "y": 7.0
+        "x": 3.512143985126321,
+        "y": 5.411340592438794
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 118.61045966596524
   },
   "reversed": false,
-  "folder": "Testing",
+  "folder": "Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

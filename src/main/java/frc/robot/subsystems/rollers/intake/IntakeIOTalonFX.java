@@ -1,7 +1,6 @@
 package frc.robot.subsystems.rollers.intake;
 
 import frc.robot.Constants;
-import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import frc.robot.subsystems.rollers.GenericRollersIOTalonFX;
 
 public class IntakeIOTalonFX extends GenericRollersIOTalonFX implements IntakeIO {

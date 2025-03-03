@@ -3,7 +3,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,19 +18,20 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
-import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.canWatchdog.CANWatchdog;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
 import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGBIO;
 import frc.robot.subsystems.rgb.RGBIOCANdle;
+import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
@@ -165,11 +168,11 @@ public class RobotContainer {
     if (pivot == null) {
       pivot = new Pivot(new PivotIO() {});
     }
-    
+
     if (canWatchdog == null) {
       canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
     }
-      
+
     if (rgb == null) {
       rgb = new RGB(new RGBIO() {});
     }
@@ -179,13 +182,54 @@ public class RobotContainer {
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
+    nameCommands();
     configureAutos();
     configureBindings();
   }
 
   public void containerMatchStarting() {
-    //runs when match starts
+    // runs when match starts
     canWatchdog.matchStarting();
+  }
+
+  private void nameCommands() {
+    // Register Command Names
+    NamedCommands.registerCommand(
+        "Intake",
+        new SequentialCommandGroup(
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            rollers.setTargetCommand(RollerState.INTAKE)));
+    NamedCommands.registerCommand(
+        "Score_L4",
+        new SequentialCommandGroup(
+            new WaitUntilCommand(() -> rollers.intakeDetected()),
+            new FunctionalCommand(
+                () -> superstructure.setTargetState(SuperstructureState.SETUP_L4),
+                () -> {},
+                (e) -> {},
+                () ->
+                    superstructure.getCurrentState() == SuperstructureState.SETUP_L4
+                        && superstructure.superstructureReachedTarget(),
+                superstructure)));
+
+    NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT_TOP));
+
+    NamedCommands.registerCommand(
+        "Eject_L4",
+        new SequentialCommandGroup(
+            rollers.setTargetCommand(RollerState.EJECT_TOP),
+            new WaitCommand(0.2),
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            rollers.setTargetCommand(RollerState.INTAKE)));
+
+    new EventTrigger("Score_L4")
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+
+    new EventTrigger("Intake")
+        .onTrue(
+            new SequentialCommandGroup(
+                superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                rollers.setTargetCommand(RollerState.INTAKE)));
   }
 
   private void configureBindings() {
@@ -333,7 +377,7 @@ public class RobotContainer {
         .onTrue(
             new SequentialCommandGroup(
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
-                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+                rollers.setTargetCommand(RollerState.INTAKE)));
 
     // Eject on L1
     new Trigger(
