@@ -53,6 +53,8 @@ public class VisionConstants {
                 new UnitDeviationParams(0.25, 0.07, 0.25), new UnitDeviationParams(0.15, 1, 1.5)));
       };
 
+  public static final int[] IGNORE_TAGS = {1, 2, 3, 4, 5};
+
   public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
