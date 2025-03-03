@@ -25,13 +25,13 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
-import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.canWatchdog.CANWatchdog;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
 import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGBIO;
 import frc.robot.subsystems.rgb.RGBIOCANdle;
+import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
@@ -168,11 +168,11 @@ public class RobotContainer {
     if (pivot == null) {
       pivot = new Pivot(new PivotIO() {});
     }
-    
+
     if (canWatchdog == null) {
       canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
     }
-      
+
     if (rgb == null) {
       rgb = new RGB(new RGBIO() {});
     }
@@ -188,7 +188,7 @@ public class RobotContainer {
   }
 
   public void containerMatchStarting() {
-    //runs when match starts
+    // runs when match starts
     canWatchdog.matchStarting();
   }
 
@@ -212,12 +212,12 @@ public class RobotContainer {
                         && superstructure.superstructureReachedTarget(),
                 superstructure)));
 
-    NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT));
+    NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT_TOP));
 
     NamedCommands.registerCommand(
         "Eject_L4",
         new SequentialCommandGroup(
-            rollers.setTargetCommand(RollerState.EJECT),
+            rollers.setTargetCommand(RollerState.EJECT_TOP),
             new WaitCommand(0.2),
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
             rollers.setTargetCommand(RollerState.INTAKE)));
