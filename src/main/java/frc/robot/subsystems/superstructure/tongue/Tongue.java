@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Tongue {
   public enum TongueTarget {
-    TOP(90),
+    TOP(115),
     INTAKE(115),
     STOW(115), // FIXME
     L1(100),
