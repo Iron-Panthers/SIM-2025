@@ -1,9 +1,8 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotState;
+import java.util.function.DoubleSupplier;
 
 public class ApproachReef extends Command {
   private final boolean bSide;
@@ -13,10 +12,10 @@ public class ApproachReef extends Command {
   public enum LevelOffsets {
     // these offsets are in metres
     // FIXME: PLEASE tweak these offset values because these are just estimates/guesses
-    L4_OFFSET(0.1016),
-    L3_OFFSET(0.0889),
-    L2_OFFSET(0.0762),
-    L1_OFFSET(0.0635);
+    L4_OFFSET(0.2),
+    L3_OFFSET(0.2),
+    L2_OFFSET(0),
+    L1_OFFSET(0);
     public double levelOffset;
 
     private LevelOffsets(double levelOffset) {
@@ -35,7 +34,8 @@ public class ApproachReef extends Command {
 
   @Override
   public void initialize() {
-    approachReef = RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
+    approachReef =
+        RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
     approachReef.initialize();
   }
 
