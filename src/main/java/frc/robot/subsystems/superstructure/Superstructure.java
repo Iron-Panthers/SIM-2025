@@ -29,6 +29,7 @@ public class Superstructure extends SubsystemBase {
 
   private SuperstructureState currentState = SuperstructureState.ZERO; // current state
   private SuperstructureState targetState = SuperstructureState.ZERO; // current target state
+  private SuperstructureState bufferCurrentState = SuperstructureState.ZERO;
   private boolean stop = false;
 
   private final Elevator elevator;
@@ -46,6 +47,7 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
+    currentState = bufferCurrentState;
     if (!stop) {
       switch (currentState) { // switch on the target state
         case L1 -> {
@@ -242,7 +244,7 @@ public class Superstructure extends SubsystemBase {
   // Current state getter and setter
   public void setCurrentState(SuperstructureState superstructureState) {
     this.stop = false;
-    this.currentState = superstructureState;
+    this.bufferCurrentState = superstructureState;
   }
 
   public SuperstructureState getCurrentState() {

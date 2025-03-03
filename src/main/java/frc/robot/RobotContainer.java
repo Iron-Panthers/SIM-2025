@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
@@ -173,7 +174,17 @@ public class RobotContainer {
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
             rollers.setTargetCommand(RollerState.INTAKE)));
     NamedCommands.registerCommand(
-        "Score_L4", superstructure.goToStateCommand(SuperstructureState.SETUP_L4));
+        "Score_L4",
+        new SequentialCommandGroup(
+            new WaitUntilCommand(() -> rollers.intakeDetected()),
+            new FunctionalCommand(
+                () -> superstructure.setTargetState(SuperstructureState.SETUP_L4),
+                () -> {},
+                (e) -> {},
+                () ->
+                    superstructure.getCurrentState() == SuperstructureState.SETUP_L4
+                        && superstructure.superstructureReachedTarget(),
+                superstructure)));
 
     NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT));
 
@@ -183,7 +194,6 @@ public class RobotContainer {
             rollers.setTargetCommand(RollerState.EJECT),
             new WaitCommand(0.2),
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
-            new WaitCommand(0.9),
             rollers.setTargetCommand(RollerState.INTAKE)));
 
     new EventTrigger("Score_L4")
