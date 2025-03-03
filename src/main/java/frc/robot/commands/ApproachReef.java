@@ -12,8 +12,8 @@ public class ApproachReef extends Command {
   public enum LevelOffsets {
     // these offsets are in metres
     // FIXME: PLEASE tweak these offset values because these are just estimates/guesses
-    L4_OFFSET(0.2),
-    L3_OFFSET(0.2),
+    L4_OFFSET(0.14),
+    L3_OFFSET(0.1),
     L2_OFFSET(0),
     L1_OFFSET(0);
     public double levelOffset;

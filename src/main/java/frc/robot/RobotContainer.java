@@ -61,7 +61,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
-  private LevelOffsets levelOffsets;
+  private LevelOffsets levelOffsets = LevelOffsets.L4_OFFSET;
   private Drive swerve;
   private Vision vision;
   private Intake intake;
