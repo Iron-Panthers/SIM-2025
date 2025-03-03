@@ -202,7 +202,6 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    //FIXME: Fix these bindings
     driverA.povUp()
       .onTrue(
         new InstantCommand(
@@ -227,7 +226,7 @@ public class RobotContainer {
           () -> levelOffsets = LevelOffsets.L1_OFFSET
         )
     );
-    //Make into a double supplier rather than a double
+
     driverA.leftBumper().whileTrue(new ApproachReef(() -> levelOffsets.getLevelOffset(), false));
 
     driverA
