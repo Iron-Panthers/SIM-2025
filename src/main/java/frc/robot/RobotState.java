@@ -208,12 +208,10 @@ public class RobotState {
       }
     }
 
-    Logger.recordOutput(
-        "RobotState/ApproachPose",
-        DriveConstants.REEF_APPROACH_POSES[closestIndex].getAlliancePose());
+    Logger.recordOutput("RobotState/ApproachPose", approachPoses[closestIndex].getAlliancePose());
     Logger.recordOutput("RobotState/ApproachPoseIndex", closestIndex);
 
-    return DriveConstants.REEF_APPROACH_POSES[closestIndex];
+    return approachPoses[closestIndex];
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
+import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.canWatchdog.CANWatchdog;
@@ -66,7 +67,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
-
+  private LevelOffsets levelOffsets = LevelOffsets.L4_OFFSET;
   private Drive swerve;
   private Vision vision;
   private Intake intake;
@@ -77,6 +78,7 @@ public class RobotContainer {
   private Superstructure superstructure;
   private RGB rgb;
   private CANWatchdog canWatchdog;
+  private ApproachReef approachReef;
 
   public RobotContainer() {
     intake = null;
@@ -221,8 +223,22 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA.rightBumper().whileTrue(new ApproachReef(0.3048, false));
-    driverA.leftBumper().whileTrue(new ApproachReef(0.3048, true));
+    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
+    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
+    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
+    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET));
+
+    driverA
+        .leftBumper()
+        .whileTrue(
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), true)
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
+
+    driverA
+        .rightBumper()
+        .whileTrue(
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), false)
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
 
     driverA
         .x()
@@ -244,28 +260,41 @@ public class RobotContainer {
                 ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povDown().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L1)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)));
+
     // L2
     new Trigger(
             () ->
                 ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povRight().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L2)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)));
     // Go to L3
     new Trigger(
             () ->
                 ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povLeft().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.SCORE_L3)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)));
     // Go to L4
     new Trigger(
             () ->
                 ((rollers.readyToRaise()
                         || superstructure.getTargetState() != SuperstructureState.INTAKE))
                     && driverB.povUp().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.SCORE_L4)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
 
     driverB // ZERO our mechanism
         .a()
