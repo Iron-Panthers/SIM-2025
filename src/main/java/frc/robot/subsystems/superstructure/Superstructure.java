@@ -84,7 +84,9 @@ public class Superstructure extends SubsystemBase {
         }
 
         case SETUP_L3 -> {
-          elevator.setPositionTarget(ElevatorTarget.L3);
+          if (pivot.getPosition() > 0) {
+            elevator.setPositionTarget(ElevatorTarget.L3);
+          }
           pivot.setPositionTarget(PivotTarget.SETUP_L3);
           tongue.setPositionTarget(TongueTarget.L3);
 
@@ -155,10 +157,11 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.SETUP_L4
-                || targetState == SuperstructureState.SCORE_L4
-                || targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
+                || targetState == SuperstructureState.SCORE_L4) {
               setCurrentState(SuperstructureState.SETUP_L4);
+            } else if (targetState == SuperstructureState.SETUP_L3
+                || targetState == SuperstructureState.SCORE_L3) {
+              setCurrentState(SuperstructureState.SETUP_L3);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.STOW);
             }
