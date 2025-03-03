@@ -73,13 +73,6 @@ public class DriveConstants {
       switch (getRobotType()) {
         case COMP -> new ModuleConfig[] {
           new ModuleConfig(
-              CAN.at(17, "FR Drive"),
-              CAN.at(16, "FR Steer"),
-              1,
-              new Rotation2d(-0.405),
-              true,
-              true),
-          new ModuleConfig(
               CAN.at(19, "FL Drive"),
               CAN.at(18, "FL Steer"),
               2,
@@ -87,9 +80,16 @@ public class DriveConstants {
               true,
               false),
           new ModuleConfig(
-              CAN.at(21, "BR Drive"), CAN.at(20, "BRSteer"), 3, new Rotation2d(1.012), true, false),
+              CAN.at(17, "FR Drive"),
+              CAN.at(16, "FR Steer"),
+              1,
+              new Rotation2d(-0.405),
+              true,
+              true),
           new ModuleConfig(
-              CAN.at(23, "BL Drive"), CAN.at(22, "BLSteer"), 4, new Rotation2d(-2.831), true, true)
+              CAN.at(21, "BL Drive"), CAN.at(20, "BLSteer"), 3, new Rotation2d(1.012), true, false),
+          new ModuleConfig(
+              CAN.at(23, "BR Drive"), CAN.at(22, "BRSteer"), 4, new Rotation2d(-2.831), true, true)
         };
         case PROG -> new ModuleConfig[] {
           new ModuleConfig(
