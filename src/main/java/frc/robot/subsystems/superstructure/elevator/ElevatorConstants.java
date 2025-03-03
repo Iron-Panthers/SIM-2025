@@ -2,15 +2,18 @@ package frc.robot.subsystems.superstructure.elevator;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import frc.robot.Constants;
+import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.Optional;
 
 public class ElevatorConstants {
   public static final ElevatorConfig ELEVATOR_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new ElevatorConfig(43, Optional.of(44), (58.0 / 14.0) / 6);
-        case PROG -> new ElevatorConfig(0, Optional.empty(), 1);
-        case ALPHA -> new ElevatorConfig(37, Optional.empty(), 9.0 / 4.0); // FIXME
-        case SIM -> new ElevatorConfig(0, Optional.empty(), 1); // FIXME
+        case COMP -> new ElevatorConfig(
+            CAN.at(0, "Elevator 1"), Optional.of(CAN.at(0, "Elevator 2")), (58.0 / 14.0) / 6);
+        case PROG -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
+        case ALPHA -> new ElevatorConfig(
+            CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0); // FIXME
+        case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1); // FIXME
       };
 
   public static final PIDGains GAINS =

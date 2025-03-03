@@ -3,7 +3,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,11 +18,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
+import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
+import frc.robot.subsystems.canWatchdog.CANWatchdog;
+import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
+import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
+import frc.robot.subsystems.rgb.RGB;
+import frc.robot.subsystems.rgb.RGBIO;
+import frc.robot.subsystems.rgb.RGBIOCANdle;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -64,7 +74,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
-
+  private LevelOffsets levelOffsets = LevelOffsets.L4_OFFSET;
   private Drive swerve;
   private Vision vision;
   private Intake intake;
@@ -74,6 +84,9 @@ public class RobotContainer {
   private Tongue tongue;
   private Climb climb;
   private Superstructure superstructure;
+  private RGB rgb;
+  private CANWatchdog canWatchdog;
+  private ApproachReef approachReef;
   private ClimbController climbController;
 
   public RobotContainer() {
@@ -100,6 +113,8 @@ public class RobotContainer {
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
+          rgb = new RGB(new RGBIOCANdle());
+          canWatchdog = new CANWatchdog(new CANWatchdogIOComp(), rgb);
           climb = new Climb(new ClimbOTalonFX());
         }
         case PROG -> {
@@ -160,11 +175,21 @@ public class RobotContainer {
     if (pivot == null) {
       pivot = new Pivot(new PivotIO() {});
     }
+
+    if (canWatchdog == null) {
+      canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
+    }
+
+    if (rgb == null) {
+      rgb = new RGB(new RGBIO() {});
+    }
+
     if (tongue == null) {
       tongue = new Tongue(new TongueIO() {});
     }
     superstructure = new Superstructure(elevator, pivot, tongue);
 
+    nameCommands();
     if (climb == null) {
       climb = new Climb(new ClimbOTalonFX());
     }
@@ -172,6 +197,51 @@ public class RobotContainer {
 
     configureAutos();
     configureBindings();
+  }
+
+  public void containerMatchStarting() {
+    // runs when match starts
+    canWatchdog.matchStarting();
+  }
+
+  private void nameCommands() {
+    // Register Command Names
+    NamedCommands.registerCommand(
+        "Intake",
+        new SequentialCommandGroup(
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            rollers.setTargetCommand(RollerState.INTAKE)));
+    NamedCommands.registerCommand(
+        "Score_L4",
+        new SequentialCommandGroup(
+            new WaitUntilCommand(() -> rollers.intakeDetected()),
+            new FunctionalCommand(
+                () -> superstructure.setTargetState(SuperstructureState.SETUP_L4),
+                () -> {},
+                (e) -> {},
+                () ->
+                    superstructure.getCurrentState() == SuperstructureState.SETUP_L4
+                        && superstructure.superstructureReachedTarget(),
+                superstructure)));
+
+    NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT_TOP));
+
+    NamedCommands.registerCommand(
+        "Eject_L4",
+        new SequentialCommandGroup(
+            rollers.setTargetCommand(RollerState.EJECT_TOP),
+            new WaitCommand(0.2),
+            superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            rollers.setTargetCommand(RollerState.INTAKE)));
+
+    new EventTrigger("Score_L4")
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+
+    new EventTrigger("Intake")
+        .onTrue(
+            new SequentialCommandGroup(
+                superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                rollers.setTargetCommand(RollerState.INTAKE)));
   }
 
   private void configureBindings() {
@@ -209,8 +279,22 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA.rightBumper().whileTrue(new ApproachReef(0.3048, false));
-    driverA.leftBumper().whileTrue(new ApproachReef(0.3048, true));
+    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
+    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
+    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
+    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET));
+
+    driverA
+        .leftBumper()
+        .whileTrue(
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), true)
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
+
+    driverA
+        .rightBumper()
+        .whileTrue(
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), false)
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
 
     driverA
         .x()
@@ -227,18 +311,47 @@ public class RobotContainer {
     //     .onTrue(
     //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
-    // driverB // GO TO L1
-    //     .povDown()
-    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
+    // L1
+    new Trigger(
+            () ->
+                ((rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
+                    && driverB.povDown().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L1)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)));
 
-    // driverB // GO TO L2
-    //     .povRight()
-    //     .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
-    new Trigger(() -> rollers.intakeDetected() && driverB.povLeft().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
-
-    new Trigger(() -> rollers.intakeDetected() && driverB.povUp().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+    // L2
+    new Trigger(
+            () ->
+                ((rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
+                    && driverB.povRight().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.L2)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)));
+    // Go to L3
+    new Trigger(
+            () ->
+                ((rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
+                    && driverB.povLeft().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.SCORE_L3)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)));
+    // Go to L4
+    new Trigger(
+            () ->
+                ((rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
+                    && driverB.povUp().getAsBoolean())
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.SCORE_L4)
+                .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
 
     driverB // ZERO our mechanism
         .a()
@@ -248,12 +361,8 @@ public class RobotContainer {
                   superstructure.setCurrentState(SuperstructureState.ZERO);
                 },
                 superstructure));
-    // new ParallelCommandGroup(
-    //     elevator
-    //         .zeroingCommand()
-    //         .andThen(elevator.goToPositionCommand(ElevatorTarget.BOTTOM)),
-    //     pivot.zeroingCommand().andThen(pivot.goToPositionCommand(PivotTarget.TOP))));
 
+    // Stop everything
     driverB
         .x()
         .onTrue(
@@ -264,16 +373,87 @@ public class RobotContainer {
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
+    // kinda manual commands
+    driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
     driverB
-        .y()
+        .b()
         .onTrue(
             climbController.setPositionTargetCommand(
                 ClimbTarget.TOP) // FIXME: We need to add elevator position up
             );
+            superstructure
+                .goToStateCommand(SuperstructureState.TOP)
+                .alongWith(superstructure.oneTimeOverrideCommand()));
 
+
+    driverB // intake
+        .leftTrigger()
+        .onTrue(
+            new SequentialCommandGroup(
+                superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                rollers.setTargetCommand(RollerState.INTAKE)));
+
+    // Eject on L1
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.L1))
+                    && driverB.rightTrigger().getAsBoolean())
     driverB
         .b()
         .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_L1)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject L2
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.L2))
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_L2)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2
+    new Trigger(
+            () ->
+                !(superstructure.getTargetState().equals(SuperstructureState.L1)
+                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_TOP)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject on L4 with sensors
+    new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
+        .onTrue(
+            new SequentialCommandGroup(
+                // new WaitCommand(0.1),
+                rollers.setTargetCommand(RollerState.EJECT_TOP),
+                new WaitCommand(0.2),
+                superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                new WaitCommand(0.9),
+                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+    // new SequentialCommandGroup(
+    //     new ParallelCommandGroup(
+    //         elevator.goToPositionCommand(ElevatorTarget.SETUP_INTAKE),
+    //         pivot.goToPositionCommand(PivotTarget.INTAKE)),
+    //     rollers.setTargetCommand(RollerState.INTAKE),
+    //     elevator.goToPositionCommand(ElevatorTarget.INTAKE),
+    //     new WaitUntilCommand(() -> rollers.getTargetState() == RollerState.HOLD),
+    //     elevator.goToPositionCommand(ElevatorTarget.SETUP_INTAKE),
+    //     pivot.goToPositionCommand(PivotTarget.TOP),
+    //     elevator
+    //         .goToPositionCommand(ElevatorTarget.BOTTOM)
+    //         .alongWith(rollers.setTargetCommand(RollerState.IDLE))));
             climbController
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
                 .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));

@@ -2,12 +2,17 @@ package frc.robot.subsystems.superstructure.pivot;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import frc.robot.Constants;
+import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.Optional;
 
 public class PivotConstants {
   public static final PivotConfig PIVOT_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new PivotConfig(8, Optional.of(28), Optional.of(-0.278), 1);
+        case COMP -> new PivotConfig(
+            CAN.at(0, "Pivot"),
+            Optional.of(CAN.at(28, "Pivot Encoder")),
+            Optional.of(-0.255859375),
+            1);
         case ALPHA -> new PivotConfig(15, Optional.empty(), Optional.empty(), 21.6 / 360);
         case PROG -> new PivotConfig(0, Optional.empty(), Optional.empty(), 1);
         case SIM -> new PivotConfig(0, Optional.empty(), Optional.empty(), 1);
@@ -60,4 +65,6 @@ public class PivotConstants {
   public static final double ZEROING_VOLTS = 1;
   public static final double ZEROING_OFFSET = 0; // offset in degrees
   public static final double ZEROING_VOLTAGE_THRESHOLD = 5;
+  public static final double ZEROING_HIGH_THRESHOLD =
+      -70.0; // the position where if the pivot is over, the pivot will go up before zeroing
 }
