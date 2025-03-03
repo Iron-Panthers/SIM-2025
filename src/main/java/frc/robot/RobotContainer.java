@@ -298,9 +298,9 @@ public class RobotContainer {
 
     driverA
         .x()
-    driverA.y().whileTrue(RobotState.getInstance().approachReefCommand());
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
+
     driverA
         .b()
         .onTrue(
@@ -354,7 +354,7 @@ public class RobotContainer {
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
 
     driverB // ZERO our mechanism
-        .a()
+        .start()
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -381,10 +381,20 @@ public class RobotContainer {
             climbController.setPositionTargetCommand(
                 ClimbTarget.TOP) // FIXME: We need to add elevator position up
             );
+
+    driverB
+        .a()
+        .onTrue(
             superstructure
                 .goToStateCommand(SuperstructureState.TOP)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
 
+    driverB
+        .b()
+        .onTrue(
+            climbController
+                .setPositionTargetCommand(ClimbTarget.BOTTOM)
+                .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
 
     driverB // intake
         .leftTrigger()
@@ -398,8 +408,6 @@ public class RobotContainer {
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L1))
                     && driverB.rightTrigger().getAsBoolean())
-    driverB
-        .b()
         .onTrue(
             rollers
                 .setTargetCommand(RollerState.EJECT_L1)
@@ -454,9 +462,6 @@ public class RobotContainer {
     //     elevator
     //         .goToPositionCommand(ElevatorTarget.BOTTOM)
     //         .alongWith(rollers.setTargetCommand(RollerState.IDLE))));
-            climbController
-                .setPositionTargetCommand(ClimbTarget.BOTTOM)
-                .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
 
     // driverB.rightTrigger().onTrue(climbController.clearCoral());
   }
