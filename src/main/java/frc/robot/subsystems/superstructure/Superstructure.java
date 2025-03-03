@@ -2,6 +2,7 @@ package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -9,6 +10,7 @@ import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
 import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import frc.robot.subsystems.superstructure.pivot.Pivot;
 import frc.robot.subsystems.superstructure.pivot.Pivot.PivotTarget;
+import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
 import org.littletonrobotics.junction.Logger;
@@ -35,6 +37,8 @@ public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final Pivot pivot;
   private final Tongue tongue;
+
+  private boolean overrideIsAtTarget = false;
 
   public Superstructure(Elevator elevator, Pivot pivot, Tongue tongue) {
     this.elevator = elevator;
@@ -82,7 +86,9 @@ public class Superstructure extends SubsystemBase {
         }
 
         case SETUP_L3 -> {
-          elevator.setPositionTarget(ElevatorTarget.L3);
+          if (pivot.getPosition() > 0) {
+            elevator.setPositionTarget(ElevatorTarget.L3);
+          }
           pivot.setPositionTarget(PivotTarget.SETUP_L3);
           tongue.setPositionTarget(TongueTarget.L3);
 
@@ -153,10 +159,11 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.SETUP_L4
-                || targetState == SuperstructureState.SCORE_L4
-                || targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
+                || targetState == SuperstructureState.SCORE_L4) {
               setCurrentState(SuperstructureState.SETUP_L4);
+            } else if (targetState == SuperstructureState.SETUP_L3
+                || targetState == SuperstructureState.SCORE_L3) {
+              setCurrentState(SuperstructureState.SETUP_L3);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.STOW);
             }
@@ -164,7 +171,9 @@ public class Superstructure extends SubsystemBase {
         }
 
         case STOW -> {
-          elevator.setPositionTarget(ElevatorTarget.BOTTOM);
+          if (pivot.getPosition() > -0.27) {
+            elevator.setPositionTarget(ElevatorTarget.BOTTOM);
+          }
           pivot.setPositionTarget(PivotTarget.STOW);
           tongue.setPositionTarget(TongueTarget.STOW);
 
@@ -190,18 +199,34 @@ public class Superstructure extends SubsystemBase {
           if (elevator.reachedTarget()) {
             if (targetState == SuperstructureState.STOW) {
               setCurrentState(SuperstructureState.INTAKE);
-            } else if (targetState == SuperstructureState.L1
-                || targetState == SuperstructureState.L2) {
+            } else if (targetState == SuperstructureState.L1) {
               setCurrentState(SuperstructureState.L1);
+            } else if (targetState == SuperstructureState.L2) {
+              setCurrentState(SuperstructureState.L2);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.TOP);
             }
           }
         }
         case ZERO -> {
-          pivot.setPositionTarget(PivotTarget.STOW);
-          elevator.setZeroing(true);
+          // zeroing system for not killing the robot on zero
+
+          // set our pivot pos
+          if (pivot.getPosition() < PivotConstants.ZEROING_HIGH_THRESHOLD) {
+            pivot.setPositionTarget(PivotTarget.ZERO_LOW);
+          } else {
+            pivot.setPositionTarget(PivotTarget.ZERO_HIGH);
+          }
           tongue.setPositionTarget(TongueTarget.STOW);
+
+          // wait for pivot to go to safe pos before zeroing
+          if (pivot.reachedTarget()) {
+            elevator.setZeroing(true);
+          } else {
+            elevator.setZeroing(false);
+          }
+
+          // check if we have have hit our hardstop, if so we can zero the elevator
           if (elevator.getFilteredSupplyCurrentAmps()
               > ElevatorConstants
                   .ZEROING_VOLTAGE_THRESHOLD) { // check if the elevator is done zeroing and set
@@ -210,8 +235,13 @@ public class Superstructure extends SubsystemBase {
             elevator.setControlMode(ControlMode.POSITION);
             elevator.setZeroing(false);
 
-            setTargetState(SuperstructureState.STOW);
-            setCurrentState(SuperstructureState.STOW);
+            if (pivot.getPositionTarget() == PivotTarget.ZERO_HIGH) {
+              setTargetState(SuperstructureState.STOW);
+              setCurrentState(SuperstructureState.TOP);
+            } else {
+              setTargetState(SuperstructureState.STOW);
+              setCurrentState(SuperstructureState.STOW);
+            }
           }
         }
       }
@@ -319,9 +349,22 @@ public class Superstructure extends SubsystemBase {
    * @return if both subsystems in the superstructure have reached their target
    */
   public boolean superstructureReachedTarget() {
-    return elevator.reachedTarget()
-        && pivot.reachedTarget()
-        && currentState != SuperstructureState.ZERO;
+    boolean output =
+        (elevator.reachedTarget()
+                && pivot.reachedTarget()
+                && currentState != SuperstructureState.ZERO)
+            || overrideIsAtTarget;
+
+    overrideIsAtTarget = false;
+    return output;
+  }
+
+  public void oneTimeOverride() {
+    overrideIsAtTarget = true;
+  }
+
+  public Command oneTimeOverrideCommand() {
+    return new InstantCommand(() -> oneTimeOverride());
   }
 
   public boolean tonguePoleDetected() {

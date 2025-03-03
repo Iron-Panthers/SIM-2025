@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -45,9 +46,16 @@ public class VisionIOPhotonvision implements VisionIO {
       }
 
       List<Integer> FIDs = new ArrayList<Integer>();
+      boolean badTag = false;
       for (PhotonTrackedTarget target : estimation.targetsUsed) {
-        FIDs.add(target.getFiducialId());
+        int id = target.getFiducialId();
+        if (IntStream.of(VisionConstants.IGNORE_TAGS).anyMatch(x -> x == id)) {
+          badTag = true;
+          break;
+        }
+        FIDs.add(id);
       }
+      if (badTag) continue;
       allTagIDs.addAll(FIDs);
 
       var observation =
