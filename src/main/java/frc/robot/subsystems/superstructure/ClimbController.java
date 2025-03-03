@@ -15,11 +15,11 @@ import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
 public class ClimbController extends SubsystemBase {
 
   private final Climb climb;
-
   /** Creates a new ClimbController. */
   public ClimbController(Climb climb) {
     this.climb = climb;
-    climb.setPositionTarget(ClimbTarget.STOW);
+    climb.setOffset();
+    // climb.setPositionTarget(ClimbTarget.STOW);
   }
 
   @Override

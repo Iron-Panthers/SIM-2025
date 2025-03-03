@@ -69,7 +69,7 @@ public class ClimbConstants {
 
   // ZEROING CONSTANTS
   public static final double ZEROING_VOLTS = -1;
-  public static final double ZEROING_OFFSET = 2.25; // offset in inches
+  public static final double ZEROING_OFFSET = 0.25; // offset in inches
   public static final double ZEROING_VOLTAGE_THRESHOLD = 4;
 
   // INDUCTION SENSOR
