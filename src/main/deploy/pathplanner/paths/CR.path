@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5854829545454543,
-        "y": 7.220894886363636
+        "x": 3.6,
+        "y": 2.803
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.113272261397114,
-        "y": 7.2213017650977624
+        "x": 2.8322699849692103,
+        "y": 2.0331033868262316
       },
       "isLocked": false,
-      "linkedName": "Q"
+      "linkedName": "C"
     },
     {
       "anchor": {
-        "x": 8.18,
-        "y": 4.0249999999999995
+        "x": 1.215456081081081,
+        "y": 1.060472972972973
       },
       "prevControl": {
-        "x": 6.423141891891891,
-        "y": 5.339273648648648
+        "x": 2.629585353236431,
+        "y": 2.4604139866099866
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Center"
+      "linkedName": "R"
     }
   ],
   "rotationTargets": [],
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 2.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -127.00000000000001
   },
   "reversed": false,
   "folder": "Autos",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 127.00000000000001
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }
