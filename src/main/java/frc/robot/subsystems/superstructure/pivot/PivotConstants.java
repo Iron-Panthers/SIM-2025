@@ -60,4 +60,6 @@ public class PivotConstants {
   public static final double ZEROING_VOLTS = 1;
   public static final double ZEROING_OFFSET = 0; // offset in degrees
   public static final double ZEROING_VOLTAGE_THRESHOLD = 5;
+  public static final double ZEROING_HIGH_THRESHOLD =
+      -70.0; // the position where if the pivot is over, the pivot will go up before zeroing
 }
