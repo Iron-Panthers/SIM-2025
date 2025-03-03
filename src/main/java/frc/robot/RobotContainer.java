@@ -22,6 +22,12 @@ import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.VibrateHIDCommand;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
+import frc.robot.subsystems.canWatchdog.CANWatchdog;
+import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
+import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
+import frc.robot.subsystems.rgb.RGB;
+import frc.robot.subsystems.rgb.RGBIO;
+import frc.robot.subsystems.rgb.RGBIOCANdle;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
@@ -69,6 +75,8 @@ public class RobotContainer {
   private Pivot pivot;
   private Tongue tongue;
   private Superstructure superstructure;
+  private RGB rgb;
+  private CANWatchdog canWatchdog;
 
   public RobotContainer() {
     intake = null;
@@ -94,6 +102,8 @@ public class RobotContainer {
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
+          rgb = new RGB(new RGBIOCANdle());
+          canWatchdog = new CANWatchdog(new CANWatchdogIOComp(), rgb);
         }
         case PROG -> {
           swerve =
@@ -153,6 +163,15 @@ public class RobotContainer {
     if (pivot == null) {
       pivot = new Pivot(new PivotIO() {});
     }
+    
+    if (canWatchdog == null) {
+      canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
+    }
+      
+    if (rgb == null) {
+      rgb = new RGB(new RGBIO() {});
+    }
+
     if (tongue == null) {
       tongue = new Tongue(new TongueIO() {});
     }
@@ -160,6 +179,11 @@ public class RobotContainer {
 
     configureAutos();
     configureBindings();
+  }
+
+  public void containerMatchStarting() {
+    //runs when match starts
+    canWatchdog.matchStarting();
   }
 
   private void configureBindings() {

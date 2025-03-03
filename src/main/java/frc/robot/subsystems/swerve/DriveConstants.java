@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants;
@@ -71,22 +72,64 @@ public class DriveConstants {
   public static final ModuleConfig[] MODULE_CONFIGS =
       switch (getRobotType()) {
         case COMP -> new ModuleConfig[] {
-          new ModuleConfig(19, 18, 2, new Rotation2d(-1.1566), true, false),
-          new ModuleConfig(17, 16, 1, new Rotation2d(-0.4049), true, true),
-          new ModuleConfig(21, 20, 3, new Rotation2d(1.0139), true, false),
-          new ModuleConfig(23, 22, 4, new Rotation2d(-2.8148), true, true)
+          new ModuleConfig(
+              CAN.at(17, "FR Drive"),
+              CAN.at(16, "FR Steer"),
+              1,
+              new Rotation2d(-0.405),
+              true,
+              true),
+          new ModuleConfig(
+              CAN.at(19, "FL Drive"),
+              CAN.at(18, "FL Steer"),
+              2,
+              new Rotation2d(-1.148),
+              true,
+              false),
+          new ModuleConfig(
+              CAN.at(21, "BR Drive"), CAN.at(20, "BRSteer"), 3, new Rotation2d(1.012), true, false),
+          new ModuleConfig(
+              CAN.at(23, "BL Drive"), CAN.at(22, "BLSteer"), 4, new Rotation2d(-2.831), true, true)
         };
         case PROG -> new ModuleConfig[] {
-          new ModuleConfig(5, 6, 1, new Rotation2d(-0.1503), false, false),
-          new ModuleConfig(7, 8, 2, new Rotation2d(-0.18254), false, true),
-          new ModuleConfig(11, 12, 3, new Rotation2d(2.9314), false, false),
-          new ModuleConfig(9, 10, 4, new Rotation2d(2.2426), false, true)
+          new ModuleConfig(
+              CAN.at(5, "FR Drive"),
+              CAN.at(6, "FR Steer"),
+              1,
+              new Rotation2d(-0.1503),
+              false,
+              false),
+          new ModuleConfig(
+              CAN.at(7, "FL Drive"),
+              CAN.at(8, "FL Steer"),
+              2,
+              new Rotation2d(-0.18254),
+              false,
+              true),
+          new ModuleConfig(
+              CAN.at(11, "BR Drive"),
+              CAN.at(12, "BR Steer"),
+              3,
+              new Rotation2d(2.9314),
+              false,
+              false),
+          new ModuleConfig(
+              CAN.at(9, "BL Drive"), CAN.at(10, "BL Steer"), 4, new Rotation2d(2.2426), false, true)
         };
         case ALPHA -> new ModuleConfig[] {
-          new ModuleConfig(5, 6, 1, new Rotation2d(1.1612), true, false),
-          new ModuleConfig(7, 8, 2, new Rotation2d(0.8099), true, true),
-          new ModuleConfig(11, 12, 3, new Rotation2d(1.4327), true, false),
-          new ModuleConfig(9, 10, 4, new Rotation2d(-1.8392), true, true)
+          new ModuleConfig(
+              CAN.at(5, "FR Drive"), CAN.at(6, "FR Steer"), 1, new Rotation2d(1.1612), true, false),
+          new ModuleConfig(
+              CAN.at(7, "FL Drive"), CAN.at(8, "FL Steer"), 2, new Rotation2d(0.8099), true, true),
+          new ModuleConfig(
+              CAN.at(11, "BR Drive"),
+              CAN.at(12, "BR Steer"),
+              3,
+              new Rotation2d(1.4327),
+              true,
+              false),
+          new ModuleConfig(
+              CAN.at(9, "BL Drive"), CAN.at(10, "BL Steer"), 4, new Rotation2d(-1.8392), true, true)
         };
         case SIM -> new ModuleConfig[] {
           new ModuleConfig(0, 0, 0, new Rotation2d(0), true, false),
