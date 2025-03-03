@@ -26,6 +26,7 @@ import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.DriveConstants.ApproachPose;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 

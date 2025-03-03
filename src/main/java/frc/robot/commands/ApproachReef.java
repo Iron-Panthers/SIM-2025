@@ -1,21 +1,41 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotState;
 
 public class ApproachReef extends Command {
-  private final double offset;
   private final boolean bSide;
   private Command approachReef;
+  private DoubleSupplier levelOffsetSupplier;
 
-  public ApproachReef(double offset, boolean bSide) {
-    this.offset = offset;
+  public enum LevelOffsets {
+    // these offsets are in metres
+    // FIXME: PLEASE tweak these offset values because these are just estimates/guesses
+    L4_OFFSET(0.1016),
+    L3_OFFSET(0.0889),
+    L2_OFFSET(0.0762),
+    L1_OFFSET(0.0635);
+    public double levelOffset;
+
+    private LevelOffsets(double levelOffset) {
+      this.levelOffset = levelOffset;
+    }
+
+    public double getLevelOffset() {
+      return levelOffset;
+    }
+  }
+
+  public ApproachReef(DoubleSupplier levelOffsetSupplier, boolean bSide) {
+    this.levelOffsetSupplier = levelOffsetSupplier;
     this.bSide = bSide;
   }
 
   @Override
   public void initialize() {
-    approachReef = RobotState.getInstance().approachReefCommand(offset, bSide);
+    approachReef = RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
     approachReef.initialize();
   }
 

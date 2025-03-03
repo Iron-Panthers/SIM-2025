@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.VibrateHIDCommand;
+import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -45,7 +46,10 @@ import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhotonvision;
+
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -60,7 +64,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
-
+  private LevelOffsets levelOffsets;
   private Drive swerve;
   private Vision vision;
   private Intake intake;
@@ -69,6 +73,7 @@ public class RobotContainer {
   private Pivot pivot;
   private Tongue tongue;
   private Superstructure superstructure;
+  private ApproachReef approachReef;
 
   public RobotContainer() {
     intake = null;
@@ -197,8 +202,33 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
-    driverA.rightBumper().whileTrue(new ApproachReef(0.3048, false));
-    driverA.leftBumper().whileTrue(new ApproachReef(0.3048, true));
+    //FIXME: Fix these bindings
+    driverA.povUp()
+      .onTrue(
+        new InstantCommand(
+          () -> levelOffsets = LevelOffsets.L4_OFFSET
+        )
+    );
+    driverA.povUp()
+      .onTrue(
+        new InstantCommand(
+          () -> levelOffsets = LevelOffsets.L3_OFFSET
+        )
+    );
+    driverA.povUp()
+      .onTrue(
+        new InstantCommand(
+          () -> levelOffsets = LevelOffsets.L2_OFFSET
+        )
+    );
+    driverA.povUp()
+      .onTrue(
+        new InstantCommand(
+          () -> levelOffsets = LevelOffsets.L1_OFFSET
+        )
+    );
+    //Make into a double supplier rather than a double
+    driverA.leftBumper().whileTrue(new ApproachReef(() -> levelOffsets.getLevelOffset(), false));
 
     driverA
         .x()
