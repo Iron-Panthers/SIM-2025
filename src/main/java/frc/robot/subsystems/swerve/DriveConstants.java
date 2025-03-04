@@ -87,7 +87,12 @@ public class DriveConstants {
               true,
               true),
           new ModuleConfig(
-              CAN.at(21, "BL Drive"), CAN.at(20, "BLSteer"), 3, new Rotation2d(1.0139), true, false),
+              CAN.at(21, "BL Drive"),
+              CAN.at(20, "BLSteer"),
+              3,
+              new Rotation2d(1.0139),
+              true,
+              false),
           new ModuleConfig(
               CAN.at(23, "BR Drive"), CAN.at(22, "BRSteer"), 4, new Rotation2d(-2.8148), true, true)
         };

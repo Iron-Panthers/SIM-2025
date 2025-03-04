@@ -306,10 +306,6 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
-    // driverA
-    //     .y()
-    //     .onTrue(
-    //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
     // L1
     new Trigger(
@@ -354,7 +350,7 @@ public class RobotContainer {
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
 
     driverB // ZERO our mechanism
-        .start()
+        .a()
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -376,14 +372,14 @@ public class RobotContainer {
     // kinda manual commands
     driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
     driverB
-        .b()
+        .y()
         .onTrue(
             climbController.setPositionTargetCommand(
                 ClimbTarget.TOP) // FIXME: We need to add elevator position up
             );
 
     driverB
-        .a()
+        .rightBumper()
         .onTrue(
             superstructure
                 .goToStateCommand(SuperstructureState.TOP)

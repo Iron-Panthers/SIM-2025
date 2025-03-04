@@ -19,7 +19,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     CLEAR(-0.15), // FIXME: Just a placeholder value
 
     // When not climbing
-    STOW(0.27); // FIXME: Just a placeholder value
+    STOW(0.25); // FIXME: Just a placeholder value
     private double position = 0;
 
     private ClimbTarget(double position) {
