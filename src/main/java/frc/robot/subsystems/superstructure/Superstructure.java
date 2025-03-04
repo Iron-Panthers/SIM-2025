@@ -29,9 +29,9 @@ public class Superstructure extends SubsystemBase {
     ZERO; // Zero the motor
   }
 
-  private SuperstructureState currentState = SuperstructureState.ZERO; // current state
-  private SuperstructureState targetState = SuperstructureState.ZERO; // current target state
-  private SuperstructureState bufferCurrentState = SuperstructureState.ZERO;
+  private SuperstructureState currentState = SuperstructureState.STOW; // current state
+  private SuperstructureState targetState = SuperstructureState.STOW; // current target state
+  private SuperstructureState bufferCurrentState = SuperstructureState.STOW;
   private boolean stop = false;
 
   private final Elevator elevator;
