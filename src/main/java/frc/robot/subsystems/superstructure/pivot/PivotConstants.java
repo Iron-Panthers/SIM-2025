@@ -9,10 +9,7 @@ public class PivotConstants {
   public static final PivotConfig PIVOT_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new PivotConfig(
-            CAN.at(8, "Pivot"),
-            Optional.of(CAN.at(28, "Pivot Encoder")),
-            Optional.of(-0.278),
-            1);
+            CAN.at(8, "Pivot"), Optional.of(CAN.at(28, "Pivot Encoder")), Optional.of(-0.278), 1);
         case ALPHA -> new PivotConfig(15, Optional.empty(), Optional.empty(), 21.6 / 360);
         case PROG -> new PivotConfig(0, Optional.empty(), Optional.empty(), 1);
         case SIM -> new PivotConfig(0, Optional.empty(), Optional.empty(), 1);
