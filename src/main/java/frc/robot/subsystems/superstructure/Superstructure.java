@@ -26,6 +26,7 @@ public class Superstructure extends SubsystemBase {
     TOP, // Apex
     INTAKE,
     STOW, // Going to the lowest position
+    CLIMB,
     ZERO; // Zero the motor
   }
 
@@ -171,7 +172,7 @@ public class Superstructure extends SubsystemBase {
         }
 
         case STOW -> {
-          if (pivot.getPosition() > -0.27) {
+          if (pivot.getPosition() < -0.27) {
             elevator.setPositionTarget(ElevatorTarget.BOTTOM);
           }
           pivot.setPositionTarget(PivotTarget.STOW);
@@ -185,6 +186,8 @@ public class Superstructure extends SubsystemBase {
               setCurrentState(SuperstructureState.L1);
             } else if (targetState == SuperstructureState.L2) {
               setCurrentState(SuperstructureState.L2);
+            } else if (targetState == SuperstructureState.CLIMB) {
+              setCurrentState(SuperstructureState.CLIMB);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.TOP);
             }
@@ -203,9 +206,20 @@ public class Superstructure extends SubsystemBase {
               setCurrentState(SuperstructureState.L1);
             } else if (targetState == SuperstructureState.L2) {
               setCurrentState(SuperstructureState.L2);
+            } else if (targetState == SuperstructureState.CLIMB) {
+              setCurrentState(SuperstructureState.CLIMB);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.TOP);
             }
+          }
+        }
+        case CLIMB -> {
+          elevator.setPositionTarget(ElevatorTarget.CLIMB);
+          pivot.setPositionTarget(PivotTarget.CLIMB);
+          tongue.setPositionTarget(TongueTarget.CLIMB);
+
+          if (superstructureReachedTarget() && targetState != currentState) {
+            setCurrentState(SuperstructureState.STOW);
           }
         }
         case ZERO -> {
