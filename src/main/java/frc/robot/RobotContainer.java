@@ -504,6 +504,10 @@ public class RobotContainer {
             new WaitCommand(105)
                 .andThen(
                     new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 3, 0.4))));
+    
+    // Smart zero the robot
+    CommandScheduler.getInstance()
+      .schedule(new InstantCommand(() -> swerve.smartZeroGyro()));
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {
