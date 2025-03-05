@@ -390,8 +390,7 @@ public class RobotContainer {
                 .goToStateCommand(SuperstructureState.TOP)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
 
-    driverB
-        .b()
+    new Trigger(() -> driverB.b().getAsBoolean() && driverB.start().getAsBoolean())
         .onTrue(
             climbController
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
