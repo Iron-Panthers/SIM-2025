@@ -10,8 +10,7 @@ public class ApproachReef extends Command {
   private DoubleSupplier levelOffsetSupplier;
 
   public enum LevelOffsets {
-    // these offsets are in metres
-    // FIXME: PLEASE tweak these offset values because these are just estimates/guesses
+    // metres
     L4_OFFSET(0.14),
     L3_OFFSET(0.1),
     L2_OFFSET(0),
@@ -37,6 +36,11 @@ public class ApproachReef extends Command {
     approachReef =
         RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
     approachReef.initialize();
+    System.out.println(
+        "Initializing ApproachReefCommand, offset of "
+            + levelOffsetSupplier.getAsDouble()
+            + ", bSide is "
+            + bSide);
   }
 
   @Override
