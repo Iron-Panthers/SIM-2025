@@ -201,7 +201,7 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (elevator.reachedTarget()) {
             if (targetState == SuperstructureState.STOW) {
-              setCurrentState(SuperstructureState.STOW);
+              setCurrentState(SuperstructureState.INTAKE);
             } else if (targetState == SuperstructureState.L1) {
               setCurrentState(SuperstructureState.L1);
             } else if (targetState == SuperstructureState.L2) {
