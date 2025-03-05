@@ -98,7 +98,10 @@ public class Superstructure extends SubsystemBase {
             if (targetState != currentState) {
               if (targetState == SuperstructureState.SCORE_L3) {
                 setCurrentState(SuperstructureState.SCORE_L3);
-              } else {
+              } 
+              else if (targetState == SuperstructureState.CLIMB){
+                setCurrentState(SuperstructureState.CLIMB);
+              }else {
                 setCurrentState(SuperstructureState.TOP);
               }
             }
@@ -124,7 +127,8 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
+                || targetState == SuperstructureState.SCORE_L3
+                || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L3);
             } else if (targetState == SuperstructureState.SCORE_L4) {
               if (tonguePoleDetected()) {
@@ -143,7 +147,8 @@ public class Superstructure extends SubsystemBase {
           if (targetState != currentState && this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.SETUP_L4
                 || targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
+                || targetState == SuperstructureState.SCORE_L3
+                || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L4);
             } else {
               setCurrentState(SuperstructureState.TOP);
@@ -163,7 +168,8 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.SCORE_L4) {
               setCurrentState(SuperstructureState.SETUP_L4);
             } else if (targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
+                || targetState == SuperstructureState.SCORE_L3 
+                || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L3);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.STOW);
@@ -186,8 +192,6 @@ public class Superstructure extends SubsystemBase {
               setCurrentState(SuperstructureState.L1);
             } else if (targetState == SuperstructureState.L2) {
               setCurrentState(SuperstructureState.L2);
-            } else if (targetState == SuperstructureState.CLIMB) {
-              setCurrentState(SuperstructureState.CLIMB);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.TOP);
             }
@@ -206,8 +210,6 @@ public class Superstructure extends SubsystemBase {
               setCurrentState(SuperstructureState.L1);
             } else if (targetState == SuperstructureState.L2) {
               setCurrentState(SuperstructureState.L2);
-            } else if (targetState == SuperstructureState.CLIMB) {
-              setCurrentState(SuperstructureState.CLIMB);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.TOP);
             }
@@ -219,7 +221,7 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.CLIMB);
 
           if (superstructureReachedTarget() && targetState != currentState) {
-            setCurrentState(SuperstructureState.STOW);
+            setCurrentState(SuperstructureState.SETUP_L3);
           }
         }
         case ZERO -> {

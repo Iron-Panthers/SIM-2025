@@ -183,7 +183,6 @@ public class RobotState {
     List<Pose2d> poses = new ArrayList<Pose2d>();
 
     Rotation2d horizontalOffset = bSide ? Rotation2d.kCW_Pi_2 : Rotation2d.kCCW_Pi_2;
-    System.out.println("bSide" + bSide);
 
     for (int i = 0; i < 6; ++i) {
       Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
