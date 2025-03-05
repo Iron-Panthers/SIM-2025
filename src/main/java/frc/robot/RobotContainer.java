@@ -36,8 +36,12 @@ import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIOTalonFX;
+import frc.robot.subsystems.superstructure.ClimbController;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
+import frc.robot.subsystems.superstructure.climb.Climb;
+import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
+import frc.robot.subsystems.superstructure.climb.ClimbOTalonFX;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOTalonFX;
@@ -78,10 +82,12 @@ public class RobotContainer {
   private Elevator elevator;
   private Pivot pivot;
   private Tongue tongue;
+  private Climb climb;
   private Superstructure superstructure;
   private RGB rgb;
   private CANWatchdog canWatchdog;
   private ApproachReef approachReef;
+  private ClimbController climbController;
 
   public RobotContainer() {
     intake = null;
@@ -109,6 +115,7 @@ public class RobotContainer {
           tongue = new Tongue(new TongueIOServo());
           rgb = new RGB(new RGBIOCANdle());
           canWatchdog = new CANWatchdog(new CANWatchdogIOComp(), rgb);
+          climb = new Climb(new ClimbOTalonFX());
         }
         case PROG -> {
           swerve =
@@ -183,6 +190,11 @@ public class RobotContainer {
     superstructure = new Superstructure(elevator, pivot, tongue);
 
     nameCommands();
+    if (climb == null) {
+      climb = new Climb(new ClimbOTalonFX());
+    }
+    climbController = new ClimbController(climb);
+
     configureAutos();
     configureBindings();
   }
@@ -288,15 +300,12 @@ public class RobotContainer {
         .x()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)))));
+
     driverA
         .b()
         .onTrue(
             new InstantCommand(() -> swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)))));
 
-    // driverA
-    //     .y()
-    //     .onTrue(
-    //         new InstantCommand(() -> tongue.setPositionTarget()));
     // -----Superstructure Controls-----
     // L1
     new Trigger(
@@ -361,16 +370,31 @@ public class RobotContainer {
                 }));
 
     // kinda manual commands
-    driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
     driverB
-        .b()
+        .leftBumper()
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.STOW)
+                .alongWith(climbController.setPositionTargetCommand(ClimbTarget.STOW)));
+    driverB
+        .y()
+        .onTrue(
+            climbController.setPositionTargetCommand(
+                ClimbTarget.TOP) // FIXME: We need to add elevator position up
+            );
+
+    driverB
+        .rightBumper()
         .onTrue(
             superstructure
                 .goToStateCommand(SuperstructureState.TOP)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
 
-    // Manual override
-    driverB.y().onTrue(superstructure.oneTimeOverrideCommand());
+    new Trigger(() -> driverB.b().getAsBoolean() && driverB.start().getAsBoolean())
+        .onTrue(
+            climbController
+                .setPositionTargetCommand(ClimbTarget.BOTTOM)
+                .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
 
     driverB // intake
         .leftTrigger()
@@ -439,14 +463,7 @@ public class RobotContainer {
     //         .goToPositionCommand(ElevatorTarget.BOTTOM)
     //         .alongWith(rollers.setTargetCommand(RollerState.IDLE))));
 
-    // driverB // eject
-    //     .rightTrigger()
-    //     .onTrue(
-    //         rollers
-    //             .setTargetCommand(Rollers.RollerState.EJECT)
-    //             .alongWith(pivot.goToPositionCommand(PivotTarget.SCORE_L4))
-    //             .andThen(elevator.goToPositionCommand(ElevatorTarget.L1))
-    //             .andThen(rollers.setTargetCommand(RollerState.IDLE)));
+    // driverB.rightTrigger().onTrue(climbController.clearCoral());
   }
 
   private void configureAutos() {
