@@ -370,7 +370,12 @@ public class RobotContainer {
                 }));
 
     // kinda manual commands
-    driverB.leftBumper().onTrue(superstructure.goToStateCommand(SuperstructureState.STOW));
+    driverB
+        .leftBumper()
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.STOW)
+                .alongWith(climbController.setPositionTargetCommand(ClimbTarget.STOW)));
     driverB
         .y()
         .onTrue(

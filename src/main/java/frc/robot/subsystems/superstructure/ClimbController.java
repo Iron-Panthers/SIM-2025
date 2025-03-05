@@ -18,7 +18,7 @@ public class ClimbController extends SubsystemBase {
   /** Creates a new ClimbController. */
   public ClimbController(Climb climb) {
     this.climb = climb;
-    climb.setOffset();
+    // climb.setOffset();
     // climb.setPositionTarget(ClimbTarget.STOW);
   }
 

@@ -172,7 +172,7 @@ public class Superstructure extends SubsystemBase {
         }
 
         case STOW -> {
-          if (pivot.getPosition() > -0.27) {
+          if (pivot.getPosition() < -0.27) {
             elevator.setPositionTarget(ElevatorTarget.BOTTOM);
           }
           pivot.setPositionTarget(PivotTarget.STOW);
