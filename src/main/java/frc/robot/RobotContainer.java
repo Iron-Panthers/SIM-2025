@@ -210,7 +210,7 @@ public class RobotContainer {
                 () ->
                     superstructure.getCurrentState() == SuperstructureState.SETUP_L4
                         && superstructure.superstructureReachedTarget(),
-                superstructure)));
+                superstructure)).withTimeout(4));
 
     NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT_TOP));
 
