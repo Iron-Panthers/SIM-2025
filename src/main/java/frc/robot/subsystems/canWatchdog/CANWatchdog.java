@@ -23,6 +23,9 @@ public class CANWatchdog extends SubsystemBase {
     RGBMessages.MISSING_CAN_DEVICE.setIsExpired(hasAllDevices);
     Logger.recordOutput("CANWatchdog/NumberOfMissingDevices", missingDevices.length);
     Logger.recordOutput("CANWatchdog/HasAllDevices", hasAllDevices());
+    if (!hasAllDevices()) {
+      Logger.recordOutput("CANWatchdog/FirstDeviceMissing", missingDevices[0]);
+    }
   }
 
   public void matchStarting() {
