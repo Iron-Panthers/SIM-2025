@@ -64,8 +64,8 @@ public class ClimbConstants {
   public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
 
   // CURRENT LIMITS
-  public static final double UPPER_VOLT_LIMIT = 12;
-  public static final double LOWER_VOLT_LIMIT = -12;
+  public static final double UPPER_VOLT_LIMIT = 4;
+  public static final double LOWER_VOLT_LIMIT = -4;
   public static final double SUPPLY_CURRENT_LIMIT = 30;
   public static final int ZEROING_CURRENT_LIMIT = 20; // FIXME currently doesn't exist lmao
 

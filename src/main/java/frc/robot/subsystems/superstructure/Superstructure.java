@@ -98,10 +98,9 @@ public class Superstructure extends SubsystemBase {
             if (targetState != currentState) {
               if (targetState == SuperstructureState.SCORE_L3) {
                 setCurrentState(SuperstructureState.SCORE_L3);
-              } 
-              else if (targetState == SuperstructureState.CLIMB){
+              } else if (targetState == SuperstructureState.CLIMB) {
                 setCurrentState(SuperstructureState.CLIMB);
-              }else {
+              } else {
                 setCurrentState(SuperstructureState.TOP);
               }
             }
@@ -168,7 +167,7 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.SCORE_L4) {
               setCurrentState(SuperstructureState.SETUP_L4);
             } else if (targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3 
+                || targetState == SuperstructureState.SCORE_L3
                 || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L3);
             } else if (targetState != currentState) {
