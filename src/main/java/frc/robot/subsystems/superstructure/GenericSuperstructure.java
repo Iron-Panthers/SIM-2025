@@ -9,7 +9,7 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
 
   public enum ControlMode {
     POSITION,
-    STOP,
+    STOP;
   }
 
   private ControlMode controlMode = ControlMode.STOP;

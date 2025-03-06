@@ -1,24 +1,24 @@
-package frc.robot.subsystems.superstructure.pivot;
+package frc.robot.subsystems.superstructure.climb;
 
-import static frc.robot.subsystems.superstructure.pivot.PivotConstants.*;
+import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
 
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import java.util.Optional;
 
-public class PivotIOTalonFX extends GenericSuperstructureIOTalonFX implements PivotIO {
+public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
-  public PivotIOTalonFX() {
+  public ClimbOTalonFX() {
     super(
-        PIVOT_CONFIG.motorID(),
+        CLIMB_CONFIG.motorID(),
         Optional.empty(),
         INVERT_MOTOR,
         Optional.empty(),
         SUPPLY_CURRENT_LIMIT,
-        PIVOT_CONFIG.canCoderID(),
-        PIVOT_CONFIG.canCoderOffset(),
-        Optional.empty(),
-        Optional.empty(),
-        PIVOT_CONFIG.reduction(),
+        CLIMB_CONFIG.canCoderID(),
+        CLIMB_CONFIG.canCoderOffset(),
+        CANCODER_DIRECTION,
+        SENSOR_DISCONTINUITY_POINT,
+        CLIMB_CONFIG.reduction(),
         UPPER_EXTENSION_LIMIT,
         LOWER_EXTENSION_LIMIT,
         UPPER_VOLT_LIMIT,
@@ -39,10 +39,5 @@ public class PivotIOTalonFX extends GenericSuperstructureIOTalonFX implements Pi
         MOTION_MAGIC_CONFIG.cruiseVelocity(),
         0,
         GRAVITY_TYPE);
-  }
-
-  @Override
-  public void runPosition(double position) {
-    super.runPosition(position / 360d); // convert degrees to rotations
   }
 }

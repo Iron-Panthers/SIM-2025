@@ -64,8 +64,14 @@ public class RobotState {
       };
   private Rotation2d lastGyroAngle = new Rotation2d();
 
-  private ApproachPose[] approachPoses = generateApproachPoses(12);
-  private double lastApproachOffset = 12;
+  @AutoLogOutput(key = "RobotState/Approach/LastOffset")
+  private double lastApproachOffset = 1;
+
+  @AutoLogOutput(key = "RobotState/Approach/LastBSide")
+  private boolean lastApproachBSide = false;
+
+  private ApproachPose[] approachPoses =
+      generateApproachPoses(lastApproachOffset, lastApproachBSide);
 
   private static RobotState instance;
 
@@ -171,33 +177,38 @@ public class RobotState {
     return estimatedPose;
   }
 
-  // returns 12 approach poses, corresponding offset from reef wall, in metres
-  private ApproachPose[] generateApproachPoses(double offset) {
+  // returns 6 approach poses, corresponding offset from reef wall & side, metres
+  private ApproachPose[] generateApproachPoses(double offset, boolean bSide) {
     Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
     List<Pose2d> poses = new ArrayList<Pose2d>();
+
+    Rotation2d horizontalOffset = bSide ? Rotation2d.kCW_Pi_2 : Rotation2d.kCCW_Pi_2;
+    System.out.println("bSide" + bSide);
 
     for (int i = 0; i < 6; ++i) {
       Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
       Pose2d directPose = offsetByVector(origin, (offset + 1.285), initialTheta);
-      Pose2d poseA = translateByVector(directPose, 0.165, Rotation2d.kCCW_Pi_2);
-      Pose2d poseB = translateByVector(directPose, 0.165, Rotation2d.kCW_Pi_2);
+      Pose2d pose = translateByVector(directPose, 0.165, horizontalOffset);
 
-      poses.add(poseA);
-      poses.add(poseB);
+      poses.add(pose);
     }
 
     var poseArray = poses.toArray(new Pose2d[poses.size()]);
-    Logger.recordOutput("RobotState/BlueApproachPoses", poseArray);
+
+    Logger.recordOutput("RobotState/Approach/BluePoses", poseArray);
+
+    lastApproachOffset = offset;
+    lastApproachBSide = bSide;
 
     return ApproachPose.fromPose2ds(poseArray);
   }
 
   public ApproachPose findApproachPose(double offset, boolean bSide) {
-    if (lastApproachOffset != offset) approachPoses = generateApproachPoses(offset);
+    approachPoses = generateApproachPoses(offset, bSide);
 
-    int closestIndex = bSide ? 1 : 0;
+    int closestIndex = 0;
     // absolutely not
-    for (int i = closestIndex; i < approachPoses.length; i += 2) {
+    for (int i = closestIndex; i < approachPoses.length; ++i) {
       if (getEstimatedPose()
               .getTranslation()
               .getDistance(approachPoses[i].getAlliancePose().getTranslation())
@@ -208,10 +219,12 @@ public class RobotState {
       }
     }
 
-    Logger.recordOutput("RobotState/ApproachPose", approachPoses[closestIndex].getAlliancePose());
+    ApproachPose approachPose = approachPoses[closestIndex];
+
+    Logger.recordOutput("RobotState/ApproachPose", approachPose.getAlliancePose());
     Logger.recordOutput("RobotState/ApproachPoseIndex", closestIndex);
 
-    return approachPoses[closestIndex];
+    return approachPose;
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {
