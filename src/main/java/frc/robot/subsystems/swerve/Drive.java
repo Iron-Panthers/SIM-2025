@@ -145,6 +145,14 @@ public class Drive extends SubsystemBase {
     return this.runOnce(() -> zeroGyro());
   }
 
+  public void smartZeroGyro() {
+    gyroYawOffset =
+        gyroInputs
+            .yawPosition
+            .minus(RobotState.getInstance().getEstimatedPose().getRotation())
+            .minus(new Rotation2d(Math.PI));
+  }
+
   @AutoLogOutput(key = "Swerve/ModuleStates")
   public SwerveModuleState[] getModuleStates() {
     return Arrays.stream(modules)
