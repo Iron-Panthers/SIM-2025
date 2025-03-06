@@ -279,6 +279,8 @@ public class RobotContainer {
 
     driverA.start().onTrue(swerve.zeroGyroCommand());
 
+    driverA.a().onTrue(new InstantCommand(() -> swerve.smartZeroGyro()));
+
     // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
     // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
     // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
@@ -370,12 +372,8 @@ public class RobotContainer {
                 }));
 
     // kinda manual commands
-    driverB
-        .leftBumper()
-        .onTrue(
-            superstructure
-                .goToStateCommand(SuperstructureState.STOW)
-                .alongWith(climbController.setPositionTargetCommand(ClimbTarget.STOW)));
+    driverB.leftBumper().onTrue(climbController.setPositionTargetCommand(ClimbTarget.STOW));
+
     driverB
         .y()
         .onTrue(
@@ -521,6 +519,9 @@ public class RobotContainer {
             new WaitCommand(105)
                 .andThen(
                     new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 3, 0.4))));
+
+    // Smart zero the robot
+    CommandScheduler.getInstance().schedule(new InstantCommand(() -> swerve.smartZeroGyro()));
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {

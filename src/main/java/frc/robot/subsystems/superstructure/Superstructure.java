@@ -64,8 +64,11 @@ public class Superstructure extends SubsystemBase {
           if (this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.L2) {
               setCurrentState(SuperstructureState.L2);
-            } else if (targetState != currentState) {
+            } else if (targetState == SuperstructureState.INTAKE
+                || targetState == SuperstructureState.STOW) {
               setCurrentState(SuperstructureState.STOW);
+            } else if (targetState != currentState) {
+              setCurrentState(SuperstructureState.TOP);
             }
           }
         }
@@ -79,8 +82,11 @@ public class Superstructure extends SubsystemBase {
             if (targetState != currentState) {
               if (targetState == SuperstructureState.L1) {
                 setCurrentState(SuperstructureState.L1);
-              } else {
+              } else if (targetState == SuperstructureState.INTAKE
+                  || targetState == SuperstructureState.STOW) {
                 setCurrentState(SuperstructureState.STOW);
+              } else if (targetState != currentState) {
+                setCurrentState(SuperstructureState.TOP);
               }
             }
           }
@@ -170,6 +176,10 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.SCORE_L3
                 || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L3);
+            } else if (targetState == SuperstructureState.L2) {
+              setCurrentState(SuperstructureState.L2);
+            } else if (targetState == SuperstructureState.L1) {
+              setCurrentState(SuperstructureState.L1);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.STOW);
             }
