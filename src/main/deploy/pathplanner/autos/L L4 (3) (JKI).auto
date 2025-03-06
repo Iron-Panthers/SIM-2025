@@ -21,7 +21,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.0
+                        "waitTime": 0.3
                       }
                     },
                     {
@@ -95,12 +95,6 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.0
-                      }
-                    },
-                    {
                       "type": "named",
                       "data": {
                         "name": "Score_L4"
@@ -173,7 +167,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.0
+                        "waitTime": 0.3
                       }
                     },
                     {

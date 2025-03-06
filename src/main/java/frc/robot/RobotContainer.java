@@ -214,15 +214,16 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Score_L4",
         new SequentialCommandGroup(
-            new WaitUntilCommand(() -> rollers.intakeDetected()),
-            new FunctionalCommand(
-                () -> superstructure.setTargetState(SuperstructureState.SETUP_L4),
-                () -> {},
-                (e) -> {},
-                () ->
-                    superstructure.getCurrentState() == SuperstructureState.SETUP_L4
-                        && superstructure.superstructureReachedTarget(),
-                superstructure)));
+                new WaitUntilCommand(() -> rollers.intakeDetected()),
+                new FunctionalCommand(
+                    () -> superstructure.setTargetState(SuperstructureState.SETUP_L4),
+                    () -> {},
+                    (e) -> {},
+                    () ->
+                        superstructure.getCurrentState() == SuperstructureState.SETUP_L4
+                            && superstructure.superstructureReachedTarget(),
+                    superstructure))
+            .withTimeout(2.6));
 
     NamedCommands.registerCommand("Eject", rollers.setTargetCommand(RollerState.EJECT_TOP));
 
