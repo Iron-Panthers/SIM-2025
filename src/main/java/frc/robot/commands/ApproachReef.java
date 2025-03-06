@@ -36,6 +36,7 @@ public class ApproachReef extends Command {
     approachReef =
         RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
     approachReef.initialize();
+
     System.out.println(
         "Initializing ApproachReefCommand, offset of "
             + levelOffsetSupplier.getAsDouble()
