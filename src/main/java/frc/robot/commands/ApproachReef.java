@@ -56,5 +56,6 @@ public class ApproachReef extends Command {
   @Override
   public void end(boolean interrupted) {
     approachReef.end(interrupted);
+    approachReef = null;
   }
 }
