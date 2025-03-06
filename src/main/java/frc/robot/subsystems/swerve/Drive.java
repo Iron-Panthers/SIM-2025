@@ -3,7 +3,6 @@ package frc.robot.subsystems.swerve;
 import static frc.robot.subsystems.swerve.DriveConstants.KINEMATICS;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -146,8 +145,12 @@ public class Drive extends SubsystemBase {
     return this.runOnce(() -> zeroGyro());
   }
 
-  public void smartZeroGyro(){
-    gyroYawOffset = gyroInputs.yawPosition.minus(RobotState.getInstance().getEstimatedPose().getRotation());
+  public void smartZeroGyro() {
+    gyroYawOffset =
+        gyroInputs
+            .yawPosition
+            .minus(RobotState.getInstance().getEstimatedPose().getRotation())
+            .minus(new Rotation2d(Math.PI));
   }
 
   @AutoLogOutput(key = "Swerve/ModuleStates")
