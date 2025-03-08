@@ -575,7 +575,9 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Tongue 2", tongue.pole2Detected());
 
     SmartDashboard.putBoolean("Coral Intaked", rollers.intakeDetected());
-    SmartDashboard.putBoolean("Climb Cage", climb.hitCage());
+    SmartDashboard.putBoolean("Climb Cage", !climb.hitCage());
+
+    SmartDashboard.putString("Current Auto", autoChooser.getSelected().getName());
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {
