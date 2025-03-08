@@ -56,6 +56,6 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     super.periodic();
     Logger.recordOutput("Superstructure/Climb/Hit Cage?", hitCage());
     Logger.recordOutput("Superstructure/Climb/Climb State", getPositionTarget());
-    SmartDashboard.putBoolean("Has Cage?", hitCage());
+    SmartDashboard.putBoolean("Has Cage?", !hitCage());
   }
 }
