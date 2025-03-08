@@ -233,6 +233,7 @@ public class RobotContainer {
             rollers.setTargetCommand(RollerState.EJECT_TOP),
             new WaitCommand(0.2),
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
+            new WaitCommand(0.9),
             rollers.setTargetCommand(RollerState.INTAKE)));
 
     new EventTrigger("Score_L4")
@@ -430,11 +431,40 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    // Eject if not at L1 or L2
+
+    // Eject Intake - ONLY IF ITS EXACTLY AT INTAKE
+        new Trigger(
+          () ->
+              (superstructure.getTargetState().equals(SuperstructureState.INTAKE) && superstructure.getCurrentState().equals(SuperstructureState.INTAKE) && superstructure.superstructureReachedTarget())
+                  && driverB.rightTrigger().getAsBoolean())
+      .onTrue(
+          rollers
+              .setTargetCommand(RollerState.EJECT_TOP)
+              .andThen(
+                  new WaitCommand(0.5)
+                      .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                      .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2 or Intake
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.INTAKE)
+                        && superstructure.getCurrentState().equals(SuperstructureState.INTAKE)
+                        && superstructure.superstructureReachedTarget())
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_TOP)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2 or Intake
     new Trigger(
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
-                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                        || superstructure.getTargetState().equals(SuperstructureState.L2)
+                        || superstructure.getTargetState().equals(SuperstructureState.INTAKE)
+                        )
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
