@@ -95,4 +95,12 @@ public class Tongue {
   public boolean poleDetected() {
     return inputs.pole1Detected && inputs.pole2Detected;
   }
+
+  public boolean pole1Detected() {
+    return inputs.pole1Detected;
+  }
+
+  public boolean pole2Detected() {
+    return inputs.pole2Detected;
+  }
 }
