@@ -268,7 +268,6 @@ public class Superstructure extends SubsystemBase {
           }
         }
         case DESCORE_LOW -> {
-          
           if (pivot.getPosition() < PivotTarget.DESCORE_LOW.getPosition() + 5) {
             elevator.setPositionTarget(ElevatorTarget.DESCORE_LOW);
           }
