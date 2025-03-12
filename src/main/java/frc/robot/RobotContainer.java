@@ -43,9 +43,11 @@ import frc.robot.subsystems.superstructure.climb.Climb;
 import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
 import frc.robot.subsystems.superstructure.climb.ClimbOTalonFX;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.superstructure.pivot.Pivot;
+import frc.robot.subsystems.superstructure.pivot.Pivot.PivotTarget;
 import frc.robot.subsystems.superstructure.pivot.PivotIO;
 import frc.robot.subsystems.superstructure.pivot.PivotIOTalonFX;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
@@ -430,11 +432,41 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    // Eject if not at L1 or L2
+
+    // Eject Intake - ONLY IF ITS EXACTLY AT INTAKE
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.INTAKE)
+                        && superstructure.getCurrentState().equals(SuperstructureState.INTAKE)
+                        && superstructure.superstructureReachedTarget())
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_TOP)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2 or Intake
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.INTAKE)
+                        && superstructure.getCurrentState().equals(SuperstructureState.INTAKE)
+                        && superstructure.superstructureReachedTarget())
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_TOP)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+    // Eject if not at L1 or L2 or Intake
     new Trigger(
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
-                        || superstructure.getTargetState().equals(SuperstructureState.L2))
+                        || superstructure.getTargetState().equals(SuperstructureState.L2)
+                        || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
             rollers
@@ -527,6 +559,24 @@ public class RobotContainer {
 
     // Smart zero the robot
     CommandScheduler.getInstance().schedule(new InstantCommand(() -> swerve.smartZeroGyro()));
+  }
+
+  public void updateDashboardStatus() {
+    SmartDashboard.putBoolean(
+        "Elevator Initial",
+        elevator.getPositionTarget() == ElevatorTarget.BOTTOM && elevator.reachedTarget());
+    SmartDashboard.putBoolean(
+        "Arm Initial", (pivot.getPositionTarget() == PivotTarget.STOW) && pivot.reachedTarget());
+    SmartDashboard.putBoolean(
+        "Climb Initial", climb.getPositionTarget() == ClimbTarget.STOW && climb.reachedTarget());
+
+    SmartDashboard.putBoolean("Tongue 1", tongue.pole1Detected());
+    SmartDashboard.putBoolean("Tongue 2", tongue.pole2Detected());
+
+    SmartDashboard.putBoolean("Coral Intaked", rollers.intakeDetected());
+    SmartDashboard.putBoolean("Climb Cage", !climb.hitCage());
+
+    SmartDashboard.putString("Current Auto", autoChooser.getSelected().getName());
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {

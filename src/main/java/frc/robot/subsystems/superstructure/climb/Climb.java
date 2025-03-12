@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure.climb;
 import static frc.robot.subsystems.superstructure.climb.ClimbConstants.INDUCTION_PORT_NUMBER;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.superstructure.GenericSuperstructure;
 import org.littletonrobotics.junction.Logger;
 
@@ -13,7 +14,7 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     BOTTOM(0.07), // FIXME: Just a placeholder value
 
     // "Top" is apex of climb
-    TOP(0.33), // FIXME: Just a placeholder value
+    TOP(0.34), // FIXME: Just a placeholder value
 
     // To get coral out
     CLEAR(-0.15), // FIXME: Just a placeholder value
@@ -55,5 +56,6 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     super.periodic();
     Logger.recordOutput("Superstructure/Climb/Hit Cage?", hitCage());
     Logger.recordOutput("Superstructure/Climb/Climb State", getPositionTarget());
+    SmartDashboard.putBoolean("Has Cage?", !hitCage());
   }
 }

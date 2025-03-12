@@ -15,7 +15,7 @@ import java.util.Optional;
 public class ClimbConstants {
   public static final ClimbConfig CLIMB_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new ClimbConfig(37, 2.5, Optional.of(29), Optional.of(0d)); // FIXME
+        case COMP -> new ClimbConfig(37, 2.5, Optional.of(29), Optional.of(0.19)); // FIXME
         case PROG -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
         case ALPHA -> new ClimbConfig(0, 0, Optional.empty(), Optional.empty()); // FIXME
         case SIM -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty()); // FIXME
@@ -65,7 +65,7 @@ public class ClimbConstants {
 
   // CURRENT LIMITS
   public static final double UPPER_VOLT_LIMIT = 4;
-  public static final double LOWER_VOLT_LIMIT = -4;
+  public static final double LOWER_VOLT_LIMIT = -8;
   public static final double SUPPLY_CURRENT_LIMIT = 30;
   public static final int ZEROING_CURRENT_LIMIT = 20; // FIXME currently doesn't exist lmao
 
