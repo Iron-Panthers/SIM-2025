@@ -235,7 +235,6 @@ public class RobotContainer {
             rollers.setTargetCommand(RollerState.EJECT_TOP),
             new WaitCommand(0.2),
             superstructure.goToStateCommand(SuperstructureState.INTAKE),
-            new WaitCommand(0.9),
             rollers.setTargetCommand(RollerState.INTAKE)));
 
     new EventTrigger("Score_L4")
