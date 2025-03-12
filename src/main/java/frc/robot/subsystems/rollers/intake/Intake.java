@@ -10,7 +10,7 @@ public class Intake extends GenericRollers<Intake.Target> {
     EJECT_TOP(-8),
     EJECT_L1(2.25),
     EJECT_L2(4.5);
-    DESCORE(4);
+    // DESCORE(4);
 
     private double volts;
 

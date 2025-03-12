@@ -27,7 +27,8 @@ public class Superstructure extends SubsystemBase {
     INTAKE,
     STOW, // Going to the lowest position
     CLIMB,
-    DESCORE, //Algae hitting 
+    DESCORE_HIGH, // Algae hitting on L3
+    DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
   }
 
@@ -110,8 +111,10 @@ public class Superstructure extends SubsystemBase {
               } else if (targetState == SuperstructureState.SETUP_L4
                   || targetState == SuperstructureState.SCORE_L4) {
                 setCurrentState(SuperstructureState.SETUP_L4);
-              } else if (targetState == SuperstructureState.DESCORE) {
-                setCurrentState(SuperstructureState.DESCORE);
+              } else if (targetState == SuperstructureState.DESCORE_HIGH) {
+                setCurrentState(SuperstructureState.DESCORE_HIGH);
+              } else if (targetState == SuperstructureState.DESCORE_LOW) {
+                setCurrentState(SuperstructureState.DESCORE_LOW);
               } else {
                 setCurrentState(SuperstructureState.TOP);
               }
@@ -141,8 +144,10 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.SCORE_L3
                 || targetState == SuperstructureState.CLIMB) {
               setCurrentState(SuperstructureState.SETUP_L3);
-            } else if (targetState == SuperstructureState.DESCORE) {
-              setCurrentState(SuperstructureState.DESCORE);
+            } else if (targetState == SuperstructureState.DESCORE_HIGH) {
+              setCurrentState(SuperstructureState.DESCORE_HIGH);
+            } else if (targetState == SuperstructureState.DESCORE_LOW) {
+              setCurrentState(SuperstructureState.DESCORE_LOW);
             } else if (targetState == SuperstructureState.SCORE_L4) {
               if (tonguePoleDetected()) {
                 setCurrentState(SuperstructureState.SCORE_L4);
@@ -162,7 +167,8 @@ public class Superstructure extends SubsystemBase {
                 || targetState == SuperstructureState.SETUP_L3
                 || targetState == SuperstructureState.SCORE_L3
                 || targetState == SuperstructureState.CLIMB
-                || targetState == SuperstructureState.DESCORE) {
+                || targetState == SuperstructureState.DESCORE_HIGH
+                || targetState == SuperstructureState.DESCORE_LOW) {
               setCurrentState(SuperstructureState.SETUP_L4);
             } else {
               setCurrentState(SuperstructureState.TOP);
@@ -190,8 +196,10 @@ public class Superstructure extends SubsystemBase {
               setCurrentState(SuperstructureState.L2);
             } else if (targetState == SuperstructureState.L1) {
               setCurrentState(SuperstructureState.L1);
-            } else if (targetState == SuperstructureState.DESCORE) {
-              setCurrentState(SuperstructureState.DESCORE);
+            } else if (targetState == SuperstructureState.DESCORE_HIGH) {
+              setCurrentState(SuperstructureState.DESCORE_HIGH);
+            } else if (targetState == SuperstructureState.DESCORE_LOW) {
+              setCurrentState(SuperstructureState.DESCORE_LOW);
             } else if (targetState != currentState) {
               setCurrentState(SuperstructureState.STOW);
             }
@@ -247,13 +255,25 @@ public class Superstructure extends SubsystemBase {
             setCurrentState(SuperstructureState.SETUP_L3);
           }
         }
-        case DESCORE -> {
-          if (pivot.getPosition()>-0.2){
-            elevator.setPositionTarget(ElevatorTarget.DESCORE);
+        case DESCORE_HIGH -> {
+          // Probably needs to change?
+          // -1 is somewhat arbitrary
+          if (pivot.getPosition() > -1) {
+            elevator.setPositionTarget(ElevatorTarget.DESCORE_HIGH);
           }
-          pivot.setPositionTarget(PivotTarget.DESCORE);
+          pivot.setPositionTarget(PivotTarget.DESCORE_HIGH);
           tongue.setPositionTarget(TongueTarget.DESCORE);
-          if (targetState != currentState){
+          if (targetState != currentState) {
+            setCurrentState(SuperstructureState.SETUP_L3);
+          }
+        }
+        case DESCORE_LOW -> {
+          if (pivot.getPosition() > -1) {
+            elevator.setPositionTarget(ElevatorTarget.DESCORE_LOW);
+          }
+          pivot.setPositionTarget(PivotTarget.DESCORE_LOW);
+          tongue.setPositionTarget(TongueTarget.DESCORE);
+          if (targetState != currentState) {
             setCurrentState(SuperstructureState.SETUP_L3);
           }
         }
