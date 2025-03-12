@@ -1,5 +1,7 @@
 package frc.robot.subsystems.superstructure;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 
 public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarget> {
@@ -9,6 +11,7 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
 
   public enum ControlMode {
     POSITION,
+    POSITION_MANUAL,
     STOP;
   }
 
@@ -16,6 +19,8 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
 
   protected final String name;
   protected final GenericSuperstructureIO superstructureIO;
+
+  private Optional<Double> positionTargetManual = Optional.empty();
 
   private GenericSuperstructureIOInputsAutoLogged inputs =
       new GenericSuperstructureIOInputsAutoLogged();
@@ -36,6 +41,9 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
       case POSITION -> {
         superstructureIO.runPosition(positionTarget.getPosition());
       }
+      case POSITION_MANUAL -> {
+        positionTargetManual.ifPresent(superstructureIO::runPosition);
+      }
       case STOP -> {
         superstructureIO.stop();
       }
@@ -55,11 +63,21 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
     this.positionTarget = positionTarget;
   }
 
+  public void setPositionTargetManual(double position){
+    setControlMode(ControlMode.POSITION_MANUAL);
+    positionTargetManual = Optional.of(position);
+  }
+
   public ControlMode getControlMode() {
     return controlMode;
   }
 
   public void setControlMode(ControlMode controlMode) {
+    if(controlMode == ControlMode.POSITION_MANUAL){
+      positionTargetManual = Optional.of(inputs.positionRotations);
+    } else {
+      positionTargetManual = Optional.empty();
+    }
     this.controlMode = controlMode;
   }
 

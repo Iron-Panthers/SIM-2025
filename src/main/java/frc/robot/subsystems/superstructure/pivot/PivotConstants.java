@@ -46,6 +46,7 @@ public class PivotConstants {
   public static final boolean INVERT_MOTOR = true;
 
   public static final double POSITION_TARGET_EPSILON = 0.01;
+  public static final double PIVOT_LENGTH = 25; // inches
 
   // SOFT LIMITS
   public static final Optional<Double> UPPER_EXTENSION_LIMIT = Optional.of(0.465);
