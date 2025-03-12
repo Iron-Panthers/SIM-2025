@@ -139,7 +139,7 @@ public class Superstructure extends SubsystemBase {
           if(getElevatorPosition() > ElevatorTarget.INTAKE_SIDE.getPosition() && !elevator.reachedTarget()){
             elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
           }else{
-            double calculatedPosition = -Math.sin(getElevatorPosition())*PivotConstants.PIVOT_LENGTH + ElevatorTarget.INTAKE_SIDE.getPosition();// do some math to calculate the elevator position that it needs to be at for the pivot to be at the correct position
+            double calculatedPosition = -Math.sin(getPivotPosition())*PivotConstants.PIVOT_LENGTH + ElevatorTarget.INTAKE_SIDE.getPosition();// do some math to calculate the elevator position that it needs to be at for the pivot to be at the correct position
             elevator.setPositionTargetManual(calculatedPosition);
           }
           tongue.setPositionTarget(TongueTarget.STOW);
