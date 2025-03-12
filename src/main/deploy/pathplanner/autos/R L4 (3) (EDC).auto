@@ -21,7 +21,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.3
+                        "waitTime": 0.0
                       }
                     },
                     {
@@ -195,9 +195,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "Eject_L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Eject_L4"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CR"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
