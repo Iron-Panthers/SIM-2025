@@ -18,8 +18,8 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     ZERO_HIGH(90),
     SETUP_L4(146),
     SCORE_L4(149),
-    INTAKE_SIDE(0),
-    SCORE_SIDE(140);
+    INTAKE_SIDE(40),
+    SCORE_SIDE(100);
 
     private double position;
 

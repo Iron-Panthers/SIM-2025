@@ -1,7 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
 import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
 
 public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarget> {
@@ -63,7 +62,7 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
     this.positionTarget = positionTarget;
   }
 
-  public void setPositionTargetManual(double position){
+  public void setPositionTargetManual(double position) {
     setControlMode(ControlMode.POSITION_MANUAL);
     positionTargetManual = Optional.of(position);
   }
@@ -73,7 +72,7 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
   }
 
   public void setControlMode(ControlMode controlMode) {
-    if(controlMode == ControlMode.POSITION_MANUAL){
+    if (controlMode == ControlMode.POSITION_MANUAL) {
       positionTargetManual = Optional.of(inputs.positionRotations);
     } else {
       positionTargetManual = Optional.empty();
