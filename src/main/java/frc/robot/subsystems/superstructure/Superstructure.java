@@ -27,6 +27,7 @@ public class Superstructure extends SubsystemBase {
     INTAKE,
     STOW, // Going to the lowest position
     CLIMB,
+    PREVENT_TIPPING,
     ZERO; // Zero the motor
   }
 
@@ -110,7 +111,7 @@ public class Superstructure extends SubsystemBase {
                   || targetState == SuperstructureState.SCORE_L4) {
                 setCurrentState(SuperstructureState.SETUP_L4);
               } else {
-                setCurrentState(SuperstructureState.TOP);
+                setCurrentState(SuperstructureState.PREVENT_TIPPING);
               }
             }
           }
@@ -128,22 +129,71 @@ public class Superstructure extends SubsystemBase {
             }
           }
         }
+
+          // ALL OF OUR TOP TO SCORE_SIDE STATES
+        case PREVENT_TIPPING -> {
+          // this one we have to make the elevator manually go to the correct position to avoid the
+          // pivot touching the intake
+
+          // switch our pivot based on our next state
+          switch (targetState) {
+            case SETUP_L4, SCORE_L4, SETUP_L3, SCORE_L3, CLIMB, PREVENT_TIPPING -> pivot
+                .setPositionTarget(PivotTarget.SCORE_SIDE);
+            default -> pivot.setPositionTarget(PivotTarget.INTAKE_SIDE);
+          }
+
+          if (pivot.getPosition() > -60.0
+              && (pivot.getPositionTarget() == PivotTarget.INTAKE_SIDE
+                  || (pivot.getPositionTarget() == PivotTarget.SCORE_SIDE
+                      && pivot.getPosition() < 90.0))) { // not in constants
+            elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
+          } else if (targetState != currentState) {
+            switch (targetState) { // set elevator pos based on target state
+              case SETUP_L4, SCORE_L4 -> elevator.setPositionTarget(ElevatorTarget.SETUP_L4);
+              case SETUP_L3, SCORE_L3, CLIMB -> {
+                if (pivot.getPosition() > 90.0) {
+                  elevator.setPositionTarget(ElevatorTarget.CLIMB);
+                } else {
+                  elevator.setPositionTarget(ElevatorTarget.TOP);
+                }
+              }
+              default -> elevator.setPositionTarget(ElevatorTarget.TOP);
+            }
+          }
+
+          if (targetState != SuperstructureState.CLIMB && pivot.getPosition() > 90.0) {
+            tongue.setPositionTarget(TongueTarget.L4);
+          } else {
+            tongue.setPositionTarget(TongueTarget.STOW);
+          }
+
+          if (currentState != targetState
+              && elevator.reachedTarget()
+              && (Math.abs(
+                      pivot.getPositionTarget().getPosition() / 360d - pivot.getPosition() / 360d)
+                  < 0.05)) {
+            switch (targetState) {
+              case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
+              case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SETUP_L3);
+              default -> setCurrentState(SuperstructureState.TOP);
+            }
+          }
+        }
+
         case SETUP_L4 -> {
           elevator.setPositionTarget(ElevatorTarget.SETUP_L4);
           pivot.setPositionTarget(PivotTarget.SETUP_L4);
           tongue.setPositionTarget(TongueTarget.L4);
           // check for state transitions
-          if (this.superstructureReachedTarget()) {
-            if (targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3
-                || targetState == SuperstructureState.CLIMB) {
-              setCurrentState(SuperstructureState.SETUP_L3);
-            } else if (targetState == SuperstructureState.SCORE_L4) {
-              if (tonguePoleDetected()) {
-                setCurrentState(SuperstructureState.SCORE_L4);
+          if (currentState != targetState && this.superstructureReachedTarget()) {
+            switch (targetState) {
+              case SCORE_L4 -> {
+                if (tonguePoleDetected()) {
+                  setCurrentState(SuperstructureState.SCORE_L4);
+                }
               }
-            } else if (targetState != currentState) {
-              setCurrentState(SuperstructureState.TOP);
+              case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SETUP_L3);
+              default -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
             }
           }
         }
@@ -153,13 +203,10 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.STOW);
           // check for state transitions
           if (targetState != currentState && this.superstructureReachedTarget()) {
-            if (targetState == SuperstructureState.SETUP_L4
-                || targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3
-                || targetState == SuperstructureState.CLIMB) {
-              setCurrentState(SuperstructureState.SETUP_L4);
-            } else {
-              setCurrentState(SuperstructureState.TOP);
+            switch (targetState) {
+              case SETUP_L4, SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(
+                  SuperstructureState.SETUP_L4);
+              default -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
             }
           }
         }
@@ -171,21 +218,17 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.TOP);
 
           // check for state transitions
-          if (this.superstructureReachedTarget()) {
-            if (targetState == SuperstructureState.SETUP_L4
-                || targetState == SuperstructureState.SCORE_L4) {
-              setCurrentState(SuperstructureState.SETUP_L4);
-            } else if (targetState == SuperstructureState.SETUP_L3
-                || targetState == SuperstructureState.SCORE_L3) {
-              setCurrentState(SuperstructureState.SETUP_L3);
-            } else if (targetState == SuperstructureState.CLIMB) {
-              setCurrentState(SuperstructureState.CLIMB);
-            } else if (targetState == SuperstructureState.L2) {
-              setCurrentState(SuperstructureState.L2);
-            } else if (targetState == SuperstructureState.L1) {
-              setCurrentState(SuperstructureState.L1);
-            } else if (targetState != currentState) {
-              setCurrentState(SuperstructureState.STOW);
+          if (currentState != targetState && this.superstructureReachedTarget()) {
+            switch (targetState) {
+              case SETUP_L4,
+                  SETUP_L3,
+                  SCORE_L3,
+                  SCORE_L4,
+                  CLIMB,
+                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case L2 -> setCurrentState(SuperstructureState.L2);
+              case L1 -> setCurrentState(SuperstructureState.L1);
+              default -> setCurrentState(SuperstructureState.STOW);
             }
           }
         }
@@ -198,7 +241,7 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.STOW);
 
           // check for state transitions
-          if (this.superstructureReachedTarget()) {
+          if (currentState != targetState && this.superstructureReachedTarget()) {
             if (targetState == SuperstructureState.INTAKE) {
               setCurrentState(SuperstructureState.INTAKE);
             } else if (targetState == SuperstructureState.L1) {
@@ -216,7 +259,7 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.INTAKE);
 
           // check for state transitions
-          if (elevator.reachedTarget()) {
+          if (currentState != targetState && elevator.reachedTarget()) {
             if (targetState == SuperstructureState.STOW) {
               setCurrentState(SuperstructureState.INTAKE);
             } else if (targetState == SuperstructureState.L1) {
