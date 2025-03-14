@@ -272,7 +272,9 @@ public class Superstructure extends SubsystemBase {
           }
         }
         case CLIMB -> {
-          elevator.setPositionTarget(ElevatorTarget.CLIMB);
+          if (pivot.getPosition() > 0) {
+            elevator.setPositionTarget(ElevatorTarget.CLIMB);
+          }
           pivot.setPositionTarget(PivotTarget.CLIMB);
           tongue.setPositionTarget(TongueTarget.CLIMB);
 
