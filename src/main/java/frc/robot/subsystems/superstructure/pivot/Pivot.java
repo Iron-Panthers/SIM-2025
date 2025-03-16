@@ -19,6 +19,8 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     SETUP_L4(146),
     SCORE_L4(149),
     DESCORE_HIGH(0),
+    INTAKE_SIDE(40),
+    SCORE_SIDE(100);
 
     // for the algae on L2
     DESCORE_LOW(-15);

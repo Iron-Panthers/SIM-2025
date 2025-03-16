@@ -347,6 +347,7 @@ public class RobotContainer {
             superstructure
                 .goToStateCommand(SuperstructureState.SCORE_L3)
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)));
+
     // Go to L4
     new Trigger(
             () ->
@@ -355,8 +356,14 @@ public class RobotContainer {
                     && driverB.povUp().getAsBoolean())
         .onTrue(
             superstructure
-                .goToStateCommand(SuperstructureState.SCORE_L4)
+                .goToStateCommand(SuperstructureState.PREVENT_TIPPING)
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
+    new Trigger(
+            () ->
+                driverB
+                    .povUp()
+                    .getAsBoolean()) // only worry about release of this to change anything
+        .onFalse(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
     driverB // ZERO our mechanism
         .a()
@@ -444,20 +451,6 @@ public class RobotContainer {
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
 
     // Eject Intake - ONLY IF ITS EXACTLY AT INTAKE
-    new Trigger(
-            () ->
-                (superstructure.getTargetState().equals(SuperstructureState.INTAKE)
-                        && superstructure.getCurrentState().equals(SuperstructureState.INTAKE)
-                        && superstructure.superstructureReachedTarget())
-                    && driverB.rightTrigger().getAsBoolean())
-        .onTrue(
-            rollers
-                .setTargetCommand(RollerState.EJECT_TOP)
-                .andThen(
-                    new WaitCommand(0.5)
-                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
-                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    // Eject if not at L1 or L2 or Intake
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.INTAKE)

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.superstructure.tongue;
 
+import static frc.robot.subsystems.superstructure.tongue.TongueConstants.TONGUE_OFFSET;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Tongue {
@@ -21,7 +23,7 @@ public class Tongue {
     }
 
     public double getPosition() {
-      return position;
+      return position + TONGUE_OFFSET;
     }
   }
 
