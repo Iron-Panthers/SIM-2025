@@ -76,6 +76,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
+
   private LevelOffsets levelOffsets = LevelOffsets.L4_OFFSET;
   private Drive swerve;
   private Vision vision;
@@ -387,26 +388,41 @@ public class RobotContainer {
 
     // kinda manual commands
     driverB.leftBumper().onTrue(climbController.setPositionTargetCommand(ClimbTarget.STOW));
-
-    driverB
-        .y()
-        .onTrue(
-            climbController.setPositionTargetCommand(
-                ClimbTarget.TOP) // FIXME: We need to add elevator position up
-            );
-
     driverB
         .rightBumper()
         .onTrue(
             superstructure
                 .goToStateCommand(SuperstructureState.TOP)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
+    // climb
+    new Trigger(
+            () ->
+                driverB.y().getAsBoolean()
+                    && driverB.start().getAsBoolean()
+                    && superstructure.getTargetState() == SuperstructureState.CLIMB)
+        .onTrue(
+            climbController.setPositionTargetCommand(
+                ClimbTarget.TOP) // FIXME: We need to add elevator position up
+            );
 
-    new Trigger(() -> driverB.b().getAsBoolean() && driverB.start().getAsBoolean())
+    new Trigger(
+            () ->
+                driverB.b().getAsBoolean()
+                    && driverB.start().getAsBoolean()
+                    && superstructure.getTargetState() != SuperstructureState.CLIMB)
         .onTrue(
             climbController
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
                 .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
+    // Descore
+    new Trigger(
+            () ->
+                driverB.b().getAsBoolean()
+                    && !driverB.start().getAsBoolean()
+                    && superstructure.getTargetState() != SuperstructureState.CLIMB)
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW));
+    new Trigger(() -> driverB.y().getAsBoolean())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH));
 
     driverB // intake
         .leftTrigger()

@@ -28,6 +28,8 @@ public class Superstructure extends SubsystemBase {
     STOW, // Going to the lowest position
     CLIMB,
     PREVENT_TIPPING,
+    DESCORE_HIGH, // Algae hitting on L3
+    DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
   }
 
@@ -110,6 +112,10 @@ public class Superstructure extends SubsystemBase {
               } else if (targetState == SuperstructureState.SETUP_L4
                   || targetState == SuperstructureState.SCORE_L4) {
                 setCurrentState(SuperstructureState.SETUP_L4);
+              } else if (targetState == SuperstructureState.DESCORE_HIGH) {
+                setCurrentState(SuperstructureState.DESCORE_HIGH);
+              } else if (targetState == SuperstructureState.DESCORE_LOW) {
+                setCurrentState(SuperstructureState.DESCORE_LOW);
               } else {
                 setCurrentState(SuperstructureState.PREVENT_TIPPING);
               }
@@ -175,6 +181,8 @@ public class Superstructure extends SubsystemBase {
             switch (targetState) {
               case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
               case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SETUP_L3);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
               default -> setCurrentState(SuperstructureState.TOP);
             }
           }
@@ -228,6 +236,8 @@ public class Superstructure extends SubsystemBase {
                   PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
               case L2 -> setCurrentState(SuperstructureState.L2);
               case L1 -> setCurrentState(SuperstructureState.L1);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
               default -> setCurrentState(SuperstructureState.STOW);
             }
           }
@@ -280,6 +290,46 @@ public class Superstructure extends SubsystemBase {
 
           if (superstructureReachedTarget() && targetState != currentState) {
             setCurrentState(SuperstructureState.SETUP_L3);
+          }
+        }
+        case DESCORE_HIGH -> {
+          // Probably needs to change?
+          // -1 is somewhat arbitrary
+          if (pivot.getPosition() > -60) {
+            elevator.setPositionTarget(ElevatorTarget.DESCORE_HIGH);
+          }
+          pivot.setPositionTarget(PivotTarget.DESCORE_HIGH);
+          tongue.setPositionTarget(TongueTarget.DESCORE);
+          if (targetState != currentState) {
+            switch (targetState) {
+              case SETUP_L4,
+                  SETUP_L3,
+                  SCORE_L3,
+                  SCORE_L4,
+                  CLIMB,
+                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
+              default -> setCurrentState(SuperstructureState.TOP);
+            }
+          }
+        }
+        case DESCORE_LOW -> {
+          if (pivot.getPosition() > -60) {
+            elevator.setPositionTarget(ElevatorTarget.DESCORE_LOW);
+          }
+          pivot.setPositionTarget(PivotTarget.DESCORE_LOW);
+          tongue.setPositionTarget(TongueTarget.DESCORE);
+          if (targetState != currentState) {
+            switch (targetState) {
+              case SETUP_L4,
+                  SETUP_L3,
+                  SCORE_L3,
+                  SCORE_L4,
+                  CLIMB,
+                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              default -> setCurrentState(SuperstructureState.TOP);
+            }
           }
         }
         case ZERO -> {

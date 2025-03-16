@@ -15,9 +15,10 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
     TOP(31),
     INTAKE(0),
     CLIMB(8),
+    DESCORE_HIGH(19.5),
+    DESCORE_LOW(9.2),
     INTAKE_SIDE(8),
     SCORE_SIDE(8);
-
     private double position = 0;
 
     private ElevatorTarget(double position) {
