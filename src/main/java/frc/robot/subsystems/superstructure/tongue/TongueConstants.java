@@ -18,7 +18,7 @@ public class TongueConstants {
   public static final boolean INVERT_MOTOR = true;
 
   public static final double POSITION_TARGET_EPSILON = 5;
-  public static final double TONGUE_OFFSET = 60;
+  public static final double TONGUE_OFFSET = 0;
   // SOFT LIMITS
   public static final Optional<Double> UPPER_EXTENSION_LIMIT =
       Optional.empty(); // top limit is 121 rotations
