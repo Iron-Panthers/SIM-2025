@@ -181,6 +181,8 @@ public class Superstructure extends SubsystemBase {
             switch (targetState) {
               case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
               case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SETUP_L3);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
               default -> setCurrentState(SuperstructureState.TOP);
             }
           }
@@ -193,8 +195,8 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
             switch (targetState) {
-                if (tonguePoleDetected()) {
               case SCORE_L4 -> {
+                if (tonguePoleDetected()) {
                   setCurrentState(SuperstructureState.SCORE_L4);
                 }
               }
@@ -211,8 +213,8 @@ public class Superstructure extends SubsystemBase {
           if (targetState != currentState && this.superstructureReachedTarget()) {
             switch (targetState) {
               case SETUP_L4, SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(
-              default -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
                   SuperstructureState.SETUP_L4);
+              default -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
             }
           }
         }
@@ -234,6 +236,8 @@ public class Superstructure extends SubsystemBase {
                   PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
               case L2 -> setCurrentState(SuperstructureState.L2);
               case L1 -> setCurrentState(SuperstructureState.L1);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
               default -> setCurrentState(SuperstructureState.STOW);
             }
           }
@@ -291,23 +295,41 @@ public class Superstructure extends SubsystemBase {
         case DESCORE_HIGH -> {
           // Probably needs to change?
           // -1 is somewhat arbitrary
-          if (pivot.getPosition() < PivotTarget.DESCORE_HIGH.getPosition() + 5) {
+          if (pivot.getPosition() > -60) {
             elevator.setPositionTarget(ElevatorTarget.DESCORE_HIGH);
           }
           pivot.setPositionTarget(PivotTarget.DESCORE_HIGH);
           tongue.setPositionTarget(TongueTarget.DESCORE);
           if (targetState != currentState) {
-            setCurrentState(SuperstructureState.SETUP_L3);
+            switch (targetState) {
+              case SETUP_L4,
+                  SETUP_L3,
+                  SCORE_L3,
+                  SCORE_L4,
+                  CLIMB,
+                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
+              default -> setCurrentState(SuperstructureState.TOP);
+            }
           }
         }
         case DESCORE_LOW -> {
-          if (pivot.getPosition() < PivotTarget.DESCORE_LOW.getPosition() + 5) {
+          if (pivot.getPosition() > -60) {
             elevator.setPositionTarget(ElevatorTarget.DESCORE_LOW);
           }
           pivot.setPositionTarget(PivotTarget.DESCORE_LOW);
           tongue.setPositionTarget(TongueTarget.DESCORE);
           if (targetState != currentState) {
-            setCurrentState(SuperstructureState.SETUP_L3);
+            switch (targetState) {
+              case SETUP_L4,
+                  SETUP_L3,
+                  SCORE_L3,
+                  SCORE_L4,
+                  CLIMB,
+                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
+              default -> setCurrentState(SuperstructureState.TOP);
+            }
           }
         }
         case ZERO -> {
