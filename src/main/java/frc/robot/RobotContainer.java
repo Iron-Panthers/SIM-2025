@@ -235,8 +235,10 @@ public class RobotContainer {
         new SequentialCommandGroup(
             rollers.setTargetCommand(RollerState.EJECT_TOP),
             new WaitCommand(0.2),
-            superstructure.goToStateCommand(SuperstructureState.INTAKE),
-            rollers.setTargetCommand(RollerState.INTAKE)));
+            superstructure
+                .goToStateCommand(SuperstructureState.INTAKE)
+                .alongWith(
+                    new WaitCommand(0.4).andThen(rollers.setTargetCommand(RollerState.INTAKE)))));
 
     new EventTrigger("Score_L4")
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
