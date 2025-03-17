@@ -556,8 +556,14 @@ public class RobotContainer {
     return autoChooser.getSelected();
   }
 
+  // runs when auto starts
+  public void autoInit() {
+    // Smart zero the robot
+    CommandScheduler.getInstance().schedule(new InstantCommand(() -> swerve.smartZeroGyro()));
+  }
+
+  // runs when teleop starts
   public void teleopInit() {
-    // runs when teleop happens
     CommandScheduler.getInstance()
         .schedule(new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 5, .5)));
 
@@ -567,9 +573,6 @@ public class RobotContainer {
             new WaitCommand(105)
                 .andThen(
                     new ParallelCommandGroup(new VibrateHIDCommand(driverB.getHID(), 3, 0.4))));
-
-    // Smart zero the robot
-    CommandScheduler.getInstance().schedule(new InstantCommand(() -> swerve.smartZeroGyro()));
   }
 
   public void updateDashboardStatus() {
