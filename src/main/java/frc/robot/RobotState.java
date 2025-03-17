@@ -5,7 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -72,6 +74,8 @@ public class RobotState {
 
   private ApproachPose[] approachPoses =
       generateApproachPoses(lastApproachOffset, lastApproachBSide);
+
+  private ApproachPose[] alignPoses = generateAlignPoses();
 
   private static RobotState instance;
 
@@ -191,13 +195,28 @@ public class RobotState {
 
       poses.add(pose);
     }
-
     var poseArray = poses.toArray(new Pose2d[poses.size()]);
 
     Logger.recordOutput("RobotState/Approach/BluePoses", poseArray);
 
-    lastApproachOffset = offset;
-    lastApproachBSide = bSide;
+    return ApproachPose.fromPose2ds(poseArray);
+  }
+
+  // returns 6 align poses
+  private ApproachPose[] generateAlignPoses() {
+    Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
+    List<Pose2d> poses = new ArrayList<Pose2d>();
+
+    for (int i = 0; i < 6; ++i) {
+      Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
+      Pose2d directPose = offsetByVector(origin, 2, initialTheta);
+      Pose2d pose = translateByVector(directPose, 0.165, new Rotation2d(0));
+
+      poses.add(pose);
+    }
+    var poseArray = poses.toArray(new Pose2d[poses.size()]);
+
+    Logger.recordOutput("RobotState/Approach/BlueAlignPoses", poseArray);
 
     return ApproachPose.fromPose2ds(poseArray);
   }
@@ -226,8 +245,42 @@ public class RobotState {
     return approachPose;
   }
 
+  public ApproachPose findAlignPose() {
+    alignPoses = generateAlignPoses();
+
+    int closestIndex = 0;
+    // absolutely not
+    for (int i = closestIndex; i < alignPoses.length; ++i) {
+      if (getEstimatedPose()
+              .getTranslation()
+              .getDistance(alignPoses[i].getAlliancePose().getTranslation())
+          < getEstimatedPose()
+              .getTranslation()
+              .getDistance(alignPoses[closestIndex].getAlliancePose().getTranslation())) {
+        closestIndex = i;
+      }
+    }
+
+    ApproachPose alignPose = alignPoses[closestIndex];
+
+    Logger.recordOutput("RobotState/AlignPose", alignPose.getAlliancePose());
+    Logger.recordOutput("RobotState/AlignPoseIndex", closestIndex);
+
+    return alignPose;
+  }
+
   public Command approachReefCommand(double offset, boolean bSide) {
-    return generateOTFPoseCommand(findApproachPose(offset, bSide).getAlliancePose());
+    List<Waypoint> waypoints =
+        PathPlannerPath.waypointsFromPoses(
+            findAlignPose().getAlliancePose(), findApproachPose(offset, bSide).getAlliancePose());
+
+    PathPlannerPath path =
+        new PathPlannerPath(
+            waypoints,
+            DriveConstants.ALIGN_PATH_CONSTRAINTS,
+            null,
+            new GoalEndState(0.0, findApproachPose(offset, bSide).getAlliancePose().getRotation()));
+    return generateOTFPathCommand(path);
   }
 
   public static Command generateOTFPoseCommand(Pose2d pose) {
