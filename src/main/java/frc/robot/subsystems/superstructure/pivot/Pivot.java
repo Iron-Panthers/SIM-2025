@@ -10,14 +10,20 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     INTAKE(-94.45),
     STOW(-94.45), // FIXME
     L1(-110),
-    L2(-110),
+    L2(-107),
     SCORE_L3(111),
     SETUP_L3(90),
     CLIMB(140),
     ZERO_LOW(-95.2),
     ZERO_HIGH(90),
     SETUP_L4(146),
-    SCORE_L4(149);
+    SCORE_L4(149),
+    DESCORE_HIGH(0),
+    INTAKE_SIDE(40),
+    SCORE_SIDE(100),
+
+    // for the algae on L2
+    DESCORE_LOW(-15);
 
     private double position;
 
