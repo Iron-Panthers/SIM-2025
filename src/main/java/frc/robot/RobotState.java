@@ -209,7 +209,7 @@ public class RobotState {
 
     for (int i = 0; i < 6; ++i) {
       Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
-      Pose2d directPose = offsetByVector(origin, 2, initialTheta);
+      Pose2d directPose = offsetByVector(origin, 1.77, initialTheta);
       Pose2d pose = translateByVector(directPose, 0.165, new Rotation2d(0));
 
       poses.add(pose);
@@ -272,14 +272,15 @@ public class RobotState {
   public Command approachReefCommand(double offset, boolean bSide) {
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-            findAlignPose().getAlliancePose(), findApproachPose(offset, bSide).getAlliancePose());
+            findAlignPose().getPose(), findApproachPose(offset, bSide).getPose());
 
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
             null,
-            new GoalEndState(0.0, findApproachPose(offset, bSide).getAlliancePose().getRotation()));
+            new GoalEndState(0.0, findApproachPose(offset, bSide).getPose().getRotation()));
+
     return generateOTFPathCommand(path);
   }
 
