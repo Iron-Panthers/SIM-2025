@@ -8,35 +8,35 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4358399105161337,
-        "y": 6.853024713170415
+        "x": 2.1925811330767,
+        "y": 6.882895031099037
       },
       "isLocked": false,
       "linkedName": "Q"
     },
     {
       "anchor": {
-        "x": 3.769261363636364,
-        "y": 5.535696022727272
+        "x": 3.6695454545454544,
+        "y": 5.1966619318181815
       },
       "prevControl": {
-        "x": 3.202780469649455,
-        "y": 5.887407510234536
+        "x": 2.96107087340203,
+        "y": 5.911995247044603
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "K Approach"
+      "linkedName": "L"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.7356580427446541,
+      "minWaypointRelativePos": 0.8953880764904387,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 3.0,
-        "maxAcceleration": 2.0,
+        "maxAcceleration": 1.5,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
         "nominalVoltage": 12.0,
@@ -56,7 +56,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 118.61045966596524
   },
   "reversed": false,
   "folder": "Autos",

@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RightE"
+                  "pathName": "LeftJ"
                 }
               },
               {
@@ -45,7 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "EScore"
+            "pathName": "JScore"
           }
         },
         {
@@ -71,7 +71,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "ER"
+                        "pathName": "JQ"
                       }
                     }
                   ]
@@ -87,7 +87,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RD"
+                  "pathName": "QK"
                 }
               },
               {
@@ -115,7 +115,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DScore"
+            "pathName": "KScore"
           }
         },
         {
@@ -141,7 +141,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "DR"
+                        "pathName": "KQ"
                       }
                     }
                   ]
@@ -157,7 +157,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RC"
+                  "pathName": "QL"
                 }
               },
               {
@@ -191,7 +191,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CScore"
+            "pathName": "LScore"
           }
         },
         {
@@ -217,7 +217,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "CR"
+                        "pathName": "LQ"
                       }
                     }
                   ]

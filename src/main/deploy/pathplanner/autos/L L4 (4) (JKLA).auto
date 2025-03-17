@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftJ"
+                  "pathName": "LeftJScore"
                 }
               },
               {
@@ -21,7 +21,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.3
+                        "waitTime": 0.0
                       }
                     },
                     {
@@ -43,19 +43,26 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "JScore"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "Eject_L4"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Eject_L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Score_L4"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -71,7 +78,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "JQ"
+                        "pathName": "JQK"
                       }
                     }
                   ]
@@ -84,12 +91,6 @@
           "type": "parallel",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "QK"
-                }
-              },
               {
                 "type": "sequential",
                 "data": {
@@ -97,35 +98,16 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "Score_L4"
+                        "name": "Eject_L4"
                       }
                     },
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 0.1
+                        "name": "Score_L4"
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "KScore"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Eject_L4"
                 }
               },
               {
@@ -141,7 +123,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "KQ"
+                        "pathName": "KQL"
                       }
                     }
                   ]
@@ -155,9 +137,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "QL"
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Eject_L4"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Score_L4"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -167,19 +162,13 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.3
+                        "waitTime": 0.2
                       }
                     },
                     {
-                      "type": "named",
+                      "type": "path",
                       "data": {
-                        "name": "Score_L4"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.1
+                        "pathName": "LQA"
                       }
                     }
                   ]
@@ -189,15 +178,16 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "LScore"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Eject_L4"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Eject_L4"
+                }
+              }
+            ]
           }
         }
       ]
