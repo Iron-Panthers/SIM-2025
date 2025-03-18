@@ -75,7 +75,7 @@ public class RobotState {
   private ApproachPose[] approachPoses =
       generateApproachPoses(lastApproachOffset, lastApproachBSide);
 
-  private ApproachPose[] alignPoses = generateAlignPoses();
+  // private ApproachPose[] alignPoses = generateAlignPoses();
 
   private static RobotState instance;
 
@@ -202,24 +202,24 @@ public class RobotState {
     return ApproachPose.fromPose2ds(poseArray);
   }
 
-  // returns 6 align poses
-  private ApproachPose[] generateAlignPoses() {
-    Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
-    List<Pose2d> poses = new ArrayList<Pose2d>();
+  // // returns 6 align poses
+  // private ApproachPose[] generateAlignPoses() {
+  //   Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
+  //   List<Pose2d> poses = new ArrayList<Pose2d>();
 
-    for (int i = 0; i < 6; ++i) {
-      Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
-      Pose2d directPose = offsetByVector(origin, 1.77, initialTheta);
-      Pose2d pose = translateByVector(directPose, 0.165, new Rotation2d(0));
+  //   for (int i = 0; i < 6; ++i) {
+  //     Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
+  //     Pose2d directPose = offsetByVector(origin, 1.77, initialTheta);
+  //     Pose2d pose = translateByVector(directPose, 0.165, new Rotation2d(0));
 
-      poses.add(pose);
-    }
-    var poseArray = poses.toArray(new Pose2d[poses.size()]);
+  //     poses.add(pose);
+  //   }
+  //   var poseArray = poses.toArray(new Pose2d[poses.size()]);
 
-    Logger.recordOutput("RobotState/Approach/BlueAlignPoses", poseArray);
+  //   Logger.recordOutput("RobotState/Approach/BlueAlignPoses", poseArray);
 
-    return ApproachPose.fromPose2ds(poseArray);
-  }
+  //   return ApproachPose.fromPose2ds(poseArray);
+  // }
 
   public ApproachPose findApproachPose(double offset, boolean bSide) {
     approachPoses = generateApproachPoses(offset, bSide);
@@ -245,34 +245,34 @@ public class RobotState {
     return approachPose;
   }
 
-  public ApproachPose findAlignPose() {
-    alignPoses = generateAlignPoses();
+  // public ApproachPose findAlignPose() {
+  //   alignPoses = generateAlignPoses();
 
-    int closestIndex = 0;
-    // absolutely not
-    for (int i = closestIndex; i < alignPoses.length; ++i) {
-      if (getEstimatedPose()
-              .getTranslation()
-              .getDistance(alignPoses[i].getAlliancePose().getTranslation())
-          < getEstimatedPose()
-              .getTranslation()
-              .getDistance(alignPoses[closestIndex].getAlliancePose().getTranslation())) {
-        closestIndex = i;
-      }
-    }
+  //   int closestIndex = 0;
+  //   // absolutely not
+  //   for (int i = closestIndex; i < alignPoses.length; ++i) {
+  //     if (getEstimatedPose()
+  //             .getTranslation()
+  //             .getDistance(alignPoses[i].getAlliancePose().getTranslation())
+  //         < getEstimatedPose()
+  //             .getTranslation()
+  //             .getDistance(alignPoses[closestIndex].getAlliancePose().getTranslation())) {
+  //       closestIndex = i;
+  //     }
+  //   }
 
-    ApproachPose alignPose = alignPoses[closestIndex];
+  //   ApproachPose alignPose = alignPoses[closestIndex];
 
-    Logger.recordOutput("RobotState/AlignPose", alignPose.getAlliancePose());
-    Logger.recordOutput("RobotState/AlignPoseIndex", closestIndex);
+  //   Logger.recordOutput("RobotState/AlignPose", alignPose.getAlliancePose());
+  //   Logger.recordOutput("RobotState/AlignPoseIndex", closestIndex);
 
-    return alignPose;
-  }
+  //   return alignPose;
+  // }
 
   public Command approachReefCommand(double offset, boolean bSide) {
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-            findAlignPose().getPose(), findApproachPose(offset, bSide).getPose());
+          findApproachPose(offset, bSide).getPose().exp(new Twist2d(0.5, 0, 0)), findApproachPose(offset, bSide).getPose());
 
     PathPlannerPath path =
         new PathPlannerPath(
