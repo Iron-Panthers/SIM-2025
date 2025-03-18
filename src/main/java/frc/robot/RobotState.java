@@ -270,9 +270,10 @@ public class RobotState {
   // }
 
   public Command approachReefCommand(double offset, boolean bSide) {
+    ApproachPose approachPose = findApproachPose(offset, bSide);
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-          findApproachPose(offset, bSide).getPose().exp(new Twist2d(0.5, 0, 0)), findApproachPose(offset, bSide).getPose());
+            approachPose.getPose().exp(new Twist2d(0.5, 0, 0)), approachPose.getPose());
 
     PathPlannerPath path =
         new PathPlannerPath(
