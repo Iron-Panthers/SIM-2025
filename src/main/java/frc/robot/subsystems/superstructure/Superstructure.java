@@ -155,6 +155,7 @@ public class Superstructure extends SubsystemBase {
             elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
           } else if (targetState != currentState) {
             switch (targetState) { // set elevator pos based on target state
+              case PREVENT_TIPPING -> elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
               case SETUP_L4, SCORE_L4 -> elevator.setPositionTarget(ElevatorTarget.SETUP_L4);
               case SETUP_L3, SCORE_L3, CLIMB -> {
                 if (pivot.getPosition() > 90.0) {
