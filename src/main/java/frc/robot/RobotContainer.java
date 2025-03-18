@@ -397,34 +397,21 @@ public class RobotContainer {
                 .goToStateCommand(SuperstructureState.TOP)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
     // climb
-    new Trigger(
-            () ->
-                driverB.y().getAsBoolean()
-                    && driverB.start().getAsBoolean()
-                    && superstructure.getTargetState() == SuperstructureState.CLIMB)
+    driverB
+        .y()
         .onTrue(
             climbController.setPositionTargetCommand(
                 ClimbTarget.TOP) // FIXME: We need to add elevator position up
             );
 
-    new Trigger(
-            () ->
-                driverB.b().getAsBoolean()
-                    && driverB.start().getAsBoolean()
-                    && superstructure.getTargetState() != SuperstructureState.CLIMB)
+    new Trigger(() -> driverB.b().getAsBoolean() && driverB.start().getAsBoolean())
         .onTrue(
             climbController
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
                 .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
     // Descore
-    new Trigger(
-            () ->
-                driverB.b().getAsBoolean()
-                    && !driverB.start().getAsBoolean()
-                    && superstructure.getTargetState() != SuperstructureState.CLIMB)
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW));
-    new Trigger(() -> driverB.y().getAsBoolean())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH));
+    driverB.rightStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW));
+    driverB.leftStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH));
 
     driverB // intake
         .leftTrigger()
