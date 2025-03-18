@@ -229,12 +229,9 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
             switch (targetState) {
-              case SETUP_L4,
-                  SETUP_L3,
-                  SCORE_L3,
-                  SCORE_L4,
-                  CLIMB,
-                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case SETUP_L4, SETUP_L3, SCORE_L3, SCORE_L4, PREVENT_TIPPING -> setCurrentState(
+                  SuperstructureState.PREVENT_TIPPING);
+              case CLIMB -> setCurrentState(SuperstructureState.CLIMB);
               case L2 -> setCurrentState(SuperstructureState.L2);
               case L1 -> setCurrentState(SuperstructureState.L1);
               case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);

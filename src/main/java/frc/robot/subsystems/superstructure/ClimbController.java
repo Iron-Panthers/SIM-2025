@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.climb.Climb;
 import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
 
@@ -63,6 +64,11 @@ public class ClimbController extends SubsystemBase {
   }
 
   public void setClimbTarget(ClimbTarget target) {
+    climb.setControlMode(ControlMode.POSITION);
     climb.setPositionTarget(target);
+  }
+
+  public void setStopped(boolean stopped) {
+    climb.setControlMode(ControlMode.STOP);
   }
 }

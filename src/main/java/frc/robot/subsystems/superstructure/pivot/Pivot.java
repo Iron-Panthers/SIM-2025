@@ -7,8 +7,8 @@ import frc.robot.subsystems.superstructure.GenericSuperstructure;
 public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
   public enum PivotTarget implements GenericSuperstructure.PositionTarget {
     TOP(-79),
-    INTAKE(-94.45),
-    STOW(-94.45), // FIXME
+    INTAKE(-95),
+    STOW(-95), // FIXME
     L1(-110),
     L2(-107),
     SCORE_L3(111),

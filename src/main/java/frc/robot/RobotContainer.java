@@ -384,7 +384,7 @@ public class RobotContainer {
             new InstantCommand(
                 () -> {
                   superstructure.setStopped(true);
-                  ;
+                  climbController.setStopped(true);
                   rollers.setTargetState(RollerState.IDLE);
                 }));
 
