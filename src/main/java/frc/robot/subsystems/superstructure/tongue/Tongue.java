@@ -8,7 +8,7 @@ public class Tongue {
   public enum TongueTarget {
     TOP(115),
     INTAKE(115),
-    STOW(115), // FIXME
+    STOW(115),
     L1(100),
     L2(100),
     L3(60),

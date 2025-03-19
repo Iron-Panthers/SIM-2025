@@ -56,7 +56,7 @@ public class ElevatorConstants {
   public static final double UPPER_VOLT_LIMIT = 10;
   public static final double LOWER_VOLT_LIMIT = -7;
   public static final double SUPPLY_CURRENT_LIMIT = 30;
-  public static final int ZEROING_CURRENT_LIMIT = 20; // FIXME currently doesn't exist lmao
+  public static final int ZEROING_CURRENT_LIMIT = 20;
 
   // ZEROING CONSTANTS
   public static final double ZEROING_VOLTS = -1;
@@ -64,5 +64,5 @@ public class ElevatorConstants {
   public static final double ZEROING_VOLTAGE_THRESHOLD = 4;
 
   // MIN HEIGHT TO MOVE PIVOT WITHOUT HITTING INTAKE
-  public static final double MIN_SAFE_HEIGHT_FOR_PIVOT = 15; // FIXME
+  public static final double MIN_SAFE_HEIGHT_FOR_PIVOT = 15;
 }

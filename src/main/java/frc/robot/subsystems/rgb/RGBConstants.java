@@ -40,13 +40,13 @@ public class RGBConstants {
     public enum MessagePriority {
       A_CRITICAL_NETWORK_FAILURE,
       B_MISSING_CAN_DEVICE,
-      C_CORAL_DETECTED,
-      D_READY_TO_INTAKE,
-      E_L1,
+      C_CLIMB,
+      D_CORAL_DETECTED,
+      E_READY_TO_INTAKE,
       F_L2,
       G_L3,
       H_L4,
-      I_CLIMB,
+      I_L1,
       J_DEFAULT
     }
 

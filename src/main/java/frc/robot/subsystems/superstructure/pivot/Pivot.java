@@ -1,14 +1,12 @@
 package frc.robot.subsystems.superstructure.pivot;
 
 import frc.robot.subsystems.superstructure.GenericSuperstructure;
-// for intaking a note - TODO: ask the intake people what to do, L4 - 45 degrees, for L2 and L3 - 35
-// degrees, L1 - TODO: need to test
 
 public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
   public enum PivotTarget implements GenericSuperstructure.PositionTarget {
     TOP(-79),
     INTAKE(-95),
-    STOW(-95), // FIXME
+    STOW(-95),
     L1(-110),
     L2(-107),
     SCORE_L3(111),
