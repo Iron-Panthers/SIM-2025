@@ -153,8 +153,9 @@ public class Superstructure extends SubsystemBase {
                   || (pivot.getPositionTarget() == PivotTarget.SCORE_SIDE
                       && pivot.getPosition() < 90.0))) { // not in constants
             elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
-          } else if (targetState != currentState) {
+          } else {
             switch (targetState) { // set elevator pos based on target state
+              case PREVENT_TIPPING -> elevator.setPositionTarget(ElevatorTarget.INTAKE_SIDE);
               case SETUP_L4, SCORE_L4 -> elevator.setPositionTarget(ElevatorTarget.SETUP_L4);
               case SETUP_L3, SCORE_L3, CLIMB -> {
                 if (pivot.getPosition() > 90.0) {
@@ -228,12 +229,9 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
             switch (targetState) {
-              case SETUP_L4,
-                  SETUP_L3,
-                  SCORE_L3,
-                  SCORE_L4,
-                  CLIMB,
-                  PREVENT_TIPPING -> setCurrentState(SuperstructureState.PREVENT_TIPPING);
+              case SETUP_L4, SETUP_L3, SCORE_L3, SCORE_L4, PREVENT_TIPPING -> setCurrentState(
+                  SuperstructureState.PREVENT_TIPPING);
+              case CLIMB -> setCurrentState(SuperstructureState.CLIMB);
               case L2 -> setCurrentState(SuperstructureState.L2);
               case L1 -> setCurrentState(SuperstructureState.L1);
               case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);

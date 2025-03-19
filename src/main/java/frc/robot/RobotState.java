@@ -5,7 +5,9 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -191,13 +193,9 @@ public class RobotState {
 
       poses.add(pose);
     }
-
     var poseArray = poses.toArray(new Pose2d[poses.size()]);
 
     Logger.recordOutput("RobotState/Approach/BluePoses", poseArray);
-
-    lastApproachOffset = offset;
-    lastApproachBSide = bSide;
 
     return ApproachPose.fromPose2ds(poseArray);
   }
@@ -227,7 +225,19 @@ public class RobotState {
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {
-    return generateOTFPoseCommand(findApproachPose(offset, bSide).getAlliancePose());
+    ApproachPose approachPose = findApproachPose(offset, bSide);
+    List<Waypoint> waypoints =
+        PathPlannerPath.waypointsFromPoses(
+            approachPose.getPose().exp(new Twist2d(0.5, 0, 0)), approachPose.getPose());
+
+    PathPlannerPath path =
+        new PathPlannerPath(
+            waypoints,
+            DriveConstants.ALIGN_PATH_CONSTRAINTS,
+            null,
+            new GoalEndState(0.0, findApproachPose(offset, bSide).getPose().getRotation()));
+
+    return generateOTFPathCommand(path);
   }
 
   public static Command generateOTFPoseCommand(Pose2d pose) {

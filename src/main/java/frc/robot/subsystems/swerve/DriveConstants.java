@@ -282,6 +282,10 @@ public class DriveConstants {
           : pose;
     }
 
+    public Pose2d getPose() {
+      return pose;
+    }
+
     public PathPlannerPath generatePath() {
       // approach @ 12 inch off, advance to 6 in.
       List<Waypoint> waypoints =
