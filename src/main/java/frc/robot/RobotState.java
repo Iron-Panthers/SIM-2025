@@ -181,6 +181,8 @@ public class RobotState {
 
   // returns 6 approach poses, corresponding offset from reef wall & side, metres
   private ApproachPose[] generateApproachPoses(double offset, boolean bSide) {
+    lastApproachBSide = bSide;
+    lastApproachOffset = offset;
     Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
     List<Pose2d> poses = new ArrayList<Pose2d>();
 
