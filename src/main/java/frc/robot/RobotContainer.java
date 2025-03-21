@@ -362,9 +362,8 @@ public class RobotContainer {
                 .goToStateCommand(SuperstructureState.SCORE_L4)
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
 
-    driverB // ZERO our mechanism
-        .a()
-        .onTrue(
+      new Trigger(() -> driverB.a().getAsBoolean() && driverB.start().getAsBoolean())
+          .onTrue(
             new InstantCommand(
                 () -> {
                   superstructure.setCurrentState(SuperstructureState.ZERO);
