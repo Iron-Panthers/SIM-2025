@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -150,7 +151,11 @@ public class Drive extends SubsystemBase {
         gyroInputs
             .yawPosition
             .minus(RobotState.getInstance().getEstimatedPose().getRotation())
-            .minus(Rotation2d.kPi);
+            .minus(
+                DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get() == Alliance.Red
+                    ? Rotation2d.kPi
+                    : Rotation2d.kZero);
   }
 
   @AutoLogOutput(key = "Swerve/ModuleStates")
