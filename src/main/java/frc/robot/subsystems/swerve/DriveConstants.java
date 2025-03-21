@@ -201,7 +201,7 @@ public class DriveConstants {
 
   public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
       new PathConstraints(
-          1.5, 2, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+          1, 1, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
 
   public static final Translation2d BLUE_REEF_ORIGIN = new Translation2d(4.5, 4.025);
 
