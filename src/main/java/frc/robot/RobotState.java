@@ -247,7 +247,7 @@ public class RobotState {
   }
 
   public static Command generateOTFPathCommand(PathPlannerPath path) {
-    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.ALIGN_PATH_CONSTRAINTS);
+    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.APPROACH_PATH_CONSTRAINTS);
   }
 
   public static Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {
