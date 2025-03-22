@@ -46,7 +46,11 @@ public class ApproachReef extends Command {
 
   @Override
   public void execute() {
-    approachReef.execute();
+    try {
+      approachReef.execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
