@@ -228,24 +228,19 @@ public class RobotState {
     ApproachPose approachPose = findApproachPose(offset, bSide);
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-            approachPose.getPose().exp(new Twist2d(0.5, 0, 0)), approachPose.getPose());
+            getEstimatedPose(), approachPose.getPose().rotateBy(Rotation2d.kPi));
+    // FIXME may want to rotate heading depending on robot orientation
+    // during travel, verify through testing (ex. the .kPi rotation may
+    // not be necessary, please confirm)
 
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
             null,
-            new GoalEndState(0.0, findApproachPose(offset, bSide).getPose().getRotation()));
+            new GoalEndState(0.0, approachPose.getPose().getRotation()));
 
-    return generateOTFPathCommand(path);
-  }
-
-  public static Command generateOTFPoseCommand(Pose2d pose) {
-    return AutoBuilder.pathfindToPose(pose, DriveConstants.ALIGN_PATH_CONSTRAINTS);
-  }
-
-  public static Command generateOTFPathCommand(PathPlannerPath path) {
-    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.ALIGN_PATH_CONSTRAINTS);
+    return AutoBuilder.followPath(path);
   }
 
   public static Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {
