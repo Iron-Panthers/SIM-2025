@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotState;
 import java.util.function.DoubleSupplier;
 
+// wrapper for autoalign FollowPathCommand
 public class ApproachReef extends Command {
   private final boolean bSide;
   private Command approachReef;

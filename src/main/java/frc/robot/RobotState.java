@@ -200,7 +200,7 @@ public class RobotState {
     return ApproachPose.fromPose2ds(poseArray);
   }
 
-  public ApproachPose findApproachPose(double offset, boolean bSide) {
+  private ApproachPose findApproachPose(double offset, boolean bSide) {
     approachPoses = generateApproachPoses(offset, bSide);
 
     int closestIndex = 0;
@@ -243,7 +243,7 @@ public class RobotState {
     return AutoBuilder.followPath(path);
   }
 
-  public static Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {
+  private Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {
     double scalarX = theta.getCos() * mag;
     double scalarY = theta.getSin() * mag;
 
@@ -252,7 +252,7 @@ public class RobotState {
   }
 
   // translate + rotate
-  public static Pose2d offsetByVector(Pose2d pose, double mag, Rotation2d theta) {
+  private Pose2d offsetByVector(Pose2d pose, double mag, Rotation2d theta) {
     return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
   }
 }
