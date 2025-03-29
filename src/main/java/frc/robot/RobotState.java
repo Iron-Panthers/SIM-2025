@@ -226,9 +226,21 @@ public class RobotState {
 
   public Command approachReefCommand(double offset, boolean bSide) {
     ApproachPose approachPose = findApproachPose(offset, bSide);
+    Pose2d estimatedPose =
+        DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
+            ? FlippingUtil.flipFieldPose(getEstimatedPose())
+            : getEstimatedPose();
+    Rotation2d angle =
+        new Rotation2d(
+            Math.atan(
+                (approachPose.getPose().getY() - estimatedPose.getY())
+                    / (approachPose.getPose().getX() - estimatedPose.getX())));
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-            getEstimatedPose(), approachPose.getPose().rotateBy(Rotation2d.kPi));
+            new Pose2d(estimatedPose.getTranslation(), angle.minus(Rotation2d.kPi)),
+            new Pose2d(
+                approachPose.getPose().getTranslation(),
+                approachPose.getPose().getRotation().minus(Rotation2d.kPi)));
     // FIXME may want to rotate heading depending on robot orientation
     // during travel, verify through testing (ex. the .kPi rotation may
     // not be necessary, please confirm)
