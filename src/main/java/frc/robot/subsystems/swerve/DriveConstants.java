@@ -172,7 +172,7 @@ public class DriveConstants {
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
-            new PIDConstants(8, 0), new PIDConstants(11, 0));
+            new PIDConstants(8, 0), new PIDConstants(3, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
@@ -197,7 +197,7 @@ public class DriveConstants {
 
   public static final PathConstraints PP_PATH_CONSTRAINTS =
       new PathConstraints(
-          3, 3, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+          3, 3, Units.degreesToRadians(540), Units.degreesToRadians(5000), 12, false);
 
   public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
       new PathConstraints(
