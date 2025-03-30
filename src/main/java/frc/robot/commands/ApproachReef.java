@@ -34,9 +34,16 @@ public class ApproachReef extends Command {
 
   @Override
   public void initialize() {
-    approachReef =
-        RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
-    approachReef.initialize();
+
+    try {
+      approachReef =
+          RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
+      approachReef.initialize();
+    } catch (Exception e) {
+      e.printStackTrace();
+      this.end(true);
+      System.out.println("Already at target");
+    }
 
     System.out.println(
         "Initializing ApproachReefCommand, offset of "
@@ -47,17 +54,21 @@ public class ApproachReef extends Command {
 
   @Override
   public void execute() {
-    approachReef.execute();
+    if (approachReef != null) {
+      approachReef.execute();
+    }
   }
 
   @Override
   public boolean isFinished() {
-    return approachReef.isFinished();
+    return approachReef == null ? true : approachReef.isFinished();
   }
 
   @Override
   public void end(boolean interrupted) {
-    approachReef.end(interrupted);
+    if (approachReef != null) {
+      approachReef.end(interrupted);
+    }
     approachReef = null;
   }
 }
