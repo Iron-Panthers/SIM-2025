@@ -19,6 +19,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -76,6 +77,8 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/Approach/LastBSide")
   private boolean lastApproachBSide = false;
+
+  private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
   private ApproachPose[] approachPoses =
       generateApproachPoses(lastApproachOffset, lastApproachBSide);
@@ -260,7 +263,7 @@ public class RobotState {
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {
-    Translation2d velocity = getVelocity();
+    Translation2d velocity = new Translation2d();
     ApproachPose approachPose = findApproachPose(offset, bSide);
     Pose2d estimatedPose =
         DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
@@ -283,7 +286,7 @@ public class RobotState {
         new PathPlannerPath(
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
-            new IdealStartingState(startingVelocity, estimatedPose.getRotation()),
+            new IdealStartingState(velocity.getNorm(), estimatedPose.getRotation()),
             new GoalEndState(0.0, approachPose.getPose().getRotation()));
     return AutoBuilder.followPath(path);
   }
@@ -299,5 +302,9 @@ public class RobotState {
   // translate + rotate
   private Pose2d offsetByVector(Pose2d pose, double mag, Rotation2d theta) {
     return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
+  }
+
+  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds){
+    this.robotSpeeds = chassisSpeeds;
   }
 }
