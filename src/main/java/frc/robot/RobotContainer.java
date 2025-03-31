@@ -298,7 +298,7 @@ public class RobotContainer {
             // new ApproachReef(() -> levelOffsets.getLevelOffset(), false)
             //     .withTimeout(0)
             //     .andThen(
-            new ApproachReef(() -> levelOffsets.getLevelOffset(), false)
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), false, swerve)
                 .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
 
     driverA
@@ -307,7 +307,7 @@ public class RobotContainer {
             // new ApproachReef(() -> levelOffsets.getLevelOffset(), true)
             //     .withTimeout(0)
             //     .andThen(
-            new ApproachReef(() -> levelOffsets.getLevelOffset(), true)
+            new ApproachReef(() -> levelOffsets.getLevelOffset(), true, swerve)
                 .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
 
     driverA
