@@ -283,7 +283,7 @@ public class RobotState {
         new PathPlannerPath(
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
-            new IdealStartingState(startingVelocity, angle),
+            new IdealStartingState(startingVelocity, estimatedPose.getRotation()),
             new GoalEndState(0.0, approachPose.getPose().getRotation()));
     return AutoBuilder.followPath(path);
   }
