@@ -304,7 +304,7 @@ public class RobotState {
     return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
   }
 
-  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds){
+  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds) {
     this.robotSpeeds = chassisSpeeds;
   }
 }
