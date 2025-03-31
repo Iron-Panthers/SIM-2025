@@ -57,9 +57,6 @@ public class RobotState {
   private TimeInterpolatableBuffer<Pose2d> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(poseBufferSizeSeconds);
 
-  @AutoLogOutput(key = "RobotState/Approach/Time")
-  private double time = 0;
-
   private Pose2d odometryPose = initialPose;
   private Pose2d estimatedPose = initialPose; // vision adjusted
 
@@ -132,7 +129,6 @@ public class RobotState {
 
     // add post estimate to buffer at timestamp; for vision
     poseBuffer.addSample(measurement.timestamp(), odometryPose);
-    time = measurement.timestamp();
   }
 
   /* from wpimath PoseEstimator.java */
@@ -165,7 +161,6 @@ public class RobotState {
     // apply Kalman-scaled vision adjustment, replay odometry data to get current estimate
     estimatedPose = sample.get().exp(scaledTwist).exp(sampleToOdometry);
     odometryPose = estimatedPose;
-    time = measurement.timestamp();
   }
 
   public void addVisionMeasurement(VisionMeasurement measurement, Matrix<N3, N1> visionStdDevs) {
@@ -192,29 +187,12 @@ public class RobotState {
   @AutoLogOutput(key = "RobotState/Velocity")
   /*meters per second*/
   public Translation2d getVelocity() {
-    Translation2d velocity = new Translation2d();
-    // average of 2 timestamps
-    if (poseBuffer.getSample(time).isPresent() && (poseBuffer.getSample(time - 0.1).isPresent())) {
-      Translation2d velocity1 =
-          poseBuffer
-              .getSample(time - 0.1)
-              .get()
-              .minus(poseBuffer.getSample(time - 0.05).get())
-              .getTranslation()
-              .times(20);
-      Translation2d velocity2 =
-          poseBuffer
-              .getSample(time - 0.05)
-              .get()
-              .minus(poseBuffer.getSample(time).get())
-              .getTranslation()
-              .times(20);
-      velocity = velocity1.plus(velocity2).div(2);
-
-    } else {
-      velocity = new Translation2d(0, 0);
-    }
-    return velocity;
+    return new Translation2d(
+            ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds, estimatedPose.getRotation())
+                .vxMetersPerSecond,
+            ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds, estimatedPose.getRotation())
+                .vyMetersPerSecond)
+        .rotateBy(Rotation2d.kPi);
   }
 
   // returns 6 approach poses, corresponding offset from reef wall & side, metres
@@ -304,7 +282,7 @@ public class RobotState {
     return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
   }
 
-  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds) {
+  public void addRobotSpeeds(ChassisSpeeds chassisSpeeds) {
     this.robotSpeeds = chassisSpeeds;
   }
 }

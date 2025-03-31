@@ -93,7 +93,7 @@ public class Drive extends SubsystemBase {
         // add heading controll override
       }
     }
-
+    RobotState.getInstance().addRobotSpeeds(getRobotSpeeds());
     // run modules
 
     /* use kinematics to get desired module states */
