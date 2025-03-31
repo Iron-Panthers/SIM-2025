@@ -83,4 +83,8 @@ public class TeleopController {
   private double getAccerlation() {
     return clampedVelocityDiff;
   }
+
+  public void setPastLinearVelocity(Translation2d pastLinearVelocity) {
+    this.pastLinearVelocity = pastLinearVelocity;
+  }
 }

@@ -263,7 +263,7 @@ public class RobotState {
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {
-    Translation2d velocity = new Translation2d();
+    Translation2d velocity = getVelocity();
     ApproachPose approachPose = findApproachPose(offset, bSide);
     Pose2d estimatedPose =
         DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
@@ -304,7 +304,7 @@ public class RobotState {
     return translateByVector(pose, mag, theta).transformBy(new Transform2d(0, 0, theta));
   }
 
-  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds){
+  public void setRobotSpeeds(ChassisSpeeds chassisSpeeds) {
     this.robotSpeeds = chassisSpeeds;
   }
 }
