@@ -29,7 +29,7 @@ public class ApproachReef extends SequentialCommandGroup {
     }
   }
 
-  private class ReefAlign extends Command {
+  public class ReefAlign extends Command {
     private final DoubleSupplier levelOffsetSupplier;
     private final boolean bSide;
     private Command reefAlign;
