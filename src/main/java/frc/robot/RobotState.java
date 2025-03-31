@@ -30,9 +30,6 @@ import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.DriveConstants.ApproachPose;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Vector;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -56,10 +53,10 @@ public class RobotState {
   private final Matrix<N3, N1> matrixQ = new Matrix<>(Nat.N3(), Nat.N1());
   private final Matrix<N3, N3> kalmanGain = new Matrix<>(Nat.N3(), Nat.N3());
 
-
   private TimeInterpolatableBuffer<Pose2d> poseBuffer =
       TimeInterpolatableBuffer.createBuffer(poseBufferSizeSeconds);
 
+  @AutoLogOutput(key = "RobotState/Approach/Time")
   private double time = 0;
 
   private Pose2d odometryPose = initialPose;
@@ -132,7 +129,7 @@ public class RobotState {
 
     // add post estimate to buffer at timestamp; for vision
     poseBuffer.addSample(measurement.timestamp(), odometryPose);
-    if (measurement.timestamp()>time) time = measurement.timestamp();
+    time = measurement.timestamp();
   }
 
   /* from wpimath PoseEstimator.java */
@@ -165,7 +162,7 @@ public class RobotState {
     // apply Kalman-scaled vision adjustment, replay odometry data to get current estimate
     estimatedPose = sample.get().exp(scaledTwist).exp(sampleToOdometry);
     odometryPose = estimatedPose;
-    if (measurement.timestamp()>time) time = measurement.timestamp();
+    time = measurement.timestamp();
   }
 
   public void addVisionMeasurement(VisionMeasurement measurement, Matrix<N3, N1> visionStdDevs) {
@@ -191,13 +188,28 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/Velocity")
   /*meters per second*/
-  public Translation2d getVelocity(){
+  public Translation2d getVelocity() {
     Translation2d velocity = new Translation2d();
-    //average of 2 timestamps
-    if (poseBuffer.getSample(time).isPresent() && (poseBuffer.getSample(time-0.1).isPresent())){
-      Translation2d velocity1 = poseBuffer.getSample(time-0.05).get().minus(poseBuffer.getSample(time-0.1).get()).getTranslation().times(20);
-      Translation2d velocity2 = poseBuffer.getSample(time).get().minus(poseBuffer.getSample(time-0.05).get()).getTranslation().times(20);
+    // average of 2 timestamps
+    if (poseBuffer.getSample(time).isPresent() && (poseBuffer.getSample(time - 0.1).isPresent())) {
+      Translation2d velocity1 =
+          poseBuffer
+              .getSample(time - 0.1)
+              .get()
+              .minus(poseBuffer.getSample(time - 0.05).get())
+              .getTranslation()
+              .times(20);
+      Translation2d velocity2 =
+          poseBuffer
+              .getSample(time - 0.05)
+              .get()
+              .minus(poseBuffer.getSample(time).get())
+              .getTranslation()
+              .times(20);
       velocity = velocity1.plus(velocity2).div(2);
+
+    } else {
+      velocity = new Translation2d(0, 0);
     }
     return velocity;
   }
@@ -248,7 +260,7 @@ public class RobotState {
   }
 
   public Command approachReefCommand(double offset, boolean bSide) {
-    Translation2d velocity = getVelocity(); 
+    Translation2d velocity = getVelocity();
     ApproachPose approachPose = findApproachPose(offset, bSide);
     Pose2d estimatedPose =
         DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red
@@ -258,19 +270,21 @@ public class RobotState {
         approachPose.getPose().getTranslation().minus(estimatedPose.getTranslation()).getAngle();
     List<Waypoint> waypoints =
         PathPlannerPath.waypointsFromPoses(
-            new Pose2d(estimatedPose.getTranslation(), velocity.getNorm()>0.4 ? velocity.getAngle() : angle),
             new Pose2d(
-                approachPose.getPose().getTranslation(),
-                angle.rotateBy(Rotation2d.kPi)));
+                estimatedPose.getTranslation(),
+                velocity.getNorm() > 0.4 ? velocity.getAngle() : angle),
+            new Pose2d(approachPose.getPose().getTranslation(), angle));
 
-    double startingVelocity = velocity.getAngle().minus(angle).getCos() * velocity.getNorm();
+    double startingVelocity =
+        // velocity.getNorm() > 0.4
+        //     ? velocity.getNorm()
+        velocity.getAngle().minus(angle).getCos() * velocity.getNorm();
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
             new IdealStartingState(startingVelocity, angle),
             new GoalEndState(0.0, approachPose.getPose().getRotation()));
-
     return AutoBuilder.followPath(path);
   }
 
