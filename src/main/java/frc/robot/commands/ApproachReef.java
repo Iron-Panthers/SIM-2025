@@ -1,14 +1,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotState;
+import frc.robot.subsystems.swerve.Drive;
 import java.util.function.DoubleSupplier;
 
 // wrapper for autoalign FollowPathCommand
-public class ApproachReef extends Command {
+public class ApproachReef extends SequentialCommandGroup {
   private final boolean bSide;
+  private final DoubleSupplier levelOffsetSupplier;
   private Command approachReef;
-  private DoubleSupplier levelOffsetSupplier;
 
   public enum LevelOffsets {
     // metres
@@ -27,48 +29,54 @@ public class ApproachReef extends Command {
     }
   }
 
-  public ApproachReef(DoubleSupplier levelOffsetSupplier, boolean bSide) {
+  public class ReefAlign extends Command {
+    private final DoubleSupplier levelOffsetSupplier;
+    private final boolean bSide;
+    private Command reefAlign;
+
+    public ReefAlign(DoubleSupplier levelOffsetSupplier, boolean bSide) {
+      this.levelOffsetSupplier = levelOffsetSupplier;
+      this.bSide = bSide;
+    }
+
+    @Override
+    public void initialize() {
+      try {
+        reefAlign =
+            RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
+        reefAlign.initialize();
+      } catch (Exception e) {
+        e.printStackTrace();
+        reefAlign.end(true);
+        System.out.println("Already at target.");
+      }
+    }
+
+    @Override
+    public void execute() {
+      try {
+        reefAlign.execute();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    @Override
+    public boolean isFinished() {
+      return reefAlign.isFinished();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      reefAlign.end(interrupted);
+      reefAlign = null;
+    }
+  }
+
+  public ApproachReef(DoubleSupplier levelOffsetSupplier, boolean bSide, Drive drive) {
     this.levelOffsetSupplier = levelOffsetSupplier;
     this.bSide = bSide;
-  }
 
-  @Override
-  public void initialize() {
-
-    try {
-      approachReef =
-          RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
-      approachReef.initialize();
-    } catch (Exception e) {
-      e.printStackTrace();
-      this.end(true);
-      System.out.println("Already at target");
-    }
-
-    System.out.println(
-        "Initializing ApproachReefCommand, offset of "
-            + levelOffsetSupplier.getAsDouble()
-            + ", bSide is "
-            + bSide);
-  }
-
-  @Override
-  public void execute() {
-    if (approachReef != null) {
-      approachReef.execute();
-    }
-  }
-
-  @Override
-  public boolean isFinished() {
-    return approachReef == null ? true : approachReef.isFinished();
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    if (approachReef != null) {
-      approachReef.end(interrupted);
-    }
-    approachReef = null;
+    addCommands(new VelocityClamp(drive), new ReefAlign(levelOffsetSupplier, bSide));
   }
 }
