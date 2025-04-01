@@ -75,6 +75,8 @@ public class RobotState {
   @AutoLogOutput(key = "RobotState/Approach/LastBSide")
   private boolean lastApproachBSide = false;
 
+  private Pose2d lastApproachPose = new Pose2d();
+
   private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
   private ApproachPose[] approachPoses =
@@ -195,6 +197,14 @@ public class RobotState {
         .rotateBy(Rotation2d.kPi);
   }
 
+  /*In inches because we are imperial... */
+  @AutoLogOutput(key = "RobotState/Error")
+  public double alignError() {
+    return lastApproachPose.getTranslation().getDistance(estimatedPose.getTranslation())
+        * 100
+        / 2.54;
+  }
+
   // returns 6 approach poses, corresponding offset from reef wall & side, metres
   private ApproachPose[] generateApproachPoses(double offset, boolean bSide) {
     Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
@@ -237,6 +247,8 @@ public class RobotState {
     Logger.recordOutput("RobotState/ApproachPose", approachPose.getAlliancePose());
     Logger.recordOutput("RobotState/ApproachPoseIndex", closestIndex);
 
+    lastApproachPose = approachPose.getAlliancePose();
+
     return approachPose;
   }
 
@@ -253,7 +265,8 @@ public class RobotState {
         PathPlannerPath.waypointsFromPoses(
             new Pose2d(
                 estimatedPose.getTranslation(),
-                velocity.getNorm() > 0.4 ? velocity.getAngle() : angle),
+                // velocity.getNorm() > 0.4 ? velocity.getAngle() : angle),
+                angle),
             new Pose2d(approachPose.getPose().getTranslation(), angle));
 
     PathPlannerPath path =

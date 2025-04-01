@@ -49,26 +49,25 @@ public class ApproachReef extends SequentialCommandGroup {
         reefAlign.initialize();
       } catch (Exception e) {
         e.printStackTrace();
-        reefAlign.end(true);
+        end(true);
         System.out.println("Already at target.");
       }
     }
 
     @Override
     public void execute() {
-      try {
+      if (reefAlign != null) {
         reefAlign.execute();
-      } catch (Exception e) {
-        e.printStackTrace();
       }
-      if (iteration>5){
+      if (iteration > 40) {
         try {
           reefAlign =
-              RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
+              RobotState.getInstance()
+                  .approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
           reefAlign.initialize();
         } catch (Exception e) {
           e.printStackTrace();
-          reefAlign.end(true);
+          end(true);
           System.out.println("Already at target.");
         }
         iteration = 0;
@@ -78,12 +77,18 @@ public class ApproachReef extends SequentialCommandGroup {
 
     @Override
     public boolean isFinished() {
-      return reefAlign.isFinished();
+      return reefAlign == null
+          ? true
+          : reefAlign.isFinished()
+              && RobotState.getInstance().alignError() < 0.5
+              && Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1;
     }
 
     @Override
     public void end(boolean interrupted) {
-      reefAlign.end(interrupted);
+      if (reefAlign != null) {
+        reefAlign.end(interrupted);
+      }
       reefAlign = null;
     }
   }
