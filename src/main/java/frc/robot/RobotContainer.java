@@ -359,17 +359,10 @@ public class RobotContainer {
                     && driverB.povUp().getAsBoolean())
         .onTrue(
             superstructure
-                .goToStateCommand(SuperstructureState.PREVENT_TIPPING)
+                .goToStateCommand(SuperstructureState.SCORE_L4)
                 .alongWith(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET)));
-    new Trigger(
-            () ->
-                driverB
-                    .povUp()
-                    .getAsBoolean()) // only worry about release of this to change anything
-        .onFalse(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
-    driverB // ZERO our mechanism
-        .a()
+    new Trigger(() -> driverB.a().getAsBoolean() && driverB.start().getAsBoolean())
         .onTrue(
             new InstantCommand(
                 () -> {

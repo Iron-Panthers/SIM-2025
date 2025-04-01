@@ -34,6 +34,12 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   private final StatusSignal<Current> supplyCurrent;
   private final StatusSignal<Temperature> temp;
 
+  private final StatusSignal<Angle> positionRotations2;
+  private final StatusSignal<AngularVelocity> velocityRPS2;
+  private final StatusSignal<Voltage> appliedVolts2;
+  private final StatusSignal<Current> supplyCurrent2;
+  private final StatusSignal<Temperature> temp2;
+
   // zeroing stuff
   private final double zeroingVolts;
   private final double zeroingOffset;
@@ -157,11 +163,28 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp);
+
+    if (talon2.isPresent()) {
+      velocityRPS2 = talon2.get().getVelocity();
+      appliedVolts2 = talon2.get().getMotorVoltage();
+      supplyCurrent2 = talon2.get().getSupplyCurrent();
+      temp2 = talon2.get().getDeviceTemp();
+      positionRotations2 = talon2.get().getPosition();
+
+      BaseStatusSignal.setUpdateFrequencyForAll(
+          50, positionRotations2, velocityRPS2, appliedVolts2, supplyCurrent2, temp2);
+    } else {
+      velocityRPS2 = null;
+      appliedVolts2 = null;
+      supplyCurrent2 = null;
+      temp2 = null;
+      positionRotations2 = null;
+    }
   }
 
   @Override
   public void updateInputs(GenericSuperstructureIOInputs inputs) {
-    inputs.connected =
+    inputs.connected1 =
         BaseStatusSignal.refreshAll(
                 positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp)
             .isOK();
@@ -170,6 +193,18 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
     inputs.tempCelsius = temp.getValueAsDouble();
+
+    if (talon2.isPresent()) {
+      inputs.connected2 =
+          BaseStatusSignal.refreshAll(
+                  positionRotations2, velocityRPS2, appliedVolts2, supplyCurrent2, temp2)
+              .isOK();
+      inputs.positionRotations2 = positionRotations2.getValueAsDouble();
+      inputs.velocityRotPerSec2 = velocityRPS2.getValueAsDouble();
+      inputs.appliedVolts2 = appliedVolts2.getValueAsDouble();
+      inputs.supplyCurrentAmps2 = supplyCurrent2.getValueAsDouble();
+      inputs.tempCelsius2 = temp2.getValueAsDouble();
+    }
   }
 
   @Override

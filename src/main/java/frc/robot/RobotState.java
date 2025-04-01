@@ -181,6 +181,8 @@ public class RobotState {
 
   // returns 6 approach poses, corresponding offset from reef wall & side, metres
   private ApproachPose[] generateApproachPoses(double offset, boolean bSide) {
+    lastApproachBSide = bSide;
+    lastApproachOffset = offset;
     Pose2d origin = new Pose2d(DriveConstants.BLUE_REEF_ORIGIN, Rotation2d.kZero);
     List<Pose2d> poses = new ArrayList<Pose2d>();
 
@@ -245,7 +247,7 @@ public class RobotState {
   }
 
   public static Command generateOTFPathCommand(PathPlannerPath path) {
-    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.ALIGN_PATH_CONSTRAINTS);
+    return AutoBuilder.pathfindThenFollowPath(path, DriveConstants.APPROACH_PATH_CONSTRAINTS);
   }
 
   public static Pose2d translateByVector(Pose2d pose, double mag, Rotation2d theta) {

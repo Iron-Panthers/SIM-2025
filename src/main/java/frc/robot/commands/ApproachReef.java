@@ -12,7 +12,7 @@ public class ApproachReef extends Command {
   public enum LevelOffsets {
     // metres
     L4_OFFSET(0.14),
-    L3_OFFSET(0.05),
+    L3_OFFSET(0.1),
     L2_OFFSET(0),
     L1_OFFSET(0);
     public double levelOffset;
@@ -46,7 +46,11 @@ public class ApproachReef extends Command {
 
   @Override
   public void execute() {
-    approachReef.execute();
+    try {
+      approachReef.execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
