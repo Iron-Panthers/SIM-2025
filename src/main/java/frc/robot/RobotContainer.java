@@ -78,6 +78,7 @@ public class RobotContainer {
   private final CommandXboxController driverB = new CommandXboxController(1);
 
   private LevelOffsets levelOffsets = LevelOffsets.L4_OFFSET;
+  private boolean eject = false;
   private Drive swerve;
   private Vision vision;
   private Intake intake;
@@ -299,7 +300,8 @@ public class RobotContainer {
             //     .withTimeout(0)
             //     .andThen(
             new ApproachReef(() -> levelOffsets.getLevelOffset(), false, swerve)
-                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
+                .andThen(new InstantCommand(() -> eject = true)));
 
     driverA
         .rightBumper()
@@ -308,7 +310,12 @@ public class RobotContainer {
             //     .withTimeout(0)
             //     .andThen(
             new ApproachReef(() -> levelOffsets.getLevelOffset(), true, swerve)
-                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl())));
+                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
+                .andThen(new InstantCommand(() -> eject = true)));
+    new Trigger(() -> eject)
+        .onTrue(
+            new WaitUntilCommand(() -> RobotState.getInstance().alignError() < 1)
+                .andThen(new InstantCommand(() -> eject = false)));
 
     driverA
         .x()
@@ -426,10 +433,10 @@ public class RobotContainer {
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L1))
-                    && driverB.rightTrigger().getAsBoolean())
+                    && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
-            rollers
-                .setTargetCommand(RollerState.EJECT_L1)
+            new InstantCommand(() -> eject = false)
+                .andThen(rollers.setTargetCommand(RollerState.EJECT_L1))
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
@@ -438,10 +445,10 @@ public class RobotContainer {
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.L2))
-                    && driverB.rightTrigger().getAsBoolean())
+                    && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
-            rollers
-                .setTargetCommand(RollerState.EJECT_L2)
+            new InstantCommand(() -> eject = false)
+                .andThen(rollers.setTargetCommand(RollerState.EJECT_L2))
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
@@ -467,10 +474,10 @@ public class RobotContainer {
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
                         || superstructure.getTargetState().equals(SuperstructureState.L2)
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
-                    && driverB.rightTrigger().getAsBoolean())
+                    && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
-            rollers
-                .setTargetCommand(RollerState.EJECT_TOP)
+            new InstantCommand(() -> eject = false)
+                .andThen(rollers.setTargetCommand(RollerState.EJECT_TOP))
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
