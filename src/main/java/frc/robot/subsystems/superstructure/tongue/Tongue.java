@@ -6,15 +6,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class Tongue {
   public enum TongueTarget {
-    TOP(115),
-    INTAKE(115),
-    STOW(115),
-    L1(100),
-    L2(100),
-    L3(60),
+    TOP(64),
+    INTAKE(64),
+    STOW(64),
+    L1(64),
+    L2(64),
+    L3(55),
     L4(0),
-    CLIMB(120),
-    DESCORE(115);
+    CLIMB(64),
+    DESCORE(64);
 
     private double position;
 
