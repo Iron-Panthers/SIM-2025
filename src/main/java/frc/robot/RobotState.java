@@ -256,10 +256,6 @@ public class RobotState {
                 velocity.getNorm() > 0.4 ? velocity.getAngle() : angle),
             new Pose2d(approachPose.getPose().getTranslation(), angle));
 
-    double startingVelocity =
-        // velocity.getNorm() > 0.4
-        //     ? velocity.getNorm()
-        velocity.getAngle().minus(angle).getCos() * velocity.getNorm();
     PathPlannerPath path =
         new PathPlannerPath(
             waypoints,

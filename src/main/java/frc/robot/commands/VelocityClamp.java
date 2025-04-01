@@ -40,6 +40,6 @@ public class VelocityClamp extends Command {
   public boolean isFinished() {
     ChassisSpeeds robotSpeeds = drive.getRobotSpeeds();
     double speed = Math.hypot(robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond);
-    return speed < 0.1;
+    return speed < 2;
   }
 }

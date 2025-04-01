@@ -12,6 +12,8 @@ public class ApproachReef extends SequentialCommandGroup {
   private final DoubleSupplier levelOffsetSupplier;
   private Command approachReef;
 
+  private double iteration = 0;
+
   public enum LevelOffsets {
     // metres
     L4_OFFSET(0.14),
@@ -59,6 +61,19 @@ public class ApproachReef extends SequentialCommandGroup {
       } catch (Exception e) {
         e.printStackTrace();
       }
+      if (iteration>5){
+        try {
+          reefAlign =
+              RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
+          reefAlign.initialize();
+        } catch (Exception e) {
+          e.printStackTrace();
+          reefAlign.end(true);
+          System.out.println("Already at target.");
+        }
+        iteration = 0;
+      }
+      iteration++;
     }
 
     @Override
