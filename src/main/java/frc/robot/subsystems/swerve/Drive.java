@@ -45,6 +45,7 @@ public class Drive extends SubsystemBase {
   private ChassisSpeeds trajectorySpeeds = new ChassisSpeeds();
   private HeadingController headingController = null;
 
+
   public Drive(GyroIO gyroIO, ModuleIO fl, ModuleIO fr, ModuleIO bl, ModuleIO br) {
     this.gyroIO = gyroIO;
 
@@ -128,13 +129,13 @@ public class Drive extends SubsystemBase {
     }
   }
 
-  public void driveTeleopController(double xAxis, double yAxis, double omega) {
+  public void driveTeleopController(double xAxis, double yAxis, double omega, double acceleration) {
     if (DriverStation.isTeleopEnabled()) {
       if (driveMode != DriveModes.TELEOP) {
         driveMode = DriveModes.TELEOP;
         teleopController.setPastLinearVelocity(new Translation2d());
       }
-      teleopController.acceptJoystickInput(xAxis, yAxis, omega);
+      teleopController.acceptJoystickInput(xAxis, yAxis, omega, acceleration);
     }
   }
 

@@ -262,25 +262,32 @@ public class RobotContainer {
                   swerve.driveTeleopController(
                       -driverA.getLeftY(),
                       -driverA.getLeftX(),
-                      driverA.getLeftTriggerAxis() - driverA.getRightTriggerAxis());
+                      driverA.getLeftTriggerAxis() - driverA.getRightTriggerAxis(),
+                      superstructure.getElevatorPosition() > 3 ? 3 : DriveConstants.DRIVE_CONFIG.maxLinearAcceleration());
                   if (Math.abs(driverA.getLeftTriggerAxis()) > 0.1
                       || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
                     swerve.clearHeadingControl();
-                  } else if (!driverA.y().getAsBoolean()){
-                    if (RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(DriveConstants.LEFT_CORNER)<2.5){
+                  } else if (!driverA.y().getAsBoolean()) {
+                    if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.LEFT_CORNER)
+                        < 2.5) {
                       new Rotation2d(Math.toRadians(232));
-                    }
-                    else if(RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(DriveConstants.RIGHT_CORNER)<2.5){
+                    } else if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.RIGHT_CORNER)
+                        < 2.5) {
                       new Rotation2d(Math.toRadians(128));
-                    }
-                    else{
+                    } else {
                       swerve.setTargetHeading(
-                        calculateSnapTargetHeading(
-                          RobotState.getInstance()
-                              .getEstimatedPose()
-                              .getTranslation()
-                              .minus(DriveConstants.REEF_TRANSLATION2D)
-                              .getAngle()));
+                          calculateSnapTargetHeading(
+                              RobotState.getInstance()
+                                  .getEstimatedPose()
+                                  .getTranslation()
+                                  .minus(DriveConstants.REEF_TRANSLATION2D)
+                                  .getAngle()));
                     }
                   }
                 })

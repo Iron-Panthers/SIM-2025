@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
+
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -19,6 +21,7 @@ public class TeleopController {
   private double controllerOmega = 0;
   private Translation2d pastLinearVelocity = new Translation2d();
   private double clampedVelocityDiff = 0;
+  private double acceleration;
 
   /* teleop control with specified yaw supplier, typically "arbitrary" yaw */
   public TeleopController(Supplier<Rotation2d> yawSupplier) {
@@ -26,10 +29,19 @@ public class TeleopController {
   }
 
   /* accept driver input from joysticks */
+  public void acceptJoystickInput(double controllerX, double controllerY, double controllerOmega, double acceleration) {
+    this.controllerX = controllerX;
+    this.controllerY = controllerY;
+    this.controllerOmega = controllerOmega;
+    this.acceleration = acceleration;
+  }
+
+    /* accept driver input from joysticks */
   public void acceptJoystickInput(double controllerX, double controllerY, double controllerOmega) {
     this.controllerX = controllerX;
     this.controllerY = controllerY;
     this.controllerOmega = controllerOmega;
+    this.acceleration = DRIVE_CONFIG.maxLinearAcceleration();
   }
 
   /* update controller with current desired state */
@@ -45,7 +57,7 @@ public class TeleopController {
         MathUtil.clamp(
             Math.abs(linearVelocity.getDistance(pastLinearVelocity)),
             0,
-            DRIVE_CONFIG.maxLinearAcceleration() * (Constants.PERIODIC_LOOP_SEC));
+            acceleration * (Constants.PERIODIC_LOOP_SEC));
     Rotation2d velocityTheta;
     if (linearVelocityDiff.getX() != 0 || linearVelocityDiff.getY() != 0) {
       velocityTheta = linearVelocityDiff.getAngle();
