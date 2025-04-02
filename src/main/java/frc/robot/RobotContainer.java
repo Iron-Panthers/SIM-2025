@@ -271,7 +271,7 @@ public class RobotContainer {
                       || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
                     swerve.clearHeadingControl();
                   } else if (!driverA.y().getAsBoolean()) {
-                    //Station snaps
+                    // Station snaps
                     if (RobotState.getInstance()
                             .getEstimatedPose()
                             .getTranslation()
@@ -284,7 +284,7 @@ public class RobotContainer {
                             .getDistance(DriveConstants.LEFT_CORNER)
                         < 3) {
                       swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)));
-                    //close up reef snaps
+                      // close up reef snaps
                     } else if (RobotState.getInstance()
                             .getEstimatedPose()
                             .getTranslation()
@@ -297,7 +297,7 @@ public class RobotContainer {
                                   .getTranslation()
                                   .minus(DriveConstants.REEF_TRANSLATION2D)
                                   .getAngle()));
-                    //default gradual far from reef snaps
+                      // default gradual far from reef snaps
                     } else {
                       swerve.setTargetHeading(
                           RobotState.getInstance()
