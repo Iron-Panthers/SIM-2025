@@ -91,6 +91,10 @@ public class Drive extends SubsystemBase {
       }
       case TRAJECTORY -> {
         targetSpeeds = trajectorySpeeds;
+        if (headingController != null && DriverStation.isTeleopEnabled()) {
+          setTargetHeading(RobotState.getInstance().getAlignPose().getRotation());
+          targetSpeeds.omegaRadiansPerSecond = headingController.update() + 0.0001;
+        }
         // add heading controll override
       }
     }
@@ -184,5 +188,9 @@ public class Drive extends SubsystemBase {
 
   public void clearHeadingControl() {
     headingController = null;
+  }
+
+  public boolean isTeleop() {
+    return driveMode == DriveModes.TELEOP;
   }
 }

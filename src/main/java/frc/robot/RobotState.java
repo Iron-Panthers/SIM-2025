@@ -296,4 +296,8 @@ public class RobotState {
   public void addRobotSpeeds(ChassisSpeeds chassisSpeeds) {
     this.robotSpeeds = chassisSpeeds;
   }
+
+  public Pose2d getAlignPose() {
+    return lastApproachPose;
+  }
 }

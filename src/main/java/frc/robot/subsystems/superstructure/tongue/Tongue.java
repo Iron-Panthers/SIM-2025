@@ -12,7 +12,7 @@ public class Tongue {
     L1(64),
     L2(64),
     L3(55),
-    L4(0),
+    L4(55),
     CLIMB(64),
     DESCORE(64);
 

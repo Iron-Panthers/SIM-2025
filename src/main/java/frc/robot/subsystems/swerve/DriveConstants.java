@@ -34,7 +34,7 @@ public class DriveConstants {
             Units.inchesToMeters(34),
             4.5, // FIXME
             5,
-            3);
+            5);
         case PROG, SIM -> new DrivebaseConfig(
             Units.inchesToMeters(2),
             Units.inchesToMeters(22.5),
@@ -172,7 +172,7 @@ public class DriveConstants {
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
-            new PIDConstants(8, 0), new PIDConstants(3, 0));
+            new PIDConstants(8, 0), new PIDConstants(4, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
@@ -180,7 +180,7 @@ public class DriveConstants {
 
   public static final HeadingControllerConstants HEADING_CONTROLLER_CONSTANTS =
       switch (getRobotType()) {
-        case COMP -> new HeadingControllerConstants(3, 0, 5, 200, 0.002);
+        case COMP -> new HeadingControllerConstants(8, 0, 5, 200, 0.002);
         case ALPHA -> new HeadingControllerConstants(3, 0, 5, 200, 0.002);
         default -> new HeadingControllerConstants(0, 0, 0, 0, 0);
       };
@@ -201,13 +201,18 @@ public class DriveConstants {
 
   public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
       new PathConstraints(
-          1, 1, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
+          3, 2, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
 
   public static final PathConstraints APPROACH_PATH_CONSTRAINTS =
       new PathConstraints(
           1.5, 1.5, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
 
   public static final Translation2d BLUE_REEF_ORIGIN = new Translation2d(4.5, 4.025);
+
+  public static final Translation2d REEF_TRANSLATION2D =
+      DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue
+          ? new Translation2d(4.5, 4)
+          : new Translation2d(13, 4);
 
   // blue alliance, will automatically flip, clockwise from top right (vertical)
   public static final ApproachPose[] REEF_APPROACH_POSES =

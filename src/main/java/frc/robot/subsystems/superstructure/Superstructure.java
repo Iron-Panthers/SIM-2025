@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
@@ -65,13 +66,16 @@ public class Superstructure extends SubsystemBase {
 
           // check for state transitions
           if (this.superstructureReachedTarget()) {
-            if (targetState == SuperstructureState.L2) {
-              setCurrentState(SuperstructureState.L2);
-            } else if (targetState == SuperstructureState.INTAKE
-                || targetState == SuperstructureState.STOW) {
-              setCurrentState(SuperstructureState.STOW);
-            } else if (targetState != currentState) {
-              setCurrentState(SuperstructureState.TOP);
+            if (currentState != targetState) {
+              RGBMessages.L1.setIsExpired(true);
+              if (targetState == SuperstructureState.L2) {
+                setCurrentState(SuperstructureState.L2);
+              } else if (targetState == SuperstructureState.INTAKE
+                  || targetState == SuperstructureState.STOW) {
+                setCurrentState(SuperstructureState.STOW);
+              } else {
+                setCurrentState(SuperstructureState.TOP);
+              }
             }
           }
         }
@@ -83,6 +87,7 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState != currentState) {
+              RGBMessages.L2.setIsExpired(true);
               if (targetState == SuperstructureState.L1) {
                 setCurrentState(SuperstructureState.L1);
               } else if (targetState == SuperstructureState.INTAKE
@@ -105,6 +110,7 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState != currentState) {
+              RGBMessages.L3.setIsExpired(true);
               if (targetState == SuperstructureState.SCORE_L3) {
                 setCurrentState(SuperstructureState.SCORE_L3);
               } else if (targetState == SuperstructureState.CLIMB) {
@@ -195,6 +201,7 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.L4);
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
+            RGBMessages.L4.setIsExpired(true);
             switch (targetState) {
               case SCORE_L4 -> {
                 if (tonguePoleDetected()) {
