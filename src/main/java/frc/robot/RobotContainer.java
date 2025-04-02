@@ -266,14 +266,22 @@ public class RobotContainer {
                   if (Math.abs(driverA.getLeftTriggerAxis()) > 0.1
                       || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
                     swerve.clearHeadingControl();
-                  } else {
-                    swerve.setTargetHeading(
-                        RobotState.getInstance()
-                            .getEstimatedPose()
-                            .getTranslation()
-                            .minus(DriveConstants.REEF_TRANSLATION2D)
-                            .getAngle()
-                            .minus(Rotation2d.kPi));
+                  } else if (!driverA.y().getAsBoolean()){
+                    if (RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(DriveConstants.LEFT_CORNER)<2.5){
+                      new Rotation2d(Math.toRadians(232));
+                    }
+                    else if(RobotState.getInstance().getEstimatedPose().getTranslation().getDistance(DriveConstants.RIGHT_CORNER)<2.5){
+                      new Rotation2d(Math.toRadians(128));
+                    }
+                    else{
+                      swerve.setTargetHeading(
+                        calculateSnapTargetHeading(
+                          RobotState.getInstance()
+                              .getEstimatedPose()
+                              .getTranslation()
+                              .minus(DriveConstants.REEF_TRANSLATION2D)
+                              .getAngle()));
+                    }
                   }
                 })
             .withName("Drive Teleop"));
