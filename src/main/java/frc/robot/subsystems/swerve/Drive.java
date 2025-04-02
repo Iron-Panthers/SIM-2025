@@ -45,7 +45,6 @@ public class Drive extends SubsystemBase {
   private ChassisSpeeds trajectorySpeeds = new ChassisSpeeds();
   private HeadingController headingController = null;
 
-
   public Drive(GyroIO gyroIO, ModuleIO fl, ModuleIO fr, ModuleIO bl, ModuleIO br) {
     this.gyroIO = gyroIO;
 

@@ -67,7 +67,6 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (currentState != targetState) {
-              RGBMessages.L1.setIsExpired(true);
               if (targetState == SuperstructureState.L2) {
                 setCurrentState(SuperstructureState.L2);
               } else if (targetState == SuperstructureState.INTAKE
@@ -87,7 +86,6 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState != currentState) {
-              RGBMessages.L2.setIsExpired(true);
               if (targetState == SuperstructureState.L1) {
                 setCurrentState(SuperstructureState.L1);
               } else if (targetState == SuperstructureState.INTAKE
@@ -110,7 +108,6 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (this.superstructureReachedTarget()) {
             if (targetState != currentState) {
-              RGBMessages.L3.setIsExpired(true);
               if (targetState == SuperstructureState.SCORE_L3) {
                 setCurrentState(SuperstructureState.SCORE_L3);
               } else if (targetState == SuperstructureState.CLIMB) {

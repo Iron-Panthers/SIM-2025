@@ -9,8 +9,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
-
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -29,14 +27,15 @@ public class TeleopController {
   }
 
   /* accept driver input from joysticks */
-  public void acceptJoystickInput(double controllerX, double controllerY, double controllerOmega, double acceleration) {
+  public void acceptJoystickInput(
+      double controllerX, double controllerY, double controllerOmega, double acceleration) {
     this.controllerX = controllerX;
     this.controllerY = controllerY;
     this.controllerOmega = controllerOmega;
     this.acceleration = acceleration;
   }
 
-    /* accept driver input from joysticks */
+  /* accept driver input from joysticks */
   public void acceptJoystickInput(double controllerX, double controllerY, double controllerOmega) {
     this.controllerX = controllerX;
     this.controllerY = controllerY;

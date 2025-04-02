@@ -4,19 +4,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotState;
 import frc.robot.subsystems.swerve.Drive;
-import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 // wrapper for autoalign FollowPathCommand
 public class ApproachReef extends SequentialCommandGroup {
-  private final boolean bSide;
-  private final DoubleSupplier levelOffsetSupplier;
-  private Command approachReef;
 
   private double iteration = 0;
 
   public enum LevelOffsets {
     // metres
     L4_OFFSET(0.14),
+    PREP_L4_OFFSET(0.5),
     L3_OFFSET(0.1),
     L2_OFFSET(0),
     L1_OFFSET(0);
@@ -32,28 +30,20 @@ public class ApproachReef extends SequentialCommandGroup {
   }
 
   public class ReefAlign extends Command {
-    private final DoubleSupplier levelOffsetSupplier;
+    private final Supplier<LevelOffsets> levelOffsetSupplier;
     private final boolean bSide;
     private Command reefAlign;
+    private LevelOffsets pastLevelOffset;
 
-    public ReefAlign(DoubleSupplier levelOffsetSupplier, boolean bSide) {
+    public ReefAlign(Supplier<LevelOffsets> levelOffsetSupplier, boolean bSide) {
       this.levelOffsetSupplier = levelOffsetSupplier;
       this.bSide = bSide;
+      pastLevelOffset = levelOffsetSupplier.get();
     }
 
     @Override
     public void initialize() {
-      try {
-        reefAlign =
-            RobotState.getInstance().approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
-        reefAlign.initialize();
-      } catch (Exception e) {
-        e.printStackTrace();
-        if (Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1) {
-          end(true);
-        }
-        System.out.println("Already at target.");
-      }
+      calculatePath();
     }
 
     @Override
@@ -61,22 +51,13 @@ public class ApproachReef extends SequentialCommandGroup {
       if (reefAlign != null) {
         reefAlign.execute();
       }
-      if (iteration > 20 && !(RobotState.getInstance().alignError() < 0.5)) {
-        try {
-          reefAlign =
-              RobotState.getInstance()
-                  .approachReefCommand(levelOffsetSupplier.getAsDouble(), bSide);
-          reefAlign.initialize();
-        } catch (Exception e) {
-          e.printStackTrace();
-          if (Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1) {
-            end(true);
-          }
-          System.out.println("Already at target.");
-        }
+      if ((iteration > 20 && !(RobotState.getInstance().alignError() < 0.5))
+          || pastLevelOffset != levelOffsetSupplier.get()) {
+        calculatePath();
         iteration = 0;
       }
       iteration++;
+      pastLevelOffset = levelOffsetSupplier.get();
     }
 
     @Override
@@ -85,7 +66,8 @@ public class ApproachReef extends SequentialCommandGroup {
           ? false
           : reefAlign.isFinished()
               && RobotState.getInstance().alignError() < 0.5
-              && Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1;
+              && Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1
+              && pastLevelOffset != LevelOffsets.PREP_L4_OFFSET;
     }
 
     @Override
@@ -95,12 +77,25 @@ public class ApproachReef extends SequentialCommandGroup {
       }
       reefAlign = null;
     }
+
+    public void calculatePath() {
+      try {
+        reefAlign =
+            RobotState.getInstance()
+                .approachReefCommand(levelOffsetSupplier.get().getLevelOffset(), bSide);
+        reefAlign.initialize();
+      } catch (Exception e) {
+        e.printStackTrace();
+        if (Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1
+            && pastLevelOffset != LevelOffsets.PREP_L4_OFFSET) {
+          end(true);
+        }
+        System.out.println("Already at target.");
+      }
+    }
   }
 
-  public ApproachReef(DoubleSupplier levelOffsetSupplier, boolean bSide, Drive drive) {
-    this.levelOffsetSupplier = levelOffsetSupplier;
-    this.bSide = bSide;
-
+  public ApproachReef(Supplier<LevelOffsets> levelOffsetSupplier, boolean bSide, Drive drive) {
     addCommands(new VelocityClamp(drive), new ReefAlign(levelOffsetSupplier, bSide));
   }
 }
