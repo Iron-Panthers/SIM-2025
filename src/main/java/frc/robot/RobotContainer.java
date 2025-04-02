@@ -29,9 +29,9 @@ import frc.robot.subsystems.canWatchdog.CANWatchdog;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
 import frc.robot.subsystems.rgb.RGB;
+import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.rgb.RGBIO;
 import frc.robot.subsystems.rgb.RGBIOCANdle;
-import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -271,19 +271,25 @@ public class RobotContainer {
                       || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
                     swerve.clearHeadingControl();
                   } else if (!driverA.y().getAsBoolean()) {
+                    //Station snaps
                     if (RobotState.getInstance()
                             .getEstimatedPose()
                             .getTranslation()
-                            .getDistance(DriveConstants.LEFT_CORNER)
-                        < 2.5) {
-                      new Rotation2d(Math.toRadians(232));
+                            .getDistance(DriveConstants.RIGHT_CORNER)
+                        < 3) {
+                      swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)));
                     } else if (RobotState.getInstance()
                             .getEstimatedPose()
                             .getTranslation()
-                            .getDistance(DriveConstants.RIGHT_CORNER)
-                        < 2.5) {
-                      new Rotation2d(Math.toRadians(128));
-                    } else {
+                            .getDistance(DriveConstants.LEFT_CORNER)
+                        < 3) {
+                      swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)));
+                    //close up reef snaps
+                    } else if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.REEF_TRANSLATION2D)
+                        < 2) {
                       swerve.setTargetHeading(
                           calculateSnapTargetHeading(
                               RobotState.getInstance()
@@ -291,6 +297,15 @@ public class RobotContainer {
                                   .getTranslation()
                                   .minus(DriveConstants.REEF_TRANSLATION2D)
                                   .getAngle()));
+                    //default gradual far from reef snaps
+                    } else {
+                      swerve.setTargetHeading(
+                          RobotState.getInstance()
+                              .getEstimatedPose()
+                              .getTranslation()
+                              .minus(DriveConstants.REEF_TRANSLATION2D)
+                              .getAngle()
+                              .minus(Rotation2d.kPi));
                     }
                   }
                 })
@@ -420,8 +435,8 @@ public class RobotContainer {
             // superstructure
             //     .goToStateCommand(SuperstructureState.L1)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)
-            .alongWith(rgb.clearLevelCommands())
-            .andThen(rgb.startMessageCommand(RGBMessages.L1)));
+                .alongWith(rgb.clearLevelCommands())
+                .andThen(rgb.startMessageCommand(RGBMessages.L1)));
     // L2
     new Trigger(
             () ->
@@ -432,8 +447,8 @@ public class RobotContainer {
             // superstructure
             // .goToStateCommand(SuperstructureState.L2)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)
-            .alongWith(rgb.clearLevelCommands())
-            .andThen(rgb.startMessageCommand(RGBMessages.L2)));
+                .alongWith(rgb.clearLevelCommands())
+                .andThen(rgb.startMessageCommand(RGBMessages.L2)));
     // Go to L3
     new Trigger(
             () ->
@@ -444,8 +459,8 @@ public class RobotContainer {
             // superstructure
             //     .goToStateCommand(SuperstructureState.SCORE_L3)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)
-            .alongWith(rgb.clearLevelCommands())
-            .andThen(rgb.startMessageCommand(RGBMessages.L3)));
+                .alongWith(rgb.clearLevelCommands())
+                .andThen(rgb.startMessageCommand(RGBMessages.L3)));
 
     // Go to L4
     new Trigger(
@@ -457,8 +472,8 @@ public class RobotContainer {
             // superstructure
             // .goToStateCommand(SuperstructureState.SCORE_L4)
             new InstantCommand(() -> levelOffsets = LevelOffsets.PREP_L4_OFFSET)
-            .alongWith(rgb.clearLevelCommands())
-            .andThen(rgb.startMessageCommand(RGBMessages.L4)));
+                .alongWith(rgb.clearLevelCommands())
+                .andThen(rgb.startMessageCommand(RGBMessages.L4)));
 
     new Trigger(() -> driverB.a().getAsBoolean() && driverB.start().getAsBoolean())
         .onTrue(
