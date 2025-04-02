@@ -31,6 +31,7 @@ import frc.robot.subsystems.canWatchdog.CANWatchdogIOComp;
 import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGBIO;
 import frc.robot.subsystems.rgb.RGBIOCANdle;
+import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -418,7 +419,9 @@ public class RobotContainer {
         .onTrue(
             // superstructure
             //     .goToStateCommand(SuperstructureState.L1)
-            new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET));
+            new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)
+            .alongWith(rgb.clearLevelCommands())
+            .andThen(rgb.startMessageCommand(RGBMessages.L1)));
     // L2
     new Trigger(
             () ->
@@ -428,8 +431,9 @@ public class RobotContainer {
         .onTrue(
             // superstructure
             // .goToStateCommand(SuperstructureState.L2)
-            new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
-
+            new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)
+            .alongWith(rgb.clearLevelCommands())
+            .andThen(rgb.startMessageCommand(RGBMessages.L2)));
     // Go to L3
     new Trigger(
             () ->
@@ -439,7 +443,9 @@ public class RobotContainer {
         .onTrue(
             // superstructure
             //     .goToStateCommand(SuperstructureState.SCORE_L3)
-            new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
+            new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)
+            .alongWith(rgb.clearLevelCommands())
+            .andThen(rgb.startMessageCommand(RGBMessages.L3)));
 
     // Go to L4
     new Trigger(
@@ -450,7 +456,9 @@ public class RobotContainer {
         .onTrue(
             // superstructure
             // .goToStateCommand(SuperstructureState.SCORE_L4)
-            new InstantCommand(() -> levelOffsets = LevelOffsets.PREP_L4_OFFSET));
+            new InstantCommand(() -> levelOffsets = LevelOffsets.PREP_L4_OFFSET)
+            .alongWith(rgb.clearLevelCommands())
+            .andThen(rgb.startMessageCommand(RGBMessages.L4)));
 
     new Trigger(() -> driverB.a().getAsBoolean() && driverB.start().getAsBoolean())
         .onTrue(

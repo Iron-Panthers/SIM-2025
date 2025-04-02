@@ -18,14 +18,14 @@ public class RGB extends SubsystemBase {
     MISSING_CAN_DEVICE(
         new RGBMessage(Colors.RED, RGBPattern.FIRE, MessagePriority.B_MISSING_CAN_DEVICE, true)),
     CLIMB(new RGBMessage(Colors.PURPLE, RGBPattern.STROBE, MessagePriority.C_CLIMB, true)),
-    CORAL_DETECTED(
-        new RGBMessage(Colors.GREEN, RGBPattern.PULSE, MessagePriority.I_CORAL_DETECTED, true)),
     READY_TO_INTAKE(
-        new RGBMessage(Colors.BLUE, RGBPattern.STROBE, MessagePriority.D_READY_TO_INTAKE, true)),
-    L1(new RGBMessage(Colors.RED, RGBPattern.STROBE, MessagePriority.H_L1, true)),
+      new RGBMessage(Colors.BLUE, RGBPattern.STROBE, MessagePriority.D_READY_TO_INTAKE, true)),
     L2(new RGBMessage(Colors.ORANGE, RGBPattern.STROBE, MessagePriority.E_L2, true)),
     L3(new RGBMessage(Colors.YELLOW, RGBPattern.STROBE, MessagePriority.F_L3, true)),
     L4(new RGBMessage(Colors.BLUE, RGBPattern.STROBE, MessagePriority.G_L4, true)),
+    L1(new RGBMessage(Colors.RED, RGBPattern.STROBE, MessagePriority.H_L1, true)),
+    CORAL_DETECTED(
+        new RGBMessage(Colors.GREEN, RGBPattern.PULSE, MessagePriority.I_CORAL_DETECTED, true)),
     DEFAULT(new RGBMessage(Colors.WHITE, RGBPattern.RAINBOW, MessagePriority.J_DEFAULT, false));
 
     RGBMessage rgbMessage;
@@ -79,5 +79,12 @@ public class RGB extends SubsystemBase {
 
   public Command endMessageCommand(RGBMessages message) {
     return new InstantCommand(() -> message.setIsExpired(true));
+  }
+
+  public Command clearLevelCommands(){
+    return new InstantCommand(()-> {RGBMessages.L1.setIsExpired(true);
+      RGBMessages.L2.setIsExpired(true);
+      RGBMessages.L3.setIsExpired(true);
+      RGBMessages.L4.setIsExpired(true);});
   }
 }
