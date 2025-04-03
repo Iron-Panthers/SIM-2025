@@ -544,6 +544,12 @@ public class RobotContainer {
                 superstructure.goToStateCommand(SuperstructureState.INTAKE),
                 rollers.setTargetCommand(RollerState.INTAKE)));
 
+    // RGB for intaking
+    new Trigger(() -> rollers.intakeDetected())
+        .onTrue(rgb.startMessageCommand(RGBMessages.CORAL_DETECTED));
+    new Trigger(() -> rollers.getTargetState().equals(RollerState.INTAKE))
+        .onTrue(rgb.endMessageCommand(RGBMessages.CORAL_DETECTED));
+
     // Eject on L1
     new Trigger(
             () ->
@@ -608,12 +614,20 @@ public class RobotContainer {
     new Trigger(() -> (superstructure.getCurrentState() == SuperstructureState.SCORE_L4))
         .onTrue(
             new SequentialCommandGroup(
-                // new WaitCommand(0.1),
-                rollers.setTargetCommand(RollerState.EJECT_TOP),
-                new WaitCommand(0.2),
-                superstructure.goToStateCommand(SuperstructureState.INTAKE),
-                new WaitCommand(0.9),
-                rollers.setTargetCommand(RollerState.FORCE_INTAKE)));
+                    // new WaitCommand(0.1),
+                    rollers.setTargetCommand(RollerState.EJECT_TOP),
+                    new WaitCommand(0.2),
+                    superstructure.goToStateCommand(SuperstructureState.INTAKE),
+                    new WaitCommand(0.9),
+                    rollers.setTargetCommand(RollerState.FORCE_INTAKE))
+                .andThen(new InstantCommand(() -> eject = false))
+                .alongWith(
+                    new InstantCommand(
+                        () ->
+                            levelOffsets =
+                                levelOffsets == LevelOffsets.L4_OFFSET
+                                    ? LevelOffsets.PREP_L4_OFFSET
+                                    : levelOffsets)));
   }
 
   private void configureAutos() {

@@ -61,6 +61,14 @@ public class RGB extends SubsystemBase {
       }
     }
     if (currentMessage.isPresent()) {
+      if (RGBMessages.CORAL_DETECTED.rgbMessage.getIsExpired()
+          // if one of the level messages
+          && (currentMessage.get().equals(RGBMessages.L1.rgbMessage)
+              || currentMessage.get().equals(RGBMessages.L2.rgbMessage)
+              || currentMessage.get().equals(RGBMessages.L3.rgbMessage)
+              || currentMessage.get().equals(RGBMessages.L4.rgbMessage))) {
+        currentMessage = Optional.of(RGBMessages.DEFAULT.rgbMessage);
+      }
       rgbIO.displayMessage(currentMessage.get());
     } else {
       rgbIO.displayMessage(RGBMessages.DEFAULT.rgbMessage);
