@@ -63,6 +63,7 @@ import frc.robot.subsystems.swerve.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIOPhotonvision;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -78,7 +79,9 @@ public class RobotContainer {
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
 
+  @AutoLogOutput(key = "CommandedOffset")
   private LevelOffsets levelOffsets = LevelOffsets.PREP_L4_OFFSET;
+
   private boolean eject = false;
 
   private Drive swerve;
@@ -339,37 +342,56 @@ public class RobotContainer {
     driverA
         .leftBumper()
         .whileTrue(
-            new ApproachReef(() -> levelOffsets, false, swerve)
-                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
-                .andThen(new InstantCommand(() -> eject = true))
-                .andThen(
-                    (new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 0.5)
-                            .andThen(new ApproachReef(() -> levelOffsets, false, swerve)))
-                        .repeatedly()));
+            (new ApproachReef(() -> levelOffsets, false, swerve)
+                    .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
+                    .andThen(
+                        new InstantCommand(
+                            () -> eject = levelOffsets != LevelOffsets.PREP_L4_OFFSET))
+                    .andThen(
+                        (new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 0.5)
+                                .andThen(new ApproachReef(() -> levelOffsets, false, swerve)))
+                            .repeatedly()
+                            .until(() -> levelOffsets == LevelOffsets.L4_OFFSET)))
+                .repeatedly()); // so if it aligns to L4 prep, it will then try to align to L4
 
     driverA
         .rightBumper()
         .whileTrue(
-            new ApproachReef(() -> levelOffsets, true, swerve)
-                .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
-                .andThen(new InstantCommand(() -> eject = true))
-                .andThen(
-                    (new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 0.5)
-                            .andThen(new ApproachReef(() -> levelOffsets, true, swerve)))
-                        .repeatedly()));
+            (new ApproachReef(() -> levelOffsets, true, swerve)
+                    .alongWith(new InstantCommand(() -> swerve.clearHeadingControl()))
+                    .andThen(
+                        new InstantCommand(
+                            () -> eject = levelOffsets != LevelOffsets.PREP_L4_OFFSET))
+                    .andThen(
+                        (new WaitUntilCommand(
+                                    () ->
+                                        RobotState.getInstance().alignError() > 0.5
+                                            || (RobotState.getInstance().alignError() < 2
+                                                && levelOffsets == LevelOffsets.PREP_L4_OFFSET))
+                                .andThen(new ApproachReef(() -> levelOffsets, true, swerve)))
+                            .repeatedly()
+                            .until(() -> levelOffsets == LevelOffsets.L4_OFFSET)))
+                .repeatedly()); // so if it aligns to L4 prep, it will then try to align to L4
 
     new Trigger(
             () ->
                 levelOffsets == LevelOffsets.PREP_L4_OFFSET
                     && !swerve.isTeleop()
                     && superstructure.superstructureReachedTarget()
-                    && superstructure.getTargetState() == SuperstructureState.SETUP_L4)
+                    && superstructure.getCurrentState() == SuperstructureState.SETUP_L4)
         .onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
 
     new Trigger(() -> eject)
         .onTrue(
-            new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 1)
-                .andThen(new InstantCommand(() -> eject = false)));
+            new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 3)
+                .andThen(new InstantCommand(() -> eject = false))
+                .alongWith(
+                    new InstantCommand(
+                        () ->
+                            levelOffsets =
+                                levelOffsets == LevelOffsets.L4_OFFSET
+                                    ? LevelOffsets.PREP_L4_OFFSET
+                                    : levelOffsets)));
 
     driverA
         .x()
@@ -392,7 +414,8 @@ public class RobotContainer {
                             .minus(DriveConstants.REEF_TRANSLATION2D)
                             .getNorm()
                     && !swerve.isTeleop()
-                    && levelOffsets == LevelOffsets.L1_OFFSET)
+                    && levelOffsets == LevelOffsets.L1_OFFSET
+                    && rollers.readyToRaise())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
 
     // auto go to L2
@@ -405,32 +428,35 @@ public class RobotContainer {
                             .minus(DriveConstants.REEF_TRANSLATION2D)
                             .getNorm()
                     && !swerve.isTeleop()
-                    && levelOffsets == LevelOffsets.L2_OFFSET)
+                    && levelOffsets == LevelOffsets.L2_OFFSET
+                    && rollers.readyToRaise())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
 
     // auto go to L3
     new Trigger(
             () ->
-                3
+                3.5
                         > RobotState.getInstance()
                             .getEstimatedPose()
                             .getTranslation()
                             .minus(DriveConstants.REEF_TRANSLATION2D)
                             .getNorm()
                     && !swerve.isTeleop()
-                    && levelOffsets == LevelOffsets.L3_OFFSET)
+                    && levelOffsets == LevelOffsets.L3_OFFSET
+                    && rollers.readyToRaise())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
 
     // auto go to L4
-    new Trigger(() -> !swerve.isTeleop() && levelOffsets == LevelOffsets.PREP_L4_OFFSET)
+    new Trigger(
+            () ->
+                !swerve.isTeleop()
+                    && levelOffsets == LevelOffsets.PREP_L4_OFFSET
+                    && rollers.readyToRaise())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
 
     // L1
-    new Trigger(
-            () ->
-                ((rollers.readyToRaise()
-                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
-                    && driverB.povDown().getAsBoolean())
+    driverB
+        .povDown()
         .onTrue(
             // superstructure
             //     .goToStateCommand(SuperstructureState.L1)
@@ -438,11 +464,9 @@ public class RobotContainer {
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L1)));
     // L2
-    new Trigger(
-            () ->
-                ((rollers.readyToRaise()
-                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
-                    && driverB.povRight().getAsBoolean())
+
+    driverB
+        .povRight()
         .onTrue(
             // superstructure
             // .goToStateCommand(SuperstructureState.L2)
@@ -450,11 +474,8 @@ public class RobotContainer {
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L2)));
     // Go to L3
-    new Trigger(
-            () ->
-                ((rollers.readyToRaise()
-                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
-                    && driverB.povLeft().getAsBoolean())
+    driverB
+        .povLeft()
         .onTrue(
             // superstructure
             //     .goToStateCommand(SuperstructureState.SCORE_L3)
@@ -463,11 +484,8 @@ public class RobotContainer {
                 .andThen(rgb.startMessageCommand(RGBMessages.L3)));
 
     // Go to L4
-    new Trigger(
-            () ->
-                ((rollers.readyToRaise()
-                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
-                    && driverB.povUp().getAsBoolean())
+    driverB
+        .povUp()
         .onTrue(
             // superstructure
             // .goToStateCommand(SuperstructureState.SCORE_L4)
@@ -573,7 +591,12 @@ public class RobotContainer {
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
                         || superstructure.getTargetState().equals(SuperstructureState.L2)
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
-                    && (driverB.rightTrigger().getAsBoolean() || eject))
+                    && (driverB.rightTrigger().getAsBoolean()
+                        || (eject
+                            && (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
+                                || superstructure
+                                    .getTargetState()
+                                    .equals(SuperstructureState.SETUP_L4)))))
         .onTrue(
             new InstantCommand(() -> eject = false)
                 .andThen(rollers.setTargetCommand(RollerState.EJECT_TOP))

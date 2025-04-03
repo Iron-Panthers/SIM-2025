@@ -51,7 +51,9 @@ public class ApproachReef extends SequentialCommandGroup {
       if (reefAlign != null) {
         reefAlign.execute();
       }
-      if ((iteration > 20 && !(RobotState.getInstance().alignError() < 0.5))
+      if ((iteration > 20 && !(RobotState.getInstance().alignError() < 0.5)
+              || (RobotState.getInstance().alignError() < 2
+                  && levelOffsetSupplier.get() == LevelOffsets.PREP_L4_OFFSET))
           || pastLevelOffset != levelOffsetSupplier.get()) {
         calculatePath();
         iteration = 0;
@@ -65,9 +67,10 @@ public class ApproachReef extends SequentialCommandGroup {
       return reefAlign == null
           ? false
           : reefAlign.isFinished()
-              && RobotState.getInstance().alignError() < 0.5
-              && Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1
-              && pastLevelOffset != LevelOffsets.PREP_L4_OFFSET;
+              && (RobotState.getInstance().alignError() < 0.5
+                  || (RobotState.getInstance().alignError() < 2
+                      && levelOffsetSupplier.get() == LevelOffsets.PREP_L4_OFFSET))
+              && Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1;
     }
 
     @Override
@@ -86,8 +89,7 @@ public class ApproachReef extends SequentialCommandGroup {
         reefAlign.initialize();
       } catch (Exception e) {
         e.printStackTrace();
-        if (Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1
-            && pastLevelOffset != LevelOffsets.PREP_L4_OFFSET) {
+        if (Math.abs(RobotState.getInstance().getVelocity().getNorm()) < 0.1) {
           end(true);
         }
         System.out.println("Already at target.");

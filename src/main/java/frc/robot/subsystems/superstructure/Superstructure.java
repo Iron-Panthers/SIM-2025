@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
@@ -198,7 +197,6 @@ public class Superstructure extends SubsystemBase {
           tongue.setPositionTarget(TongueTarget.L4);
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
-            RGBMessages.L4.setIsExpired(true);
             switch (targetState) {
               case SCORE_L4 -> {
                 if (tonguePoleDetected()) {
