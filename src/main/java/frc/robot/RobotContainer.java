@@ -302,7 +302,7 @@ public class RobotContainer {
                                   .getTranslation()
                                   .minus(DriveConstants.REEF_TRANSLATION2D)
                                   .getAngle()));
-                    //climb snaps
+                      // climb snaps
                     } else if (MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getX(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
@@ -311,7 +311,7 @@ public class RobotContainer {
                             DriveConstants.CLIMB_ZONE_CENTER.getY(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getY(),
                             2)) {
-                      swerve.setTargetHeading(new Rotation2d(Math.PI/2));
+                      swerve.setTargetHeading(new Rotation2d(Math.PI / 2));
                       // default gradual far from reef snaps
                     } else {
                       swerve.setTargetHeading(
@@ -450,7 +450,8 @@ public class RobotContainer {
                     && !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.L1_OFFSET
-                    && rollers.readyToRaise())
+                    && (rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.L1));
 
     // auto go to L2
@@ -465,7 +466,8 @@ public class RobotContainer {
                     && !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.L2_OFFSET
-                    && rollers.readyToRaise())
+                    && (rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.L2));
 
     // auto go to L3
@@ -474,7 +476,8 @@ public class RobotContainer {
                 !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.L3_OFFSET
-                    && rollers.readyToRaise())
+                    && (rollers.readyToRaise()
+                        || superstructure.getTargetState() != SuperstructureState.INTAKE))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L3));
 
     // auto go to L4
@@ -616,7 +619,8 @@ public class RobotContainer {
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3))
-                    && driverB.rightTrigger().getAsBoolean())
+                        && (driverB.rightTrigger().getAsBoolean())
+                    || (eject && superstructure.superstructureReachedTarget()))
         .onTrue(
             rollers
                 .setTargetCommand(RollerState.EJECT_L3)
