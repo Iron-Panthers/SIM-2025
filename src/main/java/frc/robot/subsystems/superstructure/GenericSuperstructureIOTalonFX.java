@@ -225,6 +225,9 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   @Override
   public void setOffset() {
     talon.getConfigurator().setPosition(zeroingOffset);
+    if (talon2.isPresent()) {
+      talon2.get().getConfigurator().setPosition(zeroingOffset);
+    }
   }
 
   @Override

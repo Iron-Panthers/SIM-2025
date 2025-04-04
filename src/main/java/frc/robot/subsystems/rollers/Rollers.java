@@ -16,6 +16,7 @@ public class Rollers extends SubsystemBase {
     EJECT_TOP,
     EJECT_L1,
     EJECT_L2,
+    EJECT_L3,
     HOLD
   }
 
@@ -69,6 +70,9 @@ public class Rollers extends SubsystemBase {
       }
       case EJECT_L2 -> {
         intake.setVoltageTarget(Intake.Target.EJECT_L2);
+      }
+      case EJECT_L3 -> {
+        intake.setVoltageTarget(Intake.Target.EJECT_L3);
       }
     }
     if (intakeDetected()) {
