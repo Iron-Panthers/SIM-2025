@@ -438,6 +438,19 @@ public class RobotContainer {
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
 
+    // Eject L3
+    new Trigger(
+            () ->
+                (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3))
+                    && driverB.rightTrigger().getAsBoolean())
+        .onTrue(
+            rollers
+                .setTargetCommand(RollerState.EJECT_L3)
+                .andThen(
+                    new WaitCommand(0.5)
+                        .andThen(rollers.setTargetCommand(RollerState.INTAKE))
+                        .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
+
     // Eject Intake - ONLY IF ITS EXACTLY AT INTAKE
     new Trigger(
             () ->
@@ -452,11 +465,12 @@ public class RobotContainer {
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE))));
-    // Eject if not at L1 or L2 or Intake
+    // Eject if not at L1 or L2 or L3 or Intake
     new Trigger(
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
                         || superstructure.getTargetState().equals(SuperstructureState.L2)
+                        || superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
                     && driverB.rightTrigger().getAsBoolean())
         .onTrue(
