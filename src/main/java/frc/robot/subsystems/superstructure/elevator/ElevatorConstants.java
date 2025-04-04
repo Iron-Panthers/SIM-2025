@@ -49,7 +49,7 @@ public class ElevatorConstants {
 
   // SOFT LIMITS
   public static final Optional<Double> UPPER_EXTENSION_LIMIT =
-      Optional.of(32.0); // top limit is 121 rotations
+      Optional.of(32.34); // top limit is 121 rotations
   public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
 
   // CURRENT LIMITS

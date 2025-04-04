@@ -11,7 +11,7 @@ public class Tongue {
     STOW(64),
     L1(64),
     L2(64),
-    L3(55),
+    L3(40),
     L4(0),
     CLIMB(64),
     DESCORE(64);
