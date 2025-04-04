@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotState;
 import frc.robot.subsystems.swerve.Drive;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 
 // wrapper for autoalign FollowPathCommand
 public class ApproachReef extends SequentialCommandGroup {
@@ -85,7 +86,7 @@ public class ApproachReef extends SequentialCommandGroup {
       try {
         reefAlign =
             RobotState.getInstance()
-                .approachReefCommand(levelOffsetSupplier.get().getLevelOffset(), bSide);
+                .approachReefCommand(levelOffsetSupplier.get().getLevelOffset(), bSide, levelOffsetSupplier.get() == LevelOffsets.L1_OFFSET ? true : false);
         reefAlign.initialize();
       } catch (Exception e) {
         e.printStackTrace();
