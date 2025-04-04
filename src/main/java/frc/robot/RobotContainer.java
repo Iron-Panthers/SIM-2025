@@ -357,25 +357,7 @@ public class RobotContainer {
                             .repeatedly()
                             .until(() -> levelOffsets == LevelOffsets.L4_OFFSET)))
                 .repeatedly()); // so if it aligns to L4 prep, it will then try to align to L4
-    driverA
-        .leftBumper()
-        .onFalse(
-            new InstantCommand(
-                () ->
-                    levelOffsets =
-                        levelOffsets == LevelOffsets.L4_OFFSET
-                            ? LevelOffsets.PREP_L4_OFFSET
-                            : levelOffsets));
-    driverA
-        .rightBumper()
-        .onFalse(
-            new InstantCommand(
-                () ->
-                    levelOffsets =
-                        levelOffsets == LevelOffsets.L4_OFFSET
-                            ? LevelOffsets.PREP_L4_OFFSET
-                            : levelOffsets));
-
+    // auto align
     driverA
         .rightBumper()
         .whileTrue(
@@ -395,6 +377,8 @@ public class RobotContainer {
                             .until(() -> levelOffsets == LevelOffsets.L4_OFFSET)))
                 .repeatedly()); // so if it aligns to L4 prep, it will then try to align to L4
 
+
+    // if superstructure at L4 pos. move to score
     new Trigger(
             () ->
                 levelOffsets == LevelOffsets.PREP_L4_OFFSET
@@ -403,7 +387,7 @@ public class RobotContainer {
                     && superstructure.getCurrentState() == SuperstructureState.SETUP_L4
                     && RobotState.getInstance().alignError() < 2)
         .onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-
+    // after ejecting or ending auto align early, when you move away make L4 auto align be prep again
     new Trigger(() -> eject)
         .onTrue(
             new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 3)
@@ -415,7 +399,25 @@ public class RobotContainer {
                                 levelOffsets == LevelOffsets.L4_OFFSET
                                     ? LevelOffsets.PREP_L4_OFFSET
                                     : levelOffsets)));
-
+    driverA
+        .leftBumper()
+        .onFalse(
+            new InstantCommand(
+                () ->
+                    levelOffsets =
+                        levelOffsets == LevelOffsets.L4_OFFSET
+                            ? LevelOffsets.PREP_L4_OFFSET
+                            : levelOffsets));
+    driverA
+        .rightBumper()
+        .onFalse(
+            new InstantCommand(
+                () ->
+                    levelOffsets =
+                        levelOffsets == LevelOffsets.L4_OFFSET
+                            ? LevelOffsets.PREP_L4_OFFSET
+                            : levelOffsets));
+    //station angle snap (no longer all that important)
     driverA
         .x()
         .onTrue(
@@ -472,9 +474,14 @@ public class RobotContainer {
                 !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.PREP_L4_OFFSET
-                    && rollers.readyToRaise())
+                    && (rollers.readyToRaise()
+                        || superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
-
+    // auto go half to L4 after intaking
+    new Trigger(
+            () -> levelOffsets == LevelOffsets.PREP_L4_OFFSET
+                    && rollers.readyToRaise())
+        .onTrue(superstructure.goToStateCommand(SuperstructureState.PREVENT_TIPPING));
     // L1
     driverB
         .povDown()
@@ -494,7 +501,7 @@ public class RobotContainer {
             new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L2)));
-    // Go to L3
+    //L3
     driverB
         .povLeft()
         .onTrue(
@@ -504,7 +511,7 @@ public class RobotContainer {
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L3)));
 
-    // Go to L4
+    //L4
     driverB
         .povUp()
         .onTrue(
