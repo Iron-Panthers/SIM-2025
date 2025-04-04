@@ -183,7 +183,7 @@ public class Superstructure extends SubsystemBase {
                   < 0.05)) {
             switch (targetState) {
               case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
-              case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SETUP_L3);
+              case SETUP_L3, SCORE_L3, CLIMB -> setCurrentState(SuperstructureState.SCORE_L3);
               case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
               case DESCORE_LOW -> setCurrentState(SuperstructureState.DESCORE_LOW);
               default -> setCurrentState(SuperstructureState.TOP);
