@@ -556,7 +556,7 @@ public class RobotContainer {
         .rightBumper()
         .onTrue(
             superstructure
-                .goToStateCommand(SuperstructureState.TOP)
+                .goToStateCommand(SuperstructureState.SETUP_L3)
                 .alongWith(superstructure.oneTimeOverrideCommand()));
     // climb
     driverB
