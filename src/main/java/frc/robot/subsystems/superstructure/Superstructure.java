@@ -241,7 +241,7 @@ public class Superstructure extends SubsystemBase {
               case INTAKE -> setCurrentState(SuperstructureState.INTAKE);
               case L1 -> setCurrentState(SuperstructureState.L1);
               case L2 -> setCurrentState(SuperstructureState.L2);
-                // case SETUP_L3, SCORE_L3 -> setCurrentState(SuperstructureState.SETUP_L3);
+              case CLIMB -> setCurrentState(SuperstructureState.CLIMB);
               default -> setCurrentState(SuperstructureState.TOP);
             }
           }
@@ -257,7 +257,7 @@ public class Superstructure extends SubsystemBase {
               case STOW -> setCurrentState(SuperstructureState.INTAKE);
               case L1 -> setCurrentState(SuperstructureState.L1);
               case L2 -> setCurrentState(SuperstructureState.L2);
-                // case SETUP_L3, SCORE_L3 -> setCurrentState(SuperstructureState.SETUP_L3);
+              case CLIMB -> setCurrentState(SuperstructureState.CLIMB);
               default -> setCurrentState(SuperstructureState.TOP);
             }
           }
