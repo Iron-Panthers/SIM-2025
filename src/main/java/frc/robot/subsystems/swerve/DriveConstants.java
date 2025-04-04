@@ -224,6 +224,11 @@ public class DriveConstants {
           ? new Translation2d(0, 0)
           : new Translation2d(17.5, 8);
 
+  public static final Translation2d CLIMB_ZONE_CENTER =
+      DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue
+          ? new Translation2d(8.765, 6)
+          : new Translation2d(8.765, 2);
+
   // blue alliance, will automatically flip, clockwise from top right (vertical)
   public static final ApproachPose[] REEF_APPROACH_POSES =
       ApproachPose.fromPose2ds(

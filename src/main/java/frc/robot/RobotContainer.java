@@ -302,6 +302,16 @@ public class RobotContainer {
                                   .getTranslation()
                                   .minus(DriveConstants.REEF_TRANSLATION2D)
                                   .getAngle()));
+                    //climb snaps
+                    } else if (MathUtil.isNear(
+                            DriveConstants.CLIMB_ZONE_CENTER.getX(),
+                            RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
+                            1.77)
+                        && MathUtil.isNear(
+                            DriveConstants.CLIMB_ZONE_CENTER.getY(),
+                            RobotState.getInstance().getEstimatedPose().getTranslation().getY(),
+                            2)) {
+                      swerve.setTargetHeading(new Rotation2d(Math.PI/2));
                       // default gradual far from reef snaps
                     } else {
                       swerve.setTargetHeading(
@@ -377,7 +387,6 @@ public class RobotContainer {
                             .until(() -> levelOffsets == LevelOffsets.L4_OFFSET)))
                 .repeatedly()); // so if it aligns to L4 prep, it will then try to align to L4
 
-
     // if superstructure at L4 pos. move to score
     new Trigger(
             () ->
@@ -387,7 +396,7 @@ public class RobotContainer {
                     && superstructure.getCurrentState() == SuperstructureState.SETUP_L4
                     && RobotState.getInstance().alignError() < 2)
         .onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-    // after ejecting or ending auto align early, when you move away make L4 auto align be prep again
+    // after ejecting or ending auto align early, when you move away make L4 auto align be prep
     new Trigger(() -> eject)
         .onTrue(
             new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 3)
@@ -417,7 +426,7 @@ public class RobotContainer {
                         levelOffsets == LevelOffsets.L4_OFFSET
                             ? LevelOffsets.PREP_L4_OFFSET
                             : levelOffsets));
-    //station angle snap (no longer all that important)
+    // station angle snap (no longer all that important)
     driverA
         .x()
         .onTrue(
@@ -478,9 +487,7 @@ public class RobotContainer {
                         || superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     // auto go half to L4 after intaking
-    new Trigger(
-            () -> levelOffsets == LevelOffsets.PREP_L4_OFFSET
-                    && rollers.readyToRaise())
+    new Trigger(() -> levelOffsets == LevelOffsets.PREP_L4_OFFSET && rollers.readyToRaise())
         .onTrue(superstructure.goToStateCommand(SuperstructureState.PREVENT_TIPPING));
     // L1
     driverB
@@ -501,7 +508,7 @@ public class RobotContainer {
             new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L2)));
-    //L3
+    // L3
     driverB
         .povLeft()
         .onTrue(
@@ -511,7 +518,7 @@ public class RobotContainer {
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L3)));
 
-    //L4
+    // L4
     driverB
         .povUp()
         .onTrue(
