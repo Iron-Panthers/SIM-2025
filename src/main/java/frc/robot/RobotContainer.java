@@ -7,7 +7,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.util.FlippingUtil;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -301,12 +300,13 @@ public class RobotContainer {
                                       .getTranslation()
                                       .minus(DriveConstants.REEF_TRANSLATION2D)
                                       .getAngle())
-                              : FlippingUtil.flipFieldRotation(calculateSnapTargetHeading(
-                                RobotState.getInstance()
-                                    .getEstimatedPose()
-                                    .getTranslation()
-                                    .minus(DriveConstants.REEF_TRANSLATION2D)
-                                    .getAngle())));
+                              : FlippingUtil.flipFieldRotation(
+                                  calculateSnapTargetHeading(
+                                      RobotState.getInstance()
+                                          .getEstimatedPose()
+                                          .getTranslation()
+                                          .minus(DriveConstants.REEF_TRANSLATION2D)
+                                          .getAngle())));
                       // climb snaps
                     } else if (MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getX(),
@@ -659,7 +659,7 @@ public class RobotContainer {
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
                     && (driverB.rightTrigger().getAsBoolean()
                         || (eject
-                        && superstructure.getTargetState().equals(SuperstructureState.SETUP_L4)
+                            && superstructure.getTargetState().equals(SuperstructureState.SETUP_L4)
                             && superstructure.superstructureReachedTarget())))
         .onTrue(
             new InstantCommand(() -> eject = false)

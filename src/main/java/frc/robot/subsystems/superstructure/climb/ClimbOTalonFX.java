@@ -2,10 +2,9 @@ package frc.robot.subsystems.superstructure.climb;
 
 import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
 
+import com.ctre.phoenix6.configs.VoltageConfigs;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import java.util.Optional;
-
-import com.ctre.phoenix6.configs.VoltageConfigs;
 
 public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
@@ -42,7 +41,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         0,
         GRAVITY_TYPE);
   }
-  
+
   @Override
   public void runPosition(double rotations) {
     double newRotations = rotations - 0.4;
