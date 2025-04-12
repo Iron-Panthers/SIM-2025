@@ -6,9 +6,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.events.EventTrigger;
+import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -113,13 +116,7 @@ public class RobotContainer {
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
-          vision =
-              new Vision(
-                  new VisionIOPhotonvision(1),
-                  new VisionIOPhotonvision(2),
-                  new VisionIOPhotonvision(3),
-                  new VisionIOPhotonvision(4),
-                  new VisionIOPhotonvision(5));
+          vision = new Vision(new VisionIOPhotonvision(4), new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
@@ -296,12 +293,20 @@ public class RobotContainer {
                             .getDistance(DriveConstants.REEF_TRANSLATION2D)
                         < 2) {
                       swerve.setTargetHeading(
-                          calculateSnapTargetHeading(
-                              RobotState.getInstance()
-                                  .getEstimatedPose()
-                                  .getTranslation()
-                                  .minus(DriveConstants.REEF_TRANSLATION2D)
-                                  .getAngle()));
+                          DriverStation.getAlliance().isPresent()
+                                  && DriverStation.getAlliance().get() == Alliance.Red
+                              ? calculateSnapTargetHeading(
+                                  RobotState.getInstance()
+                                      .getEstimatedPose()
+                                      .getTranslation()
+                                      .minus(DriveConstants.REEF_TRANSLATION2D)
+                                      .getAngle())
+                              : FlippingUtil.flipFieldRotation(calculateSnapTargetHeading(
+                                RobotState.getInstance()
+                                    .getEstimatedPose()
+                                    .getTranslation()
+                                    .minus(DriveConstants.REEF_TRANSLATION2D)
+                                    .getAngle())));
                       // climb snaps
                     } else if (MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getX(),
@@ -320,7 +325,11 @@ public class RobotContainer {
                               .getTranslation()
                               .minus(DriveConstants.REEF_TRANSLATION2D)
                               .getAngle()
-                              .minus(Rotation2d.kPi));
+                              .minus(
+                                  DriverStation.getAlliance().isPresent()
+                                          && DriverStation.getAlliance().get() == Alliance.Red
+                                      ? Rotation2d.kPi
+                                      : Rotation2d.kZero));
                     }
                   }
                 })
@@ -486,8 +495,7 @@ public class RobotContainer {
                 !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.PREP_L4_OFFSET
-                    && (rollers.readyToRaise()
-                        || superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING))
+                    && (superstructure.getTargetState() != SuperstructureState.INTAKE))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     // auto go half to L4 after intaking
     new Trigger(() -> levelOffsets == LevelOffsets.PREP_L4_OFFSET && rollers.readyToRaise())
@@ -622,8 +630,8 @@ public class RobotContainer {
                         && (driverB.rightTrigger().getAsBoolean())
                     || (eject && superstructure.superstructureReachedTarget()))
         .onTrue(
-            rollers
-                .setTargetCommand(RollerState.EJECT_L3)
+            new InstantCommand(() -> eject = false)
+                .andThen(rollers.setTargetCommand(RollerState.EJECT_L3))
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.INTAKE))
@@ -648,14 +656,10 @@ public class RobotContainer {
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
                         || superstructure.getTargetState().equals(SuperstructureState.L2)
-                        || superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
                     && (driverB.rightTrigger().getAsBoolean()
                         || (eject
-                            && (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
-                                || superstructure
-                                    .getTargetState()
-                                    .equals(SuperstructureState.SETUP_L4))
+                        && superstructure.getTargetState().equals(SuperstructureState.SETUP_L4)
                             && superstructure.superstructureReachedTarget())))
         .onTrue(
             new InstantCommand(() -> eject = false)
