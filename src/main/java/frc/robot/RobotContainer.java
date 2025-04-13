@@ -498,8 +498,12 @@ public class RobotContainer {
                     && (superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     // auto go half to L4 after intaking
-    new Trigger(() -> levelOffsets == LevelOffsets.PREP_L4_OFFSET && rollers.readyToRaise())
-        .onTrue(superstructure.goToStateCommand(SuperstructureState.PREVENT_TIPPING));
+    new Trigger(
+            () ->
+                levelOffsets == LevelOffsets.PREP_L4_OFFSET
+                    && rollers.readyToRaise()
+                    && DriverStation.isTeleop())
+        .whileTrue(superstructure.goToStateCommand(SuperstructureState.PREVENT_TIPPING));
     // L1
     driverB
         .povDown()
@@ -619,16 +623,18 @@ public class RobotContainer {
                 .andThen(
                     new WaitCommand(0.5)
                         .andThen(rollers.setTargetCommand(RollerState.EJECT_TOP))
-                        .andThen(new WaitCommand(0.1))
+                        .andThen(new WaitCommand(0.03))
+                        .andThen(rollers.setTargetCommand(RollerState.IDLE))
                         .andThen(superstructure.goToStateCommand(SuperstructureState.INTAKE)))
+                .andThen(new WaitCommand(0.5))
                 .andThen(rollers.setTargetCommand(RollerState.INTAKE)));
 
     // Eject L3
     new Trigger(
             () ->
                 (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3))
-                        && (driverB.rightTrigger().getAsBoolean())
-                    || (eject && superstructure.superstructureReachedTarget()))
+                    && (driverB.rightTrigger().getAsBoolean()
+                        || (eject && superstructure.superstructureReachedTarget())))
         .onTrue(
             new InstantCommand(() -> eject = false)
                 .andThen(rollers.setTargetCommand(RollerState.EJECT_L3))
@@ -656,6 +662,7 @@ public class RobotContainer {
             () ->
                 !(superstructure.getTargetState().equals(SuperstructureState.L1)
                         || superstructure.getTargetState().equals(SuperstructureState.L2)
+                        || superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
                         || superstructure.getTargetState().equals(SuperstructureState.INTAKE))
                     && (driverB.rightTrigger().getAsBoolean()
                         || (eject
