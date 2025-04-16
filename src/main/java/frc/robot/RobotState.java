@@ -220,8 +220,8 @@ public class RobotState {
     for (int i = 0; i < 6; ++i) {
       Rotation2d initialTheta = new Rotation2d(i * -Math.PI / 3);
       Pose2d directPose = offsetByVector(origin, (offset + 1.285), initialTheta);
-      Pose2d pose = translateByVector(directPose, l1 ? 0.39 : 0.165, horizontalOffset);
 
+      Pose2d pose = translateByVector(directPose, l1 ? 0.41 : 0.165, horizontalOffset);
       poses.add(pose);
     }
     var poseArray = poses.toArray(new Pose2d[poses.size()]);
