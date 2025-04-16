@@ -15,7 +15,7 @@ import java.util.Optional;
 public class ClimbConstants {
   public static final ClimbConfig CLIMB_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.889)); // FIXME
+        case COMP -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201)); // FIXME
         case PROG -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
         case ALPHA -> new ClimbConfig(0, 0, Optional.empty(), Optional.empty()); // FIXME
         case SIM -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty()); // FIXME
@@ -54,7 +54,7 @@ public class ClimbConstants {
 
   public static final double POSITION_TARGET_EPSILON = 0.03;
 
-  public static final Optional<Double> SENSOR_DISCONTINUITY_POINT = Optional.of(0.07);
+  public static final Optional<Double> SENSOR_DISCONTINUITY_POINT = Optional.of(0.7);
 
   public record MotionMagicConfig(double acceleration, double cruiseVelocity, double jerk) {}
 
