@@ -603,7 +603,9 @@ public class RobotContainer {
     // Eject on L1
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L1))
+                (superstructure.getTargetState().equals(SuperstructureState.L1)
+                        && superstructure.getCurrentState().equals(SuperstructureState.L1)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
             new InstantCommand(() -> eject = false)
@@ -615,7 +617,9 @@ public class RobotContainer {
     // Eject L2
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L2))
+                (superstructure.getTargetState().equals(SuperstructureState.L2)
+                        && superstructure.getCurrentState().equals(SuperstructureState.L2)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
             new InstantCommand(() -> eject = false)
@@ -632,7 +636,9 @@ public class RobotContainer {
     // Eject L3
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3))
+                (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
+                        && superstructure.getCurrentState().equals(SuperstructureState.SCORE_L3)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean()
                         || (eject && superstructure.superstructureReachedTarget())))
         .onTrue(
