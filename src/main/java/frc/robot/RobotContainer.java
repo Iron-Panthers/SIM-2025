@@ -311,11 +311,12 @@ public class RobotContainer {
                     } else if (MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getX(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
-                            1.77)
+                            2)
                         && MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getY(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getY(),
-                            2)) {
+                            2)
+                        && superstructure.getTargetState() == SuperstructureState.CLIMB) {
                       swerve.setTargetHeading(new Rotation2d(Math.PI / 2));
                       // default gradual far from reef snaps
                     } else {
