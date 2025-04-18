@@ -586,8 +586,10 @@ public class RobotContainer {
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
                 .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
     // Descore
-    driverB.rightStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW));
-    driverB.leftStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH));
+    driverB.rightStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW)
+        .alongWith(rollers.setTargetCommand(RollerState.INTAKE)));
+    driverB.leftStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH)
+        .alongWith(rollers.setTargetCommand(RollerState.INTAKE)));
 
     driverB // intake
         .leftTrigger()
