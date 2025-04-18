@@ -202,7 +202,7 @@ public class DriveConstants {
   public static final PathConstraints ALIGN_PATH_CONSTRAINTS =
       new PathConstraints(
           3, 2, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
-  //unused
+  // unused
   public static final PathConstraints APPROACH_PATH_CONSTRAINTS =
       new PathConstraints(
           1.5, 1.5, Units.degreesToRadians(540), Units.degreesToRadians(720), 12, false);
