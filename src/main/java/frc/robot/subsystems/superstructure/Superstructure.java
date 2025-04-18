@@ -235,7 +235,7 @@ public class Superstructure extends SubsystemBase {
           }
           if (pivot.getPosition() < -100
               && elevator.getPosition() < 12) { // if were too low just wait on the elevator
-            elevator.setPositionTarget(ElevatorTarget.L1);
+            elevator.setPositionTarget(ElevatorTarget.SAFE_MIDWAY);
           }
 
           pivot.setPositionTarget(PivotTarget.STOW);
