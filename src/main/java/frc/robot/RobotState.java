@@ -279,7 +279,11 @@ public class RobotState {
             waypoints,
             DriveConstants.ALIGN_PATH_CONSTRAINTS,
             new IdealStartingState(velocity.getNorm(), estimatedPose.getRotation()),
-            new GoalEndState(0.0, approachPose.getPose().getRotation()));
+            new GoalEndState(
+                0.0,
+                l1
+                    ? approachPose.getPose().getRotation().minus(new Rotation2d(bSide ? -0.1 : 0.1))
+                    : approachPose.getPose().getRotation()));
     return AutoBuilder.followPath(path);
   }
 
