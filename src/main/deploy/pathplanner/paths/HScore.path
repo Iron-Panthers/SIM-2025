@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.863126066132591,
-        "y": 3.858292992030733
+        "x": 6.316828878298683,
+        "y": 4.17459816261574
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.15522864765433,
-        "y": 2.5945022311611665
+        "x": 6.066828878298683,
+        "y": 4.17459816261574
       },
       "isLocked": false,
-      "linkedName": "G Score"
+      "linkedName": "H Approach"
     },
     {
       "anchor": {
-        "x": 1.6453125000000002,
-        "y": 0.9698454483695639
+        "x": 5.863126066132591,
+        "y": 4.17459816261574
       },
       "prevControl": {
-        "x": 3.052173913043479,
-        "y": 0.9877292798913038
+        "x": 6.133126066132591,
+        "y": 4.17459816261574
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "2"
+      "linkedName": "H"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.48
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Autos",
