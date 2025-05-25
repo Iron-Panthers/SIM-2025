@@ -5,6 +5,7 @@ import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import java.util.Optional;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
@@ -42,16 +43,23 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         GRAVITY_TYPE);
   }
 
+  @AutoLogOutput(key = "Superstructure/Climb/ModdedRotations")
+  public double moddedRotations;
+
   @Override
   public void runPosition(double rotations) {
-    double newRotations = rotations - 0.4;
+    moddedRotations =
+        rotations
+            - (talon.getPosition().getValueAsDouble()
+                - (talon.getPosition().getValueAsDouble()
+                    % 0.4)); // calculates how much the fricking encoder is off by (so sad🥲)
     VoltageConfigs voltageConfigs = new VoltageConfigs();
     voltageConfigs.withPeakForwardVoltage(
-        talon.getPosition().getValueAsDouble() + 0.4 > 0.2
+        talon.getPosition().getValueAsDouble() % 0.4 > 0.2
             ? UPPER_VOLT_LIMIT_CLIMBING
             : UPPER_VOLT_LIMIT);
     voltageConfigs.withPeakReverseVoltage(LOWER_VOLT_LIMIT);
     talon.getConfigurator().apply(voltageConfigs);
-    super.runPosition(newRotations);
+    super.runPosition(moddedRotations);
   }
 }

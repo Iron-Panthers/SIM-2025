@@ -311,11 +311,12 @@ public class RobotContainer {
                     } else if (MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getX(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
-                            1.77)
+                            2)
                         && MathUtil.isNear(
                             DriveConstants.CLIMB_ZONE_CENTER.getY(),
                             RobotState.getInstance().getEstimatedPose().getTranslation().getY(),
-                            2)) {
+                            2)
+                        && superstructure.getTargetState() == SuperstructureState.CLIMB) {
                       swerve.setTargetHeading(new Rotation2d(Math.PI / 2));
                       // default gradual far from reef snaps
                     } else {
@@ -495,7 +496,8 @@ public class RobotContainer {
                 !swerve.isTeleop()
                     && DriverStation.isTeleop()
                     && levelOffsets == LevelOffsets.PREP_L4_OFFSET
-                    && (superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING))
+                    && (superstructure.getTargetState() == SuperstructureState.PREVENT_TIPPING
+                        || superstructure.getTargetState() == SuperstructureState.SETUP_L3))
         .onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     // auto go half to L4 after intaking
     new Trigger(
@@ -584,8 +586,18 @@ public class RobotContainer {
                 .setPositionTargetCommand(ClimbTarget.BOTTOM)
                 .alongWith(superstructure.goToStateCommand(SuperstructureState.CLIMB)));
     // Descore
-    driverB.rightStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_LOW));
-    driverB.leftStick().onTrue(superstructure.goToStateCommand(SuperstructureState.DESCORE_HIGH));
+    driverB
+        .rightStick()
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.DESCORE_LOW)
+                .andThen(rollers.setTargetCommand(RollerState.INTAKE)));
+    driverB
+        .leftStick()
+        .onTrue(
+            superstructure
+                .goToStateCommand(SuperstructureState.DESCORE_HIGH)
+                .andThen(rollers.setTargetCommand(RollerState.INTAKE)));
 
     driverB // intake
         .leftTrigger()
@@ -603,7 +615,9 @@ public class RobotContainer {
     // Eject on L1
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L1))
+                (superstructure.getTargetState().equals(SuperstructureState.L1)
+                        && superstructure.getCurrentState().equals(SuperstructureState.L1)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
             new InstantCommand(() -> eject = false)
@@ -615,7 +629,9 @@ public class RobotContainer {
     // Eject L2
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.L2))
+                (superstructure.getTargetState().equals(SuperstructureState.L2)
+                        && superstructure.getCurrentState().equals(SuperstructureState.L2)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean() || eject))
         .onTrue(
             new InstantCommand(() -> eject = false)
@@ -632,7 +648,9 @@ public class RobotContainer {
     // Eject L3
     new Trigger(
             () ->
-                (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3))
+                (superstructure.getTargetState().equals(SuperstructureState.SCORE_L3)
+                        && superstructure.getCurrentState().equals(SuperstructureState.SCORE_L3)
+                        && superstructure.superstructureReachedTarget())
                     && (driverB.rightTrigger().getAsBoolean()
                         || (eject && superstructure.superstructureReachedTarget())))
         .onTrue(

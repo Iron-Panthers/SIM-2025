@@ -230,9 +230,14 @@ public class Superstructure extends SubsystemBase {
         }
 
         case STOW -> {
-          if (pivot.getPosition() < -0.27) {
+          if (pivot.getPosition() < -0.27) { // idek just kept this here because I am paranoid
             elevator.setPositionTarget(ElevatorTarget.BOTTOM);
           }
+          if (pivot.getPosition() < -100
+              && elevator.getPosition() < 12) { // if were too low just wait on the elevator
+            elevator.setPositionTarget(ElevatorTarget.SAFE_MIDWAY);
+          }
+
           pivot.setPositionTarget(PivotTarget.STOW);
           tongue.setPositionTarget(TongueTarget.STOW);
 

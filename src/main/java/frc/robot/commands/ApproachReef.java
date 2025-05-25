@@ -17,7 +17,7 @@ public class ApproachReef extends SequentialCommandGroup {
     L3_OFFSET(0.07),
     PREP_L4_OFFSET(0.5),
     L2_OFFSET(0),
-    L1_OFFSET(0);
+    L1_OFFSET(0.04);
     public double levelOffset;
 
     private LevelOffsets(double levelOffset) {
