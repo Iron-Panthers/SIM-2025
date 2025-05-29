@@ -1,5 +1,11 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,6 +20,11 @@ import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
+import static frc.robot.utility.UnitConversions.*;
+
 
 public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
@@ -42,6 +53,23 @@ public class Superstructure extends SubsystemBase {
   private final Pivot pivot;
   private final Tongue tongue;
 
+  // For mechanism display
+  private final LoggedMechanism2d mechanism2d;
+  private final LoggedMechanismRoot2d mechanismRoot2d;
+  private final LoggedMechanismLigament2d elevatorLigament2d;
+  private final LoggedMechanismLigament2d pivotLigament2d;
+
+  private Pose3d elevatorPose3d;
+  private Pose3d pivotPose3d;
+
+  private final Transform3d elevatorToPivotTransform =
+      new Transform3d(
+          new Translation3d(
+              inchesToMeters(-3.5),
+              inchesToMeters(0d),
+              inchesToMeters(33.875)),
+          new Rotation3d(0, 0, 0));
+
   private boolean overrideIsAtTarget = false;
 
   public Superstructure(Elevator elevator, Pivot pivot, Tongue tongue) {
@@ -51,6 +79,27 @@ public class Superstructure extends SubsystemBase {
     pivot.setPositionTarget(PivotTarget.STOW);
     elevator.setPositionTarget(ElevatorTarget.BOTTOM);
     tongue.setPositionTarget(TongueTarget.STOW);
+
+    // setup the mechanism2d for visualization
+    mechanism2d = new LoggedMechanism2d(1, 5);
+    mechanismRoot2d = mechanism2d.getRoot("Superstructure", inchesToMeters(20), 0);
+
+    elevatorLigament2d =
+        mechanismRoot2d.append(
+            new LoggedMechanismLigament2d(
+                "elevator",
+                ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
+                    * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
+                90,
+                6,
+                new Color8Bit(Color.kRed)));
+    pivotLigament2d =
+        elevatorLigament2d.append(
+            new LoggedMechanismLigament2d(
+                "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
+
+    elevatorPose3d = new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
+    pivotPose3d = new Pose3d();
   }
 
   @Override
@@ -368,12 +417,37 @@ public class Superstructure extends SubsystemBase {
     pivot.periodic();
     tongue.periodic();
 
+    // updating the mechanism display
+    elevatorLigament2d.setLength(inchesToMeters(elevator.getPosition() + 41.375));
+    pivotLigament2d.setAngle(pivot.getPosition() - 90d);
+
+    // updating the pose data
+    // translating it up by the correct position
+    elevatorPose3d =
+        new Pose3d(
+            new Translation3d(
+                inchesToMeters(0),
+                inchesToMeters(0),
+                inchesToMeters(elevator.getPosition())),
+            new Rotation3d(0, 0, 0));
+    pivotPose3d =
+        elevatorPose3d
+            .plus(elevatorToPivotTransform)
+            .plus(
+                new Transform3d(
+                    Translation3d.kZero,
+                    new Rotation3d(0, -Math.toRadians(pivot.getPosition() + 90), 0)));
+
     Logger.recordOutput("Superstructure/TargetState", targetState);
     Logger.recordOutput("Superstructure/CurrentState", currentState);
     Logger.recordOutput("Superstructure/Elevator reached target", elevator.reachedTarget());
     Logger.recordOutput("Superstructure/Pivot reached target", pivot.reachedTarget());
     Logger.recordOutput("Superstructure/Reached Target", superstructureReachedTarget());
+    Logger.recordOutput("Superstructure/Mechanism", mechanism2d);
+    Logger.recordOutput("Superstructure/Elevator Pose", elevatorPose3d);
+    Logger.recordOutput("Superstructure/Pivot Pose", pivotPose3d);
   }
+
 
   // Target state getter and setter
   public void setTargetState(SuperstructureState superstructureState) {

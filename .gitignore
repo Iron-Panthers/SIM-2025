@@ -177,3 +177,5 @@ simgui*.json
 src/main/java/frc/robot/BuildConstants.java
 
 .roboRIOTeamNumberSetter/
+
+.vscode/

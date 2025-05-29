@@ -38,6 +38,7 @@ import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
+import frc.robot.subsystems.rollers.intake.IntakeIO;
 import frc.robot.subsystems.rollers.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.superstructure.ClimbController;
 import frc.robot.subsystems.superstructure.Superstructure;
@@ -174,6 +175,9 @@ public class RobotContainer {
       vision = new Vision();
     }
 
+    if (intake == null) {
+      intake = new Intake(new IntakeIO() {});
+    }
     rollers = new Rollers(intake, new RollerSensorsIOComp());
 
     if (elevator == null) {

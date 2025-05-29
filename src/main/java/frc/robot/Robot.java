@@ -86,6 +86,11 @@ public class Robot extends LoggedRobot {
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
+
+        if (logPath == null || logPath.isEmpty()) {
+          System.err.println("Error: Replay log not found. Ensure a valid log file is available.");
+          throw new IllegalStateException("Replay log not found.");
+        }
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
