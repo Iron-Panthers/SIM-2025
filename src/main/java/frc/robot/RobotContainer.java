@@ -361,10 +361,14 @@ public class RobotContainer {
 
     driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
 
-    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
-    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
-    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET));
+    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L4_OFFSET));
+    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L3_OFFSET));
+    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L2_OFFSET));
+    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L1_OFFSET));
 
     // auto align
     driverA
@@ -410,7 +414,8 @@ public class RobotContainer {
                     && superstructure.getCurrentState() == SuperstructureState.SETUP_L4
                     && RobotState.getInstance().alignError() < 2)
         .onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-    // after ejecting or ending auto align early, when you move away make L4 auto align be prep
+    // after ejecting or ending auto align early, when you move away make L4 auto
+    // align be prep
     new Trigger(() -> eject)
         .onTrue(
             new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 3)
@@ -515,7 +520,7 @@ public class RobotContainer {
         .povDown()
         .onTrue(
             // superstructure
-            //     .goToStateCommand(SuperstructureState.L1)
+            // .goToStateCommand(SuperstructureState.L1)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L1)));
@@ -534,7 +539,7 @@ public class RobotContainer {
         .povLeft()
         .onTrue(
             // superstructure
-            //     .goToStateCommand(SuperstructureState.SCORE_L3)
+            // .goToStateCommand(SuperstructureState.SCORE_L3)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L3)));
@@ -730,7 +735,8 @@ public class RobotContainer {
 
     BooleanSupplier flipAlliance =
         () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 

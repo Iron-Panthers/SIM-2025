@@ -1,6 +1,11 @@
 package frc.robot.subsystems.superstructure.pivot;
 
+import static frc.robot.utility.UnitConversions.inchesToMeters;
+
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.Optional;
@@ -65,4 +70,10 @@ public class PivotConstants {
   public static final double ZEROING_VOLTAGE_THRESHOLD = 5;
   public static final double ZEROING_HIGH_THRESHOLD =
       -70.0; // the position where if the pivot is over, the pivot will go up before zeroing
+
+  // PIVOT POSITION CONSTANTS
+  public static final Transform3d ELEVATOR_TO_PIVOT_TRANSFORM =
+      new Transform3d(
+          new Translation3d(inchesToMeters(-3.5), inchesToMeters(0d), inchesToMeters(33.875)),
+          new Rotation3d(0, 0, 0));
 }
