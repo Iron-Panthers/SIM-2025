@@ -32,7 +32,7 @@ public class DriveConstants {
             Units.inchesToMeters(22.5),
             Units.inchesToMeters(34),
             Units.inchesToMeters(34),
-            4.5, // FIXME
+            4.5,
             10,
             6);
         case PROG, SIM -> new DrivebaseConfig(
@@ -40,7 +40,7 @@ public class DriveConstants {
             Units.inchesToMeters(22.5),
             Units.inchesToMeters(38.5),
             Units.inchesToMeters(33),
-            4.5, // FIXME
+            4.5,
             5,
             3);
         case ALPHA -> new DrivebaseConfig(
@@ -48,8 +48,6 @@ public class DriveConstants {
             Units.inchesToMeters(22.5),
             Units.inchesToMeters(34),
             Units.inchesToMeters(34),
-            // 5.4764, // FIXME
-            // 6.7759);
             2.7,
             5,
             3);

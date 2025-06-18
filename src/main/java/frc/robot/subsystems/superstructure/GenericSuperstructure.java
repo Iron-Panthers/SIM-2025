@@ -101,35 +101,4 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
     return Math.abs(inputs.positionRotations - (positionTarget.getPosition()))
         <= superstructureIO.getPositionTargetEpsilon();
   }
-
-  // public Command zeroingCommand() {
-  //   return new FunctionalCommand(
-  //       () -> {},
-  //       () -> { // execute
-  //         // nothing needs to happen here
-  //         setControlMode(ControlMode.ZERO);
-  //       },
-  //       (e) -> { // on end
-  //         setOffset();
-  //         setControlMode(ControlMode.POSITION);
-  //       },
-  //       () ->
-  //           (getFilteredSupplyCurrentAmps()
-  //               > superstructureIO.getZeroingVoltageThreshold()) // TODO: Make this work for both
-  //       ,
-  //       this);
-  // }
-
-  // public Command goToPositionCommand(G position) {
-  //   return new FunctionalCommand(
-  //       () -> {
-  //         setPositionTarget(position);
-  //       },
-  //       () -> { // execute
-  //       },
-  //       (e) -> { // on end
-  //       },
-  //       () -> reachedTarget(),
-  //       this);
-  // }
 }

@@ -11,8 +11,7 @@ public class ElevatorConstants {
         case COMP -> new ElevatorConfig(
             CAN.at(43, "Elevator 1"), Optional.of(CAN.at(44, "Elevator 2")), (58.0 / 14.0) / 6);
         case PROG -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
-        case ALPHA -> new ElevatorConfig(
-            CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0); // FIXME
+        case ALPHA -> new ElevatorConfig(CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0);
         case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1); // FIXME
       };
 

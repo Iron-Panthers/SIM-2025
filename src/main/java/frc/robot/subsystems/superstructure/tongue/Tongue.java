@@ -36,7 +36,7 @@ public class Tongue {
 
   private final TongueIO io;
 
-  private TongueIOInputsAutoLogged inputs = new TongueIOInputsAutoLogged(); // FIXME
+  private TongueIOInputsAutoLogged inputs = new TongueIOInputsAutoLogged();
   private TongueTarget positionTarget;
 
   public Tongue(TongueIO io) {
