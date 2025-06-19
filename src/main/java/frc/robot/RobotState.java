@@ -157,13 +157,15 @@ public class RobotState {
     // measure twist between estimate and vision pose
     var twist = oldEstimate.log(measurement.visionPose());
 
-    // scale twist by Kalman gain matrix; represents how much to trust vision vs. current pose
+    // scale twist by Kalman gain matrix; represents how much to trust vision vs.
+    // current pose
     var timesTwist = kalmanGain.times(VecBuilder.fill(twist.dx, twist.dy, twist.dtheta));
 
     // convert back to Twist2d
     var scaledTwist = new Twist2d(timesTwist.get(0, 0), timesTwist.get(1, 0), timesTwist.get(2, 0));
 
-    // apply Kalman-scaled vision adjustment, replay odometry data to get current estimate
+    // apply Kalman-scaled vision adjustment, replay odometry data to get current
+    // estimate
     estimatedPose = sample.get().exp(scaledTwist).exp(sampleToOdometry);
     odometryPose = estimatedPose;
   }
@@ -190,7 +192,7 @@ public class RobotState {
   }
 
   @AutoLogOutput(key = "RobotState/Velocity")
-  /*meters per second*/
+  /* meters per second */
   public Translation2d getVelocity() {
     return new Translation2d(
             ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds, estimatedPose.getRotation())
@@ -200,7 +202,7 @@ public class RobotState {
         .rotateBy(Rotation2d.kPi);
   }
 
-  /*In inches because we are imperial... */
+  /* In inches because we are imperial... */
   @AutoLogOutput(key = "RobotState/Error")
   public double alignError() {
     return lastApproachPose.getTranslation().getDistance(estimatedPose.getTranslation())

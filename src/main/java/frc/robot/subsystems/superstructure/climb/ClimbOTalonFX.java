@@ -27,8 +27,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         LOWER_VOLT_LIMIT,
         ZEROING_VOLTS,
         ZEROING_OFFSET,
-        ZEROING_VOLTAGE_THRESHOLD,
-        POSITION_TARGET_EPSILON);
+        ZEROING_VOLTAGE_THRESHOLD);
     setSlot0(
         GAINS.kP(),
         GAINS.kI(),

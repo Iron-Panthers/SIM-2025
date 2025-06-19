@@ -30,6 +30,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     SAFE_MIDWAY(11.5);
 
     private double position = 0;
+    private static final double EPSILON = ElevatorConstants.POSITION_TARGET_EPSILON;
 
     private ElevatorTarget(double position) {
       this.position = position;
@@ -37,6 +38,10 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
 
     public double getPosition() {
       return position;
+    }
+
+    public double getEpsilon() {
+      return EPSILON;
     }
   }
 

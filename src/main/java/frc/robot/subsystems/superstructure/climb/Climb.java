@@ -22,7 +22,9 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
 
     // When not climbing
     STOW(0.25);
+
     private double position = 0;
+    private static final double EPSILON = ClimbConstants.POSITION_TARGET_EPSILON;
 
     private ClimbTarget(double position) {
       this.position = position;
@@ -31,11 +33,17 @@ public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {
     public double getPosition() {
       return position;
     }
+
+    public double getEpsilon() {
+      return EPSILON;
+    }
   }
+
   // induction sensor
   private DigitalInput inductionSensor;
 
-  // run tino the cage - sensor triggers - flash leds to tell driver - button presses : reels it in
+  // run tino the cage - sensor triggers - flash leds to tell driver - button
+  // presses : reels it in
   // or out
   // CAN'T BACKOUT
   // set position for intake in a cage, a button to climb up or down

@@ -6,6 +6,8 @@ import org.littletonrobotics.junction.Logger;
 public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarget> {
   public interface PositionTarget {
     double getPosition();
+
+    double getEpsilon();
   }
 
   public enum ControlMode {
@@ -51,6 +53,8 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
     Logger.recordOutput("Superstructure/" + name + "/Target", positionTarget.toString());
     Logger.recordOutput("Superstructure/" + name + "/Control Mode", controlMode.toString());
     Logger.recordOutput("Superstructure/" + name + "/Reached target", reachedTarget());
+    Logger.recordOutput(
+        "Superstructure/" + name + "/Target Position", positionTarget.getPosition());
   }
 
   public G getPositionTarget() {
@@ -99,6 +103,6 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
    */
   public boolean reachedTarget() {
     return Math.abs(inputs.positionRotations - (positionTarget.getPosition()))
-        <= superstructureIO.getPositionTargetEpsilon();
+        <= positionTarget.getEpsilon();
   }
 }

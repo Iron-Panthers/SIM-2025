@@ -45,10 +45,6 @@ public interface GenericSuperstructureIO {
 
   default void setOffset() {}
 
-  default double getPositionTargetEpsilon() {
-    return 0;
-  }
-
   default double getZeroingVoltageThreshold() {
     return Double.POSITIVE_INFINITY;
   }

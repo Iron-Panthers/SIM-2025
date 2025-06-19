@@ -29,6 +29,7 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
     DESCORE_LOW(-15);
 
     private double position;
+    private static final double EPSILON = PivotConstants.POSITION_TARGET_EPSILON;
 
     private PivotTarget(double position) {
       this.position = position;
@@ -36,6 +37,11 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
 
     public double getPosition() {
       return position;
+    }
+
+    @Override
+    public double getEpsilon() {
+      return EPSILON;
     }
   }
 
@@ -52,7 +58,7 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
    */
   public boolean reachedTarget() {
     return Math.abs(super.getPosition() - (super.getPositionTarget().getPosition() / 360d))
-        <= superstructureIO.getPositionTargetEpsilon();
+        <= super.getPositionTarget().getEpsilon();
   }
 
   public double getPosition() {
