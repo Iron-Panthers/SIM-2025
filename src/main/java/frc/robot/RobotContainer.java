@@ -64,6 +64,7 @@ import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonvision;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -176,7 +177,7 @@ public class RobotContainer {
               new ModuleIO() {});
     }
     if (vision == null) {
-      vision = new Vision();
+      vision = new Vision(new VisionIO() {}, new VisionIO() {});
     }
 
     if (intake == null) {
@@ -772,7 +773,7 @@ public class RobotContainer {
   }
 
   public Command getAutoCommand() {
-    return AutoBuilder.buildAuto("L L4 (3) (JKL)"); // HACK: Replace once we get auto logging
+    return AutoBuilder.buildAuto("R L4 (3) (EDC)"); // HACK: Replace once we get auto logging
   }
 
   // runs when auto starts
