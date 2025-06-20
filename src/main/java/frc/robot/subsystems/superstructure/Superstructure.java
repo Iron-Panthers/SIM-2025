@@ -2,6 +2,8 @@ package frc.robot.subsystems.superstructure;
 
 import static frc.robot.utility.UnitConversions.*;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -40,6 +42,13 @@ public class Superstructure extends SubsystemBase {
     DESCORE_HIGH, // Algae hitting on L3
     DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
+
+    // here we define some properties of the enum
+    private StateTransitionOptions transitionOptions;
+  }
+
+  private record StateTransitionOptions(SuperstructureState newState, Optional<ElevatorTarget> elevatorTarget,
+      Optional<PivotTarget> pivotTarget, Optional<TongueTarget> tongueTarget) {
   }
 
   private SuperstructureState currentState = SuperstructureState.STOW; // current state
@@ -75,19 +84,17 @@ public class Superstructure extends SubsystemBase {
     mechanism2d = new LoggedMechanism2d(1, 5);
     mechanismRoot2d = mechanism2d.getRoot("Superstructure", inchesToMeters(20), 0);
 
-    elevatorLigament2d =
-        mechanismRoot2d.append(
-            new LoggedMechanismLigament2d(
-                "elevator",
-                ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
-                    * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
-                90,
-                6,
-                new Color8Bit(Color.kRed)));
-    pivotLigament2d =
-        elevatorLigament2d.append(
-            new LoggedMechanismLigament2d(
-                "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
+    elevatorLigament2d = mechanismRoot2d.append(
+        new LoggedMechanismLigament2d(
+            "elevator",
+            ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
+                * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
+            90,
+            6,
+            new Color8Bit(Color.kRed)));
+    pivotLigament2d = elevatorLigament2d.append(
+        new LoggedMechanismLigament2d(
+            "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
 
     elevatorPose3d = Pose3d.kZero;
     pivotPose3d = Pose3d.kZero;
@@ -171,7 +178,7 @@ public class Superstructure extends SubsystemBase {
           }
         }
 
-          // ALL OF OUR TOP TO SCORE_SIDE STATES
+        // ALL OF OUR TOP TO SCORE_SIDE STATES
         case PREVENT_TIPPING -> {
           // this one we have to make the elevator manually go to the correct position to
           // avoid the
@@ -208,8 +215,7 @@ public class Superstructure extends SubsystemBase {
           if (currentState != targetState
               && elevator.reachedTarget()
               && (Math.abs(
-                      pivot.getPositionTarget().getPosition() / 360d - pivot.getPosition() / 360d)
-                  < 0.05)) {
+                  pivot.getPositionTarget().getPosition() / 360d - pivot.getPosition() / 360d) < 0.05)) {
             switch (targetState) {
               case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
               case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
@@ -382,8 +388,7 @@ public class Superstructure extends SubsystemBase {
           }
 
           // check if we have have hit our hardstop, if so we can zero the elevator
-          if (elevator.getFilteredSupplyCurrentAmps()
-              > ElevatorConstants.ZEROING_VOLTAGE_THRESHOLD) { // check if the
+          if (elevator.getFilteredSupplyCurrentAmps() > ElevatorConstants.ZEROING_VOLTAGE_THRESHOLD) { // check if the
             // elevator is
             // done zeroing
             // and set
@@ -465,8 +470,10 @@ public class Superstructure extends SubsystemBase {
           System.out.println("Setting superstructure state to: " + superstructureState);
           setTargetState(superstructureState);
         },
-        () -> {},
-        (e) -> {},
+        () -> {
+        },
+        (e) -> {
+        },
         () -> {
           return currentState == targetState && superstructureReachedTarget();
         },
@@ -510,7 +517,8 @@ public class Superstructure extends SubsystemBase {
   }
 
   /**
-   * @return a boolean that says whether or not both of our mechanisms have finished zeroing
+   * @return a boolean that says whether or not both of our mechanisms have
+   *         finished zeroing
    */
   public boolean notZeroing() {
     return !elevator.isZeroing();
@@ -520,11 +528,10 @@ public class Superstructure extends SubsystemBase {
    * @return if both subsystems in the superstructure have reached their target
    */
   public boolean superstructureReachedTarget() {
-    boolean output =
-        (elevator.reachedTarget()
-                && pivot.reachedTarget()
-                && currentState != SuperstructureState.ZERO)
-            || overrideIsAtTarget;
+    boolean output = (elevator.reachedTarget()
+        && pivot.reachedTarget()
+        && currentState != SuperstructureState.ZERO)
+        || overrideIsAtTarget;
 
     overrideIsAtTarget = false;
     return output;
