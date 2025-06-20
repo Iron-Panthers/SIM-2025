@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -22,6 +23,8 @@ import edu.wpi.first.wpilibj.RobotBase;
  */
 public final class Constants {
   public static final double PERIODIC_LOOP_SEC = 0.02;
+
+  public static final Pose3d MECHANISM_ROOT_POSE = Pose3d.kZero;
 
   public static RobotType ROBOT_TYPE = RobotType.COMP;
 

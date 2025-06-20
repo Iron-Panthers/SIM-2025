@@ -11,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -34,6 +33,7 @@ import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.rgb.RGBIO;
 import frc.robot.subsystems.rgb.RGBIOCANdle;
+import frc.robot.subsystems.rollers.RollerSensorsIO;
 import frc.robot.subsystems.rollers.RollerSensorsIOComp;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
@@ -64,9 +64,11 @@ import frc.robot.subsystems.swerve.GyroIOPigeon2;
 import frc.robot.subsystems.swerve.ModuleIO;
 import frc.robot.subsystems.swerve.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonvision;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -77,7 +79,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 public class RobotContainer {
   private final RobotState robotState = RobotState.getInstance();
 
-  private SendableChooser<Command> autoChooser;
+  // private SendableChooser<Command> autoChooser;
+  private LoggedDashboardChooser<Command> autoChooser;
 
   private final CommandXboxController driverA = new CommandXboxController(0);
   private final CommandXboxController driverB = new CommandXboxController(1);
@@ -92,6 +95,7 @@ public class RobotContainer {
   private Drive swerve;
   private Vision vision;
   private Intake intake;
+  private RollerSensorsIO rollerSensors;
   private Rollers rollers;
   private Elevator elevator;
   private Pivot pivot;
@@ -118,6 +122,7 @@ public class RobotContainer {
                   new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
           vision = new Vision(new VisionIOPhotonvision(4), new VisionIOPhotonvision(5));
           intake = new Intake(new IntakeIOTalonFX());
+          rollerSensors = new RollerSensorsIOComp();
           elevator = new Elevator(new ElevatorIOTalonFX());
           pivot = new Pivot(new PivotIOTalonFX());
           tongue = new Tongue(new TongueIOServo());
@@ -172,13 +177,16 @@ public class RobotContainer {
               new ModuleIO() {});
     }
     if (vision == null) {
-      vision = new Vision();
+      vision = new Vision(new VisionIO() {}, new VisionIO() {});
     }
 
     if (intake == null) {
       intake = new Intake(new IntakeIO() {});
     }
-    rollers = new Rollers(intake, new RollerSensorsIOComp());
+    if (rollerSensors == null) {
+      rollerSensors = new RollerSensorsIO() {};
+    }
+    rollers = new Rollers(intake, rollerSensors);
 
     if (elevator == null) {
       elevator = new Elevator(new ElevatorIO() {});
@@ -361,10 +369,14 @@ public class RobotContainer {
 
     driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
 
-    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET));
-    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L2_OFFSET));
-    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET));
+    // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L4_OFFSET));
+    // driverA.povRight().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L3_OFFSET));
+    // driverA.povDown().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L2_OFFSET));
+    // driverA.povLeft().onTrue(new InstantCommand(() -> levelOffsets =
+    // LevelOffsets.L1_OFFSET));
 
     // auto align
     driverA
@@ -410,7 +422,8 @@ public class RobotContainer {
                     && superstructure.getCurrentState() == SuperstructureState.SETUP_L4
                     && RobotState.getInstance().alignError() < 2)
         .onTrue(new InstantCommand(() -> levelOffsets = LevelOffsets.L4_OFFSET));
-    // after ejecting or ending auto align early, when you move away make L4 auto align be prep
+    // after ejecting or ending auto align early, when you move away make L4 auto
+    // align be prep
     new Trigger(() -> eject)
         .onTrue(
             new WaitUntilCommand(() -> RobotState.getInstance().alignError() > 3)
@@ -515,7 +528,7 @@ public class RobotContainer {
         .povDown()
         .onTrue(
             // superstructure
-            //     .goToStateCommand(SuperstructureState.L1)
+            // .goToStateCommand(SuperstructureState.L1)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L1_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L1)));
@@ -534,7 +547,7 @@ public class RobotContainer {
         .povLeft()
         .onTrue(
             // superstructure
-            //     .goToStateCommand(SuperstructureState.SCORE_L3)
+            // .goToStateCommand(SuperstructureState.SCORE_L3)
             new InstantCommand(() -> levelOffsets = LevelOffsets.L3_OFFSET)
                 .alongWith(rgb.clearLevelCommands())
                 .andThen(rgb.startMessageCommand(RGBMessages.L3)));
@@ -730,7 +743,8 @@ public class RobotContainer {
 
     BooleanSupplier flipAlliance =
         () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
@@ -753,12 +767,13 @@ public class RobotContainer {
         flipAlliance,
         swerve);
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoChooser =
+        new LoggedDashboardChooser<Command>("Auto Chooser", AutoBuilder.buildAutoChooser());
+    SmartDashboard.putData("Auto Chooser", autoChooser.getSendableChooser());
   }
 
   public Command getAutoCommand() {
-    return autoChooser.getSelected();
+    return AutoBuilder.buildAuto("R L4 (3) (EDC)"); // HACK: Replace once we get auto logging
   }
 
   // runs when auto starts
@@ -795,7 +810,12 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Coral Intaked", rollers.intakeDetected());
     SmartDashboard.putBoolean("Climb Cage", !climb.hitCage());
 
-    SmartDashboard.putString("Current Auto", autoChooser.getSelected().getName());
+    try {
+      SmartDashboard.putString("Current Auto", autoChooser.get().getName());
+    } catch (Exception e) {
+      // Do nothing because the auto chooser is not set ()
+      // HACK: This is a workaround
+    }
   }
 
   public static double relativeAngularDifference(double currentAngle, double newAngle) {

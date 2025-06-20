@@ -1,8 +1,13 @@
 package frc.robot.subsystems.superstructure.pivot;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.subsystems.superstructure.GenericSuperstructure;
+import frc.robot.utility.LoggableMechanism3d;
 
-public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
+public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements LoggableMechanism3d {
   public enum PivotTarget implements GenericSuperstructure.PositionTarget {
     TOP(-79),
     INTAKE(-96),
@@ -24,6 +29,7 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
     DESCORE_LOW(-15);
 
     private double position;
+    private static final double EPSILON = PivotConstants.POSITION_TARGET_EPSILON;
 
     private PivotTarget(double position) {
       this.position = position;
@@ -31,6 +37,11 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
 
     public double getPosition() {
       return position;
+    }
+
+    @Override
+    public double getEpsilon() {
+      return EPSILON;
     }
   }
 
@@ -47,10 +58,19 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> {
    */
   public boolean reachedTarget() {
     return Math.abs(super.getPosition() - (super.getPositionTarget().getPosition() / 360d))
-        <= superstructureIO.getPositionTargetEpsilon();
+        <= super.getPositionTarget().getEpsilon();
   }
 
   public double getPosition() {
     return super.getPosition() * 360.0;
+  }
+
+  @Override
+  public Pose3d getDisplayPose3d(Pose3d parentPose3d) {
+    return parentPose3d
+        .plus(PivotConstants.ELEVATOR_TO_PIVOT_TRANSFORM)
+        .plus(
+            new Transform3d(
+                Translation3d.kZero, new Rotation3d(0, -Math.toRadians(getPosition() + 90), 0)));
   }
 }

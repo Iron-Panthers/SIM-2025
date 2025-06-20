@@ -4,7 +4,6 @@ import frc.robot.Constants;
 import java.util.Optional;
 
 public class TongueConstants {
-  // FIXME
   public static final TongueConfig TONGUE_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new TongueConfig(7, 0);

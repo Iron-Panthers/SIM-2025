@@ -1,15 +1,23 @@
 package frc.robot.subsystems.superstructure.elevator;
 
+import static frc.robot.utility.UnitConversions.inchesToMeters;
+
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.subsystems.superstructure.GenericSuperstructure;
+import frc.robot.utility.LoggableMechanism3d;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
+public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
+    implements LoggableMechanism3d {
   public enum ElevatorTarget implements GenericSuperstructure.PositionTarget {
-    BOTTOM(0.6), // 25 and 7.25, made it a bit bigger
-    L1(11), // FIXME: 26 and 21.5
-    L2(20), // 24 and 53.75
-    L3(32.4), // 0 and 53.75
+    BOTTOM(0.6),
+    L1(11),
+    L2(20),
+    L3(32.4),
     SETUP_L4(31.6),
     SCORE_L4(30),
     TOP(31),
@@ -20,7 +28,9 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
     INTAKE_SIDE(13),
     SCORE_SIDE(13),
     SAFE_MIDWAY(11.5);
+
     private double position = 0;
+    private static final double EPSILON = ElevatorConstants.POSITION_TARGET_EPSILON;
 
     private ElevatorTarget(double position) {
       this.position = position;
@@ -29,9 +39,12 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
     public double getPosition() {
       return position;
     }
+
+    public double getEpsilon() {
+      return EPSILON;
+    }
   }
 
-  // linear filter for superstrucure
   private final LinearFilter supplyCurrentFilter;
   private double filteredSupplyCurrentAmps = 0;
 
@@ -75,5 +88,13 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget> {
 
   public boolean isZeroing() {
     return zeroing;
+  }
+
+  @Override
+  public Pose3d getDisplayPose3d(Pose3d parentPose3d) {
+    return parentPose3d.plus(
+        new Transform3d(
+            new Translation3d(inchesToMeters(0), inchesToMeters(0), inchesToMeters(getPosition())),
+            new Rotation3d(0, 0, 0))); // Placeholder, replace with actual pose logic
   }
 }

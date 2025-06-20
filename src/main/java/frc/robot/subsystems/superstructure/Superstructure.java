@@ -1,15 +1,15 @@
 package frc.robot.subsystems.superstructure;
 
+import static frc.robot.utility.UnitConversions.*;
+
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
@@ -23,8 +23,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
-import static frc.robot.utility.UnitConversions.*;
-
 
 public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
@@ -62,17 +60,10 @@ public class Superstructure extends SubsystemBase {
   private Pose3d elevatorPose3d;
   private Pose3d pivotPose3d;
 
-  private final Transform3d elevatorToPivotTransform =
-      new Transform3d(
-          new Translation3d(
-              inchesToMeters(-3.5),
-              inchesToMeters(0d),
-              inchesToMeters(33.875)),
-          new Rotation3d(0, 0, 0));
-
   private boolean overrideIsAtTarget = false;
 
   public Superstructure(Elevator elevator, Pivot pivot, Tongue tongue) {
+
     this.elevator = elevator;
     this.pivot = pivot;
     this.tongue = tongue;
@@ -98,8 +89,8 @@ public class Superstructure extends SubsystemBase {
             new LoggedMechanismLigament2d(
                 "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
 
-    elevatorPose3d = new Pose3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
-    pivotPose3d = new Pose3d();
+    elevatorPose3d = Pose3d.kZero;
+    pivotPose3d = Pose3d.kZero;
   }
 
   @Override
@@ -182,7 +173,8 @@ public class Superstructure extends SubsystemBase {
 
           // ALL OF OUR TOP TO SCORE_SIDE STATES
         case PREVENT_TIPPING -> {
-          // this one we have to make the elevator manually go to the correct position to avoid the
+          // this one we have to make the elevator manually go to the correct position to
+          // avoid the
           // pivot touching the intake
 
           // switch our pivot based on our next state
@@ -391,8 +383,10 @@ public class Superstructure extends SubsystemBase {
 
           // check if we have have hit our hardstop, if so we can zero the elevator
           if (elevator.getFilteredSupplyCurrentAmps()
-              > ElevatorConstants
-                  .ZEROING_VOLTAGE_THRESHOLD) { // check if the elevator is done zeroing and set
+              > ElevatorConstants.ZEROING_VOLTAGE_THRESHOLD) { // check if the
+            // elevator is
+            // done zeroing
+            // and set
             // offsets accordingly
             elevator.setOffset();
             elevator.setControlMode(ControlMode.POSITION);
@@ -423,20 +417,8 @@ public class Superstructure extends SubsystemBase {
 
     // updating the pose data
     // translating it up by the correct position
-    elevatorPose3d =
-        new Pose3d(
-            new Translation3d(
-                inchesToMeters(0),
-                inchesToMeters(0),
-                inchesToMeters(elevator.getPosition())),
-            new Rotation3d(0, 0, 0));
-    pivotPose3d =
-        elevatorPose3d
-            .plus(elevatorToPivotTransform)
-            .plus(
-                new Transform3d(
-                    Translation3d.kZero,
-                    new Rotation3d(0, -Math.toRadians(pivot.getPosition() + 90), 0)));
+    elevatorPose3d = elevator.getDisplayPose3d(Constants.MECHANISM_ROOT_POSE);
+    pivotPose3d = pivot.getDisplayPose3d(elevatorPose3d);
 
     Logger.recordOutput("Superstructure/TargetState", targetState);
     Logger.recordOutput("Superstructure/CurrentState", currentState);
@@ -447,7 +429,6 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput("Superstructure/Elevator Pose", elevatorPose3d);
     Logger.recordOutput("Superstructure/Pivot Pose", pivotPose3d);
   }
-
 
   // Target state getter and setter
   public void setTargetState(SuperstructureState superstructureState) {
@@ -481,6 +462,7 @@ public class Superstructure extends SubsystemBase {
   public Command goToStateCommand(SuperstructureState superstructureState) {
     return new FunctionalCommand(
         () -> {
+          System.out.println("Setting superstructure state to: " + superstructureState);
           setTargetState(superstructureState);
         },
         () -> {},
@@ -517,6 +499,7 @@ public class Superstructure extends SubsystemBase {
   public double getElevatorSupplyCurrentAmps() {
     return elevator.getSupplyCurrentAmps();
   }
+
   /**
    * Get the supply current of the pivot
    *

@@ -45,8 +45,6 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   private final double zeroingOffset;
   private final double zeroingVoltageThreshold;
 
-  private final double positionTargetEpsilon;
-
   protected final VoltageOut voltageOutput = new VoltageOut(0).withUpdateFreqHz(0);
   private final NeutralOut neutralOutput = new NeutralOut();
   private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0).withUpdateFreqHz(0);
@@ -84,8 +82,7 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
       double lowerVoltLimit,
       double zeroingVolts,
       double zeroingOffset,
-      double zeroingVoltageThreshold,
-      double positionTargetEpsilon) {
+      double zeroingVoltageThreshold) {
     talon = new TalonFX(id);
     if (id2.isPresent()) {
       talon2 = Optional.of(new TalonFX(id2.get()));
@@ -93,14 +90,14 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
       talon2 = Optional.empty();
     }
 
-    // set the zeroing values such that when the robot zeros it will apply the zeroing volts and
-    // when it reaches a resistance from part of the mechanism, it sets the position to the zeroing
+    // set the zeroing values such tha when the robot zeros it will apply the
+    // zeroing volts and
+    // when it reaches a resistance from part of the mechanism, it sets the position
+    // to the zeroing
     // Offset
     this.zeroingVolts = zeroingVolts;
     this.zeroingOffset = zeroingOffset;
     this.zeroingVoltageThreshold = zeroingVoltageThreshold;
-
-    this.positionTargetEpsilon = positionTargetEpsilon;
 
     // VOLTAGE, LIMITS AND RATIO CONFIG
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -226,11 +223,6 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   public void setOffset() {
     talon.getConfigurator().setPosition(zeroingOffset);
     if (talon2.isPresent()) talon2.get().getConfigurator().setPosition(zeroingOffset);
-  }
-
-  @Override
-  public double getPositionTargetEpsilon() {
-    return positionTargetEpsilon;
   }
 
   @Override
