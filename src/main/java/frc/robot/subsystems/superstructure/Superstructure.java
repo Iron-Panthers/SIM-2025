@@ -2,8 +2,6 @@ package frc.robot.subsystems.superstructure;
 
 import static frc.robot.utility.UnitConversions.*;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -21,6 +19,12 @@ import frc.robot.subsystems.superstructure.pivot.Pivot.PivotTarget;
 import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
@@ -43,12 +47,99 @@ public class Superstructure extends SubsystemBase {
     DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
 
+    public StateTransitionOptions getTransitionOptions() {
+      return transitionOptions;
+    }
+
+    public Runnable getOnStateExecute() {
+      return onStateExecute;
+    }
+
     // here we define some properties of the enum
     private StateTransitionOptions transitionOptions;
+    private Runnable onStateExecute;
+
+    private SuperstructureState(StateTransitionOptions transitionOptions) {
+      this.transitionOptions = transitionOptions;
+      this.onStateExecute = null;
+    }
+
+    public boolean subsystemReadyToTransition(MechType mechType) {
+      if (transitionOptions == null || transitionOptions.targetChangeConditions == null
+          || transitionOptions.targetChangeConditions.isEmpty()) {
+        return true; // no conditions, always ready
+      }
+      Supplier<Boolean> condition = transitionOptions.targetChangeConditions.get(mechType);
+      return condition != null && condition.get();
+    }
+
+    private SuperstructureState(Runnable onStateExecute) {
+      this.onStateExecute = onStateExecute;
+      this.transitionOptions = null;
+    }
+
+    private SuperstructureState() {
+    }
   }
 
-  private record StateTransitionOptions(SuperstructureState newState, Optional<ElevatorTarget> elevatorTarget,
-      Optional<PivotTarget> pivotTarget, Optional<TongueTarget> tongueTarget) {
+  private void iterateState() {
+    if (currentState.onStateExecute != null) {
+      // action for if we have a specified state execute
+      currentState.onStateExecute.run();
+    } else if (currentState.transitionOptions != null) {
+      // default action that will encompass most states
+      if (currentState.transitionOptions.elevatorTarget.isPresent()
+          && currentState.subsystemReadyToTransition(MechType.ELEVATOR)) {
+        elevator.setPositionTarget(currentState.transitionOptions.elevatorTarget.get());
+      }
+      if (currentState.transitionOptions.pivotTarget.isPresent()
+          && currentState.subsystemReadyToTransition(MechType.PIVOT)) {
+        pivot.setPositionTarget(currentState.transitionOptions.pivotTarget.get());
+      }
+      if (currentState.transitionOptions.tongueTarget.isPresent()
+          && currentState.subsystemReadyToTransition(MechType.TONGUE)) {
+        tongue.setPositionTarget(currentState.transitionOptions.tongueTarget.get());
+      }
+      // check if we have reached our target and then transition if we go there
+      if (this.superstructureReachedTarget()) {
+        Optional<SuperstructureState> nextState = currentState.transitionOptions.stateTransitions.entrySet().stream()
+            .filter(entry -> Objects.equals(entry.getValue(), targetState))
+            .map(Map.Entry::getKey)
+            .findFirst();
+        if (nextState.isPresent()) {
+          setCurrentState(nextState.get());
+        } else {
+          // if no next state is found, just stay in the current state
+          setCurrentState(currentState.transitionOptions.defaultState);
+        }
+
+      }
+    }
+  }
+
+  private enum MechType { // for defining
+    ELEVATOR,
+    PIVOT,
+    TONGUE
+  }
+
+  /**
+   * Options for transitioning between superstructure states.
+   *
+   * @param defaultState           The default state to transition to.
+   * @param stateTransitions       Map of possible state transitions for each
+   *                               state. (key: next state, target states that can
+   *                               be reached by going to that state)
+   * @param elevatorTarget         Optional target for the elevator mechanism.
+   * @param pivotTarget            Optional target for the pivot mechanism.
+   * @param tongueTarget           Optional target for the tongue mechanism.
+   * @param targetChangeConditions Map of mechanism types to conditions that must
+   *                               be met for target changes.
+   */
+  private record StateTransitionOptions(
+      SuperstructureState defaultState, Map<SuperstructureState, SuperstructureState[]> stateTransitions,
+      Optional<ElevatorTarget> elevatorTarget, Optional<PivotTarget> pivotTarget,
+      Optional<TongueTarget> tongueTarget, Map<MechType, Supplier<Boolean>> targetChangeConditions) {
   }
 
   private SuperstructureState currentState = SuperstructureState.STOW; // current state

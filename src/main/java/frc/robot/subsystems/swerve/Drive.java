@@ -63,17 +63,19 @@ public class Drive extends SubsystemBase {
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Swerve/Gyro", gyroInputs);
 
-    arbitraryYaw = Rotation2d.fromDegrees(
-        (gyroInputs.yawPosition.minus(gyroYawOffset).getDegrees() % 360 + 360) % 360);
+    arbitraryYaw =
+        Rotation2d.fromDegrees(
+            (gyroInputs.yawPosition.minus(gyroYawOffset).getDegrees() % 360 + 360) % 360);
 
     for (Module module : modules) {
       module.updateInputs();
     }
 
     // pass odometry data to robotstate
-    SwerveModulePosition[] wheelPositions = Arrays.stream(modules)
-        .map(module -> module.getModulePosition())
-        .toArray(SwerveModulePosition[]::new);
+    SwerveModulePosition[] wheelPositions =
+        Arrays.stream(modules)
+            .map(module -> module.getModulePosition())
+            .toArray(SwerveModulePosition[]::new);
     RobotState.getInstance()
         .addOdometryMeasurement(
             new RobotState.OdometryMeasurement(
@@ -102,7 +104,8 @@ public class Drive extends SubsystemBase {
     // run modules
 
     /* use kinematics to get desired module states */
-    ChassisSpeeds discretizedSpeeds = ChassisSpeeds.discretize(targetSpeeds, Constants.PERIODIC_LOOP_SEC);
+    ChassisSpeeds discretizedSpeeds =
+        ChassisSpeeds.discretize(targetSpeeds, Constants.PERIODIC_LOOP_SEC);
 
     SwerveModuleState[] moduleTargetStates = KINEMATICS.toSwerveModuleStates(discretizedSpeeds);
     // SwerveDriveKinematics.desaturateWheelSpeeds(
@@ -153,14 +156,16 @@ public class Drive extends SubsystemBase {
   }
 
   public void smartZeroGyro() {
-    gyroYawOffset = gyroInputs.yawPosition
-        .minus(
-            DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Blue
+    gyroYawOffset =
+        gyroInputs
+            .yawPosition
+            .minus(
+                DriverStation.getAlliance().isPresent()
+                        && DriverStation.getAlliance().get() == Alliance.Blue
                     ? FlippingUtil.flipFieldRotation(
                         RobotState.getInstance().getEstimatedPose().getRotation())
                     : RobotState.getInstance().getEstimatedPose().getRotation())
-        .minus(Rotation2d.kPi);
+            .minus(Rotation2d.kPi);
   }
 
   @AutoLogOutput(key = "Swerve/ModuleStates")
