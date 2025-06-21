@@ -39,19 +39,31 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
     L1(new StateTransitionOptions(ElevatorTarget.L1, PivotTarget.L1, TongueTarget.L1)), // Scoring in the trough
-    L2, // Scoring in L2
-    SETUP_L3, // Setting up in L3
-    SCORE_L3, // Scoring in L3
-    PREVENT_TIPPING,
-    SETUP_L4, // Setting up in L4
-    SCORE_L4, // Scoring in L4
-    TOP, // Apex
-    STOW, // Going to the lowest position
-    INTAKE,
-    CLIMB,
-    DESCORE_HIGH, // Algae hitting on L3
-    DESCORE_LOW, // Algae hitting on L2
-    ZERO; // Zero the motor
+    L2(new StateTransitionOptions(ElevatorTarget.L2, PivotTarget.L2, TongueTarget.L2)), // Scoring in L2
+    SETUP_L3(new StateTransitionOptions(ElevatorTarget.L3, null/* PivotTarget.SETUP_L3 */, TongueTarget.L3)), // Setting
+                                                                                                              // up in
+                                                                                                              // L3
+    SCORE_L3(new StateTransitionOptions(ElevatorTarget.L3, PivotTarget.SCORE_L3, TongueTarget.L3)), // Scoring in L3
+    PREVENT_TIPPING(), // null because it has its own logic
+    SETUP_L4(new StateTransitionOptions(ElevatorTarget.SETUP_L4, PivotTarget.SETUP_L4, TongueTarget.L4)), // Setting up
+                                                                                                          // in L4
+    SCORE_L4(new StateTransitionOptions(ElevatorTarget.SCORE_L4, PivotTarget.SCORE_L4, TongueTarget.STOW)), // Scoring
+                                                                                                            // in L4
+    TOP(new StateTransitionOptions(ElevatorTarget.TOP, null/* PivotTarget.TOP */, TongueTarget.TOP)), // Apex
+    STOW(new StateTransitionOptions(null/* ElevatorTarget.BOTTOM */, PivotTarget.STOW, TongueTarget.STOW)), // Going to
+                                                                                                            // the
+                                                                                                            // lowest
+                                                                                                            // position
+    INTAKE(new StateTransitionOptions(ElevatorTarget.INTAKE, PivotTarget.INTAKE, TongueTarget.INTAKE)),
+    CLIMB(new StateTransitionOptions(ElevatorTarget.CLIMB, null/* PivotTarget.CLIMB */, TongueTarget.CLIMB)),
+    DESCORE_HIGH(new StateTransitionOptions(null/* ElevatorTarget.DESCORE_HIGH */, PivotTarget.DESCORE_HIGH,
+        TongueTarget.DESCORE)), // Algae hitting on L3
+    DESCORE_LOW(new StateTransitionOptions(null/* ElevatorTarget.DESCORE_LOW */, PivotTarget.DESCORE_LOW,
+        TongueTarget.DESCORE)), // Algae
+    // hitting
+    // on
+    // L2
+    ZERO(); // Zero the motor
 
     static {
       // Define all of the transitions for the states
@@ -80,7 +92,8 @@ public class Superstructure extends SubsystemBase {
       this.transitionOptions = transitionOptions;
     }
 
-    private SuperstructureState() { // FIXME: This is a hack to make it have less errors for now
+    private SuperstructureState() {
+      this.transitionOptions = null;
     }
 
     // getters for the properties
@@ -91,6 +104,7 @@ public class Superstructure extends SubsystemBase {
     public Set<SuperstructureState> getTransitions() {
       return transitions != null ? transitions : Set.of(); // return empty set if no transitions
     }
+
   }
 
   private void iterateState() {
