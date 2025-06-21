@@ -60,30 +60,47 @@ public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
     L1(
         new StateTransitionOptions(
-            ElevatorTarget.L1, PivotTarget.L1, TongueTarget.L1)), // Scoring in the trough
+            ElevatorTarget.L1,
+            PivotTarget.L1,
+            TongueTarget.L1)), // Scoring in the trough
     L2(
         new StateTransitionOptions(
-            ElevatorTarget.L2, PivotTarget.L2, TongueTarget.L2)), // Scoring in L2
+            ElevatorTarget.L2,
+            PivotTarget.L2,
+            TongueTarget.L2)), // Scoring in L2
     SETUP_L3(
         new StateTransitionOptions(
-            ElevatorTarget.L3, null /* PivotTarget.SETUP_L3 */, TongueTarget.L3)),
+            ElevatorTarget.L3,
+            null /* PivotTarget.SETUP_L3 */,
+            TongueTarget.L3)),
     SCORE_L3(
         new StateTransitionOptions(
-            ElevatorTarget.L3, PivotTarget.SCORE_L3, TongueTarget.L3)), // Scoring in L3
+            ElevatorTarget.L3,
+            PivotTarget.SCORE_L3,
+            TongueTarget.L3)), // Scoring in L3
     PREVENT_TIPPING(), // null because it has its own logic
     SETUP_L4(), // Setting up in L4 - has its own logic
     SCORE_L4(
         new StateTransitionOptions(
-            ElevatorTarget.SCORE_L4, PivotTarget.SCORE_L4, TongueTarget.STOW)), // Scoring
+            ElevatorTarget.SCORE_L4,
+            PivotTarget.SCORE_L4,
+            TongueTarget.STOW)), // Scoring
     // in L4
     TOP(
         new StateTransitionOptions(
-            ElevatorTarget.TOP, null /* PivotTarget.TOP */, TongueTarget.TOP)), // Apex
+            ElevatorTarget.TOP,
+            null /* PivotTarget.TOP */,
+            TongueTarget.TOP)), // Apex
     STOW(
         new StateTransitionOptions(
-            null /* ElevatorTarget.BOTTOM */, PivotTarget.STOW, TongueTarget.STOW)),
+            null /* ElevatorTarget.BOTTOM */,
+            PivotTarget.STOW,
+            TongueTarget.STOW)),
     INTAKE(
-        new StateTransitionOptions(ElevatorTarget.INTAKE, PivotTarget.INTAKE, TongueTarget.INTAKE)),
+        new StateTransitionOptions(
+            ElevatorTarget.INTAKE,
+            PivotTarget.INTAKE,
+            TongueTarget.INTAKE)),
     CLIMB(
         new StateTransitionOptions(
             ElevatorTarget.CLIMB, null /* PivotTarget.CLIMB */, TongueTarget.CLIMB)),
@@ -196,8 +213,8 @@ public class Superstructure extends SubsystemBase {
    * @param start The starting SuperstructureState.
    * @param goal  The goal SuperstructureState.
    * @return A list of SuperstructureStates representing the path from start to
-   *         goal,
-   *         or null if no path is found.
+   *         goal, or null if no
+   *         path is found.
    */
   public static List<SuperstructureState> findPath(
       SuperstructureState start, SuperstructureState goal) {
@@ -232,11 +249,12 @@ public class Superstructure extends SubsystemBase {
 
   /**
    * Iterates the current state of the superstructure, updating subsystem targets
-   * and
-   * handling state transitions. If a direct transition to the target state is not
-   * available,
-   * attempts to find a path using findPath.
+   * and handling state
+   * transitions. If a direct transition to the target state is not available,
+   * attempts to find a
+   * path using findPath.
    *
+   * <p>
    * Use this method after other logic in the periodic method to modify it
    */
   private void iterateState() {
