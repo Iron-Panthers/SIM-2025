@@ -38,17 +38,17 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
-    L1, // Scoring in the trough
+    L1(new StateTransitionOptions(ElevatorTarget.L1, PivotTarget.L1, TongueTarget.L1)), // Scoring in the trough
     L2, // Scoring in L2
-    SETUP_L4, // Setting up in L4
-    SCORE_L4, // Scoring in L4
     SETUP_L3, // Setting up in L3
     SCORE_L3, // Scoring in L3
-    TOP, // Apex
-    INTAKE,
-    STOW, // Going to the lowest position
-    CLIMB,
     PREVENT_TIPPING,
+    SETUP_L4, // Setting up in L4
+    SCORE_L4, // Scoring in L4
+    TOP, // Apex
+    STOW, // Going to the lowest position
+    INTAKE,
+    CLIMB,
     DESCORE_HIGH, // Algae hitting on L3
     DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
@@ -71,39 +71,21 @@ public class Superstructure extends SubsystemBase {
       // none for zero
     }
 
-    public StateTransitionOptions getTransitionOptions() {
-      return transitionOptions;
-    }
-
-    public Runnable getOnStateExecute() {
-      return onStateExecute;
-    }
-
     // here we define some properties of the enum
-    private StateTransitionOptions transitionOptions;
     private Set<SuperstructureState> transitions;
-    private Runnable onStateExecute;
+    private StateTransitionOptions transitionOptions;
 
+    // Constructor for states with transitions
     private SuperstructureState(StateTransitionOptions transitionOptions) {
       this.transitionOptions = transitionOptions;
-      this.onStateExecute = null;
     }
 
-    public boolean subsystemReadyToTransition(SubstructureType mechType) {
-      if (transitionOptions == null || transitionOptions.targetChangeConditions == null
-          || transitionOptions.targetChangeConditions.isEmpty()) {
-        return true; // no conditions, always ready
-      }
-      Supplier<Boolean> condition = transitionOptions.targetChangeConditions.get(mechType);
-      return condition != null && condition.get();
+    private SuperstructureState() { // FIXME: This is a hack to make it have less errors for now
     }
 
-    private SuperstructureState(Runnable onStateExecute) {
-      this.onStateExecute = onStateExecute;
-      this.transitionOptions = null;
-    }
-
-    private SuperstructureState() {
+    // getters for the properties
+    public StateTransitionOptions getTransitionOptions() {
+      return transitionOptions;
     }
 
     public Set<SuperstructureState> getTransitions() {
@@ -112,26 +94,33 @@ public class Superstructure extends SubsystemBase {
   }
 
   private void iterateState() {
-    if (currentState.onStateExecute != null) {
-      // action for if we have a specified state execute
-      currentState.onStateExecute.run();
-    } else if (currentState.transitionOptions != null) {
+    if (currentState.transitionOptions != null) {
       // default action that will encompass most states
-      if (currentState.transitionOptions.elevatorTarget.isPresent()
-          && currentState.subsystemReadyToTransition(SubstructureType.ELEVATOR)) {
-        elevator.setPositionTarget(currentState.transitionOptions.elevatorTarget.get());
+      if (currentState.transitionOptions.elevatorTarget != null) {
+        elevator.setPositionTarget(currentState.transitionOptions.elevatorTarget);
       }
-      if (currentState.transitionOptions.pivotTarget.isPresent()
-          && currentState.subsystemReadyToTransition(SubstructureType.PIVOT)) {
-        pivot.setPositionTarget(currentState.transitionOptions.pivotTarget.get());
+      if (currentState.transitionOptions.pivotTarget != null) {
+        pivot.setPositionTarget(currentState.transitionOptions.pivotTarget);
       }
-      if (currentState.transitionOptions.tongueTarget.isPresent()
-          && currentState.subsystemReadyToTransition(SubstructureType.TONGUE)) {
-        tongue.setPositionTarget(currentState.transitionOptions.tongueTarget.get());
+      if (currentState.transitionOptions.tongueTarget != null) {
+        tongue.setPositionTarget(currentState.transitionOptions.tongueTarget);
       }
       // check if we have reached our target and then transition if we go there
-      if (this.superstructureReachedTarget()) {
+      if (this.superstructureReachedTarget() && this.targetState != this.currentState) {
         // figure out which state to go to next
+        if (currentState.getTransitions().contains(targetState)) { // if we have a transition, just take it
+          setCurrentState(targetState);
+        } else {
+          // if we don't have a transition, use the findPath method to find a path
+          List<SuperstructureState> path = findPath(currentState, targetState);
+          if (path != null && !path.isEmpty()) {
+            // set the next state to the first state in the path
+            setCurrentState(path.get(0));
+          } else {
+            // if no path is found, just stay in the current state
+            System.out.println("No path found from " + currentState + " to " + targetState);
+          }
+        }
       }
     }
   }
@@ -186,9 +175,8 @@ public class Superstructure extends SubsystemBase {
    *                               be met for target changes.
    */
   private record StateTransitionOptions(
-      SuperstructureState defaultState, Map<SuperstructureState, SuperstructureState[]> stateTransitions,
-      Optional<ElevatorTarget> elevatorTarget, Optional<PivotTarget> pivotTarget,
-      Optional<TongueTarget> tongueTarget, Map<SubstructureType, Supplier<Boolean>> targetChangeConditions) {
+      ElevatorTarget elevatorTarget, PivotTarget pivotTarget,
+      TongueTarget tongueTarget) {
   }
 
   private SuperstructureState currentState = SuperstructureState.STOW; // current state
