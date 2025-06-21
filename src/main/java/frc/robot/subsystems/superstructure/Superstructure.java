@@ -20,9 +20,15 @@ import frc.robot.subsystems.superstructure.pivot.PivotConstants;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.Tongue.TongueTarget;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -32,12 +38,12 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Superstructure extends SubsystemBase {
   public enum SuperstructureState {
+    L1, // Scoring in the trough
+    L2, // Scoring in L2
     SETUP_L4, // Setting up in L4
     SCORE_L4, // Scoring in L4
     SETUP_L3, // Setting up in L3
     SCORE_L3, // Scoring in L3
-    L2, // Scoring in L2
-    L1, // Scoring in the trough
     TOP, // Apex
     INTAKE,
     STOW, // Going to the lowest position
@@ -46,6 +52,24 @@ public class Superstructure extends SubsystemBase {
     DESCORE_HIGH, // Algae hitting on L3
     DESCORE_LOW, // Algae hitting on L2
     ZERO; // Zero the motor
+
+    static {
+      // Define all of the transitions for the states
+      L1.transitions = Set.of(L2, STOW, CLIMB, TOP);
+      L2.transitions = Set.of(L1, STOW, CLIMB, TOP);
+      SETUP_L3.transitions = Set.of(SCORE_L3, DESCORE_HIGH, DESCORE_LOW, PREVENT_TIPPING, TOP);
+      SCORE_L3.transitions = Set.of(SETUP_L3);
+      PREVENT_TIPPING.transitions = Set.of(SETUP_L4, DESCORE_HIGH, DESCORE_LOW, TOP); // Use diff logic
+      SETUP_L4.transitions = Set.of(SCORE_L4, PREVENT_TIPPING); // Use diff logic
+      SCORE_L4.transitions = Set.of(SETUP_L4, PREVENT_TIPPING);
+      TOP.transitions = Set.of(PREVENT_TIPPING, CLIMB, L2, L1, DESCORE_HIGH, DESCORE_LOW, SETUP_L3, STOW);
+      STOW.transitions = Set.of(INTAKE, L1, L2, CLIMB, TOP);
+      INTAKE.transitions = Set.of(STOW, L1, L2, CLIMB, TOP);
+      CLIMB.transitions = Set.of(L1, STOW, L2, TOP);
+      DESCORE_HIGH.transitions = Set.of(PREVENT_TIPPING, DESCORE_LOW, SETUP_L3, TOP);
+      DESCORE_LOW.transitions = Set.of(PREVENT_TIPPING, DESCORE_HIGH, SETUP_L3, TOP);
+      // none for zero
+    }
 
     public StateTransitionOptions getTransitionOptions() {
       return transitionOptions;
@@ -57,6 +81,7 @@ public class Superstructure extends SubsystemBase {
 
     // here we define some properties of the enum
     private StateTransitionOptions transitionOptions;
+    private Set<SuperstructureState> transitions;
     private Runnable onStateExecute;
 
     private SuperstructureState(StateTransitionOptions transitionOptions) {
@@ -64,7 +89,7 @@ public class Superstructure extends SubsystemBase {
       this.onStateExecute = null;
     }
 
-    public boolean subsystemReadyToTransition(MechType mechType) {
+    public boolean subsystemReadyToTransition(SubstructureType mechType) {
       if (transitionOptions == null || transitionOptions.targetChangeConditions == null
           || transitionOptions.targetChangeConditions.isEmpty()) {
         return true; // no conditions, always ready
@@ -80,6 +105,10 @@ public class Superstructure extends SubsystemBase {
 
     private SuperstructureState() {
     }
+
+    public Set<SuperstructureState> getTransitions() {
+      return transitions != null ? transitions : Set.of(); // return empty set if no transitions
+    }
   }
 
   private void iterateState() {
@@ -89,35 +118,55 @@ public class Superstructure extends SubsystemBase {
     } else if (currentState.transitionOptions != null) {
       // default action that will encompass most states
       if (currentState.transitionOptions.elevatorTarget.isPresent()
-          && currentState.subsystemReadyToTransition(MechType.ELEVATOR)) {
+          && currentState.subsystemReadyToTransition(SubstructureType.ELEVATOR)) {
         elevator.setPositionTarget(currentState.transitionOptions.elevatorTarget.get());
       }
       if (currentState.transitionOptions.pivotTarget.isPresent()
-          && currentState.subsystemReadyToTransition(MechType.PIVOT)) {
+          && currentState.subsystemReadyToTransition(SubstructureType.PIVOT)) {
         pivot.setPositionTarget(currentState.transitionOptions.pivotTarget.get());
       }
       if (currentState.transitionOptions.tongueTarget.isPresent()
-          && currentState.subsystemReadyToTransition(MechType.TONGUE)) {
+          && currentState.subsystemReadyToTransition(SubstructureType.TONGUE)) {
         tongue.setPositionTarget(currentState.transitionOptions.tongueTarget.get());
       }
       // check if we have reached our target and then transition if we go there
       if (this.superstructureReachedTarget()) {
-        Optional<SuperstructureState> nextState = currentState.transitionOptions.stateTransitions.entrySet().stream()
-            .filter(entry -> Objects.equals(entry.getValue(), targetState))
-            .map(Map.Entry::getKey)
-            .findFirst();
-        if (nextState.isPresent()) {
-          setCurrentState(nextState.get());
-        } else {
-          // if no next state is found, just stay in the current state
-          setCurrentState(currentState.transitionOptions.defaultState);
-        }
-
+        // figure out which state to go to next
       }
     }
   }
 
-  private enum MechType { // for defining
+  public static List<SuperstructureState> findPath(SuperstructureState start, SuperstructureState goal) {
+    Queue<List<SuperstructureState>> queue = new LinkedList<>();
+    Set<SuperstructureState> visited = new HashSet<>();
+
+    queue.add(List.of(start));
+
+    while (!queue.isEmpty()) {
+      List<SuperstructureState> path = queue.poll();
+      SuperstructureState current = path.get(path.size() - 1);
+
+      if (current == goal) {
+        return path;
+      }
+
+      if (visited.contains(current)) {
+        continue;
+      }
+
+      visited.add(current);
+
+      for (SuperstructureState neighbor : current.getTransitions()) {
+        List<SuperstructureState> newPath = new ArrayList<>(path);
+        newPath.add(neighbor);
+        queue.add(newPath);
+      }
+    }
+
+    return null; // no path found
+  }
+
+  private enum SubstructureType { // for defining some of the stuff
     ELEVATOR,
     PIVOT,
     TONGUE
@@ -139,7 +188,7 @@ public class Superstructure extends SubsystemBase {
   private record StateTransitionOptions(
       SuperstructureState defaultState, Map<SuperstructureState, SuperstructureState[]> stateTransitions,
       Optional<ElevatorTarget> elevatorTarget, Optional<PivotTarget> pivotTarget,
-      Optional<TongueTarget> tongueTarget, Map<MechType, Supplier<Boolean>> targetChangeConditions) {
+      Optional<TongueTarget> tongueTarget, Map<SubstructureType, Supplier<Boolean>> targetChangeConditions) {
   }
 
   private SuperstructureState currentState = SuperstructureState.STOW; // current state
@@ -398,7 +447,7 @@ public class Superstructure extends SubsystemBase {
           // check for state transitions
           if (currentState != targetState && this.superstructureReachedTarget()) {
             switch (targetState) {
-              case STOW -> setCurrentState(SuperstructureState.INTAKE);
+              case STOW -> setCurrentState(SuperstructureState.STOW);
               case L1 -> setCurrentState(SuperstructureState.L1);
               case L2 -> setCurrentState(SuperstructureState.L2);
               case CLIMB -> setCurrentState(SuperstructureState.CLIMB);
