@@ -4,7 +4,6 @@ import static frc.robot.utility.UnitConversions.inchesToMeters;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -14,8 +13,7 @@ import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 public class PivotConstants {
   public static final PivotConfig PIVOT_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new PivotConfig(
-            CAN.at(8, "Pivot"), CAN.at(28, "Pivot Encoder"), -0.278, 1);
+        case COMP -> new PivotConfig(CAN.at(8, "Pivot"), CAN.at(28, "Pivot Encoder"), -0.278, 1);
         case ALPHA -> new PivotConfig(15, 0, 0, 21.6 / 360);
         default -> new PivotConfig(0, 0, 0, 1);
       };
@@ -33,11 +31,7 @@ public class PivotConstants {
         default -> new MotionMagicConfig(0, 0);
       };
 
-  public record PivotConfig(
-      int motorID,
-      int canCoderID,
-      double canCoderOffset,
-      double reduction) {}
+  public record PivotConfig(int motorID, int canCoderID, double canCoderOffset, double reduction) {}
 
   public record PIDGains(
       double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
@@ -48,7 +42,8 @@ public class PivotConstants {
 
   public static final boolean INVERT_MOTOR = true;
 
-  public static final SensorDirectionValue SENSOR_DIRECTION = SensorDirectionValue.Clockwise_Positive;
+  public static final SensorDirectionValue SENSOR_DIRECTION =
+      SensorDirectionValue.Clockwise_Positive;
 
   public static final double POSITION_TARGET_EPSILON = 0.01;
   public static final double PIVOT_LENGTH = 25; // inches

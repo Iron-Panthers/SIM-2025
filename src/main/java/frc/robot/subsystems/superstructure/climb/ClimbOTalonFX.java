@@ -20,11 +20,11 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         ZEROING_OFFSET,
         ZEROING_VOLTAGE_THRESHOLD);
 
-    setCanCoderConfigs(CLIMB_CONFIG.canCoderID(), CLIMB_CONFIG.canCoderOffset(), CANCODER_DIRECTION);
+    setCanCoderConfigs(
+        CLIMB_CONFIG.canCoderID(), CLIMB_CONFIG.canCoderOffset(), CANCODER_DIRECTION);
 
     setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);
 
-    
     setSlot0(
         GAINS.kP(),
         GAINS.kI(),
@@ -38,7 +38,6 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         0,
         GRAVITY_TYPE);
   }
-
 
   @AutoLogOutput(key = "Superstructure/Climb/ModdedRotations")
   public double moddedRotations;

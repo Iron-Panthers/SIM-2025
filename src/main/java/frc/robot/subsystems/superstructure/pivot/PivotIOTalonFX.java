@@ -17,7 +17,7 @@ public class PivotIOTalonFX extends GenericSuperstructureIOTalonFX implements Pi
         ZEROING_VOLTS,
         ZEROING_OFFSET,
         ZEROING_VOLTAGE_THRESHOLD);
-    
+
     setCanCoderConfigs(PIVOT_CONFIG.canCoderID(), PIVOT_CONFIG.canCoderOffset(), SENSOR_DIRECTION);
 
     setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);

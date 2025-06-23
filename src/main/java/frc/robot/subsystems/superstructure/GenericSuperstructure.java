@@ -25,6 +25,7 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
 
   private GenericSuperstructureIOInputsAutoLogged inputs =
       new GenericSuperstructureIOInputsAutoLogged();
+  private GenericSuperstructureIOInputsMotor2AutoLogged inputs2 = null;
   private G positionTarget;
 
   public GenericSuperstructure(String name, GenericSuperstructureIO superstructureIO) {
@@ -35,6 +36,10 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
   public void periodic() {
     // Process inputs
     superstructureIO.updateInputs(inputs);
+    if (inputs2 != null) {
+      superstructureIO.updateSecondaryInputs(inputs2);
+      Logger.processInputs(name, inputs2);
+    }
     Logger.processInputs(name, inputs);
 
     // Process control mode
@@ -104,5 +109,9 @@ public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarge
   public boolean reachedTarget() {
     return Math.abs(inputs.positionRotations - (positionTarget.getPosition()))
         <= positionTarget.getEpsilon();
+  }
+
+  public void enableSecondaryMotorLogging() {
+    inputs2 = new GenericSuperstructureIOInputsMotor2AutoLogged();
   }
 }

@@ -71,6 +71,7 @@ public class Superstructure extends SubsystemBase {
     elevator.setPositionTarget(ElevatorTarget.BOTTOM);
     tongue.setPositionTarget(TongueTarget.STOW);
 
+    elevator.enableSecondaryMotorLogging();
     // setup the mechanism2d for visualization
     mechanism2d = new LoggedMechanism2d(1, 5);
     mechanismRoot2d = mechanism2d.getRoot("Superstructure", inchesToMeters(20), 0);

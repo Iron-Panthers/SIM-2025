@@ -62,7 +62,8 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
    * @param lowerVoltLimit The lower voltage limit for the motor.
    * @param zeroingVolts The voltage to apply during zeroing.
    * @param zeroingOffset The offset to set after zeroing.
-   * @param zeroingVoltageThreshold The voltage threshold to determine if the mechanism has reached the zeroing position.
+   * @param zeroingVoltageThreshold The voltage threshold to determine if the mechanism has reached
+   *     the zeroing position.
    */
   public GenericSuperstructureIOTalonFX(
       int id,
@@ -139,7 +140,10 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
     inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
     inputs.tempCelsius = temp.getValueAsDouble();
+  }
 
+  @Override
+  public void updateSecondaryInputs(GenericSuperstructureIOInputsMotor2 inputs) {
     if (talon2.isPresent()) {
       inputs.connected2 =
           BaseStatusSignal.refreshAll(

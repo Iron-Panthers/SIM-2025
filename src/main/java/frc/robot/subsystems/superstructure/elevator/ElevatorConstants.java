@@ -3,7 +3,6 @@ package frc.robot.subsystems.superstructure.elevator;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
-import java.util.Optional;
 
 public class ElevatorConstants {
   public static final ElevatorConfig ELEVATOR_CONFIG =
@@ -41,7 +40,7 @@ public class ElevatorConstants {
   public static final double POSITION_TARGET_EPSILON = 1;
 
   // SOFT LIMITS
-  public static final double UPPER_EXTENSION_LIMIT = 32.5; 
+  public static final double UPPER_EXTENSION_LIMIT = 32.5;
 
   // CURRENT LIMITS
   public static final double UPPER_VOLT_LIMIT = 10;

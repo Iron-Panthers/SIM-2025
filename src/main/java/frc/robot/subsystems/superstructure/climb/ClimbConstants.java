@@ -4,7 +4,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
-
 import java.util.Optional;
 
 public class ClimbConstants {
@@ -26,11 +25,7 @@ public class ClimbConstants {
         default -> new MotionMagicConfig(0, 0, 0);
       };
 
-  public record ClimbConfig(
-      int motorID,
-      double reduction,
-      int canCoderID,
-      double canCoderOffset) {}
+  public record ClimbConfig(int motorID, double reduction, int canCoderID, double canCoderOffset) {}
 
   public record PIDGains(
       double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
@@ -38,7 +33,8 @@ public class ClimbConstants {
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
   public static final boolean INVERT_MOTOR = false;
-  public static final SensorDirectionValue CANCODER_DIRECTION = SensorDirectionValue.CounterClockwise_Positive;
+  public static final SensorDirectionValue CANCODER_DIRECTION =
+      SensorDirectionValue.CounterClockwise_Positive;
 
   public static final double POSITION_TARGET_EPSILON = 0.03;
 

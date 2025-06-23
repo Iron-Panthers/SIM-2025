@@ -14,7 +14,10 @@ public interface GenericSuperstructureIO {
     public double supplyCurrentAmps = 0;
     public double tempCelsius = 0;
     public boolean zeroing = false;
+  }
 
+  @AutoLog
+  class GenericSuperstructureIOInputsMotor2 {
     public boolean connected2 = true;
     public double positionRotations2 = 0;
     public double velocityRotPerSec2 = 0;
@@ -24,6 +27,8 @@ public interface GenericSuperstructureIO {
   }
 
   default void updateInputs(GenericSuperstructureIOInputs inputs) {}
+
+  default void updateSecondaryInputs(GenericSuperstructureIOInputsMotor2 inputs) {}
 
   default void runPosition(double position) {}
 
@@ -47,11 +52,9 @@ public interface GenericSuperstructureIO {
 
   default void setSecondMotorConfigs(int id2, boolean opposeFirst) {}
 
-  default void setUpperExtensionLimit(
-      double upperLimit) {}
-      
-  default void setLowerExtensionLimit(
-    double lowerLimit) {}
+  default void setUpperExtensionLimit(double upperLimit) {}
+
+  default void setLowerExtensionLimit(double lowerLimit) {}
 
   default void stop() {}
 
