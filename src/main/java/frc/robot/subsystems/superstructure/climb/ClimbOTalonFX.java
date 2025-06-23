@@ -4,7 +4,6 @@ import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
 
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
-import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
@@ -12,22 +11,20 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
   public ClimbOTalonFX() {
     super(
         CLIMB_CONFIG.motorID(),
-        Optional.empty(),
         INVERT_MOTOR,
-        Optional.empty(),
         SUPPLY_CURRENT_LIMIT,
-        CLIMB_CONFIG.canCoderID(),
-        CLIMB_CONFIG.canCoderOffset(),
-        CANCODER_DIRECTION,
-        SENSOR_DISCONTINUITY_POINT,
         CLIMB_CONFIG.reduction(),
-        UPPER_EXTENSION_LIMIT,
-        LOWER_EXTENSION_LIMIT,
         UPPER_VOLT_LIMIT,
         LOWER_VOLT_LIMIT,
         ZEROING_VOLTS,
         ZEROING_OFFSET,
         ZEROING_VOLTAGE_THRESHOLD);
+
+    setCanCoderConfigs(CLIMB_CONFIG.canCoderID(), CLIMB_CONFIG.canCoderOffset(), CANCODER_DIRECTION);
+
+    setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);
+
+    
     setSlot0(
         GAINS.kP(),
         GAINS.kI(),
@@ -41,6 +38,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
         0,
         GRAVITY_TYPE);
   }
+
 
   @AutoLogOutput(key = "Superstructure/Climb/ModdedRotations")
   public double moddedRotations;

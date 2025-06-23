@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericSuperstructureIO {
@@ -40,6 +41,17 @@ public interface GenericSuperstructureIO {
       double motionMagicCruiseVelocity,
       double jerk,
       GravityTypeValue gravityTypeValue) {}
+
+  default void setCanCoderConfigs(
+      int canCoderID, double canCoderOffset, SensorDirectionValue direction) {}
+
+  default void setSecondMotorConfigs(int id2, boolean opposeFirst) {}
+
+  default void setUpperExtensionLimit(
+      double upperLimit) {}
+      
+  default void setLowerExtensionLimit(
+    double lowerLimit) {}
 
   default void stop() {}
 

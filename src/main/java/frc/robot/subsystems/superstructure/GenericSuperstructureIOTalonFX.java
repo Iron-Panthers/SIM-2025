@@ -26,7 +26,9 @@ import java.util.Optional;
 
 public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   protected final TalonFX talon;
-  protected final Optional<TalonFX> talon2;
+  protected Optional<TalonFX> talon2;
+
+  private final TalonFXConfiguration config = new TalonFXConfiguration();
 
   private final StatusSignal<Angle> positionRotations;
   private final StatusSignal<AngularVelocity> velocityRPS;
@@ -52,43 +54,26 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   /**
    * Constructs a new GenericSuperstructureIOTalonFX.
    *
-   * @param id The ID of the TalonFX motor controller.
+   * @param id The ID of the TalonFX motor
    * @param inverted Whether the motor is inverted.
    * @param supplyCurrentLimit The supply current limit for the motor.
-   * @param canCoderID The optional ID of the CANcoder.
-   * @param reduction The reduction ratio for the mechanism.
-   * @param upperLimit The upper limit for the motor position.
-   * @param lowerLimit The lower limit for the motor position.
+   * @param reduction The reduction ratio between the sensor and mechanism.
    * @param upperVoltLimit The upper voltage limit for the motor.
    * @param lowerVoltLimit The lower voltage limit for the motor.
    * @param zeroingVolts The voltage to apply during zeroing.
    * @param zeroingOffset The offset to set after zeroing.
-   * @param positionTargetEpsilon The allowable error in position target.
+   * @param zeroingVoltageThreshold The voltage threshold to determine if the mechanism has reached the zeroing position.
    */
   public GenericSuperstructureIOTalonFX(
       int id,
-      Optional<Integer> id2,
       boolean inverted,
-      Optional<Boolean> oposeFirst,
       double supplyCurrentLimit,
-      Optional<Integer> canCoderID,
-      Optional<Double> canCoderOffset,
-      Optional<SensorDirectionValue> direction,
-      Optional<Double> sensorDiscontinuityPoint,
       double reduction,
-      Optional<Double> upperLimit,
-      Optional<Double> lowerLimit,
       double upperVoltLimit,
       double lowerVoltLimit,
       double zeroingVolts,
       double zeroingOffset,
       double zeroingVoltageThreshold) {
-    talon = new TalonFX(id);
-    if (id2.isPresent()) {
-      talon2 = Optional.of(new TalonFX(id2.get()));
-    } else {
-      talon2 = Optional.empty();
-    }
 
     // set the zeroing values such tha when the robot zeros it will apply the
     // zeroing volts and
@@ -100,56 +85,20 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
     this.zeroingVoltageThreshold = zeroingVoltageThreshold;
 
     // VOLTAGE, LIMITS AND RATIO CONFIG
-    TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.Inverted =
         inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
     config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    if (upperLimit.isPresent()) { // only set the upper limit if we have one
-      config.SoftwareLimitSwitch.withForwardSoftLimitEnable(true);
-      config.SoftwareLimitSwitch.withForwardSoftLimitThreshold(upperLimit.get());
-    }
-    if (lowerLimit.isPresent()) { // only set the lower limit if we have one
-      config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
-      config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(lowerLimit.get());
-    }
 
     config.Voltage.withPeakForwardVoltage(upperVoltLimit);
     config.Voltage.withPeakReverseVoltage(lowerVoltLimit);
     config.Feedback.withSensorToMechanismRatio(reduction);
-    // CANCODER CONFIG
-    if (canCoderID.isPresent()) {
-      CANcoder canCoder = new CANcoder(canCoderID.get());
-      canCoder
-          .getConfigurator()
-          .apply(
-              new CANcoderConfiguration()
-                  .withMagnetSensor(
-                      new MagnetSensorConfigs()
-                          .withAbsoluteSensorDiscontinuityPoint(
-                              sensorDiscontinuityPoint.isPresent()
-                                  ? sensorDiscontinuityPoint.get()
-                                  : 0.5)
-                          .withSensorDirection(
-                              direction.isPresent()
-                                  ? direction.get()
-                                  : SensorDirectionValue.Clockwise_Positive)
-                          .withMagnetOffset(
-                              canCoderOffset.isPresent() ? canCoderOffset.get() : 0)));
 
-      // canCoder.getConfigurator().setPosition(0);
-      config.Feedback.withRemoteCANcoder(canCoder);
-      config.Feedback.withSensorToMechanismRatio(reduction);
-    }
+    talon = new TalonFX(id);
+
     talon.getConfigurator().apply(config);
     setOffset();
     talon.setNeutralMode(NeutralModeValue.Brake);
-
-    if (talon2.isPresent()) {
-      talon2.get().getConfigurator().apply(config);
-      talon2.get().setNeutralMode(NeutralModeValue.Brake);
-      talon2.get().setControl(new Follower(talon.getDeviceID(), oposeFirst.get()));
-    }
 
     // STATUS SIGNALS
     velocityRPS = talon.getVelocity();
@@ -260,5 +209,45 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
 
     talon.getConfigurator().apply(gainsConfig);
     talon.getConfigurator().apply(motionMagicConfig);
+  }
+
+  @Override
+  public void setCanCoderConfigs(
+      int canCoderID, double canCoderOffset, SensorDirectionValue direction) {
+    CANcoder canCoder = new CANcoder(canCoderID);
+    canCoder
+        .getConfigurator()
+        .apply(
+            new CANcoderConfiguration()
+                .withMagnetSensor(
+                    new MagnetSensorConfigs()
+                        .withAbsoluteSensorDiscontinuityPoint(0.5)
+                        .withSensorDirection(direction)
+                        .withMagnetOffset(canCoderOffset)));
+
+    config.Feedback.withRemoteCANcoder(canCoder);
+    talon.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void setSecondMotorConfigs(int id2, boolean opposeFirst) {
+    talon2.get().getConfigurator().apply(config);
+    talon2.get().setNeutralMode(NeutralModeValue.Brake);
+    talon2.get().setControl(new Follower(talon.getDeviceID(), opposeFirst));
+    talon.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void setUpperExtensionLimit(double upperLimit) {
+    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(upperLimit);
+    talon.getConfigurator().apply(config);
+  }
+
+  @Override
+  public void setLowerExtensionLimit(double lowerLimit) {
+    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(lowerLimit);
+    talon.getConfigurator().apply(config);
   }
 }

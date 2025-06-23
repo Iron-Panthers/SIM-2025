@@ -79,7 +79,7 @@ public class Superstructure extends SubsystemBase {
         mechanismRoot2d.append(
             new LoggedMechanismLigament2d(
                 "elevator",
-                ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
+                ElevatorConstants.UPPER_EXTENSION_LIMIT
                     * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
                 90,
                 6,

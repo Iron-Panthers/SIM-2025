@@ -9,29 +9,23 @@ public class ElevatorConstants {
   public static final ElevatorConfig ELEVATOR_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new ElevatorConfig(
-            CAN.at(43, "Elevator 1"), Optional.of(CAN.at(44, "Elevator 2")), (58.0 / 14.0) / 6);
-        case PROG -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
-        case ALPHA -> new ElevatorConfig(CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0);
-        case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1); // FIXME
+            CAN.at(43, "Elevator 1"), CAN.at(44, "Elevator 2"), (58.0 / 14.0) / 6);
+        default -> new ElevatorConfig(0, 0, 1); // FIXME
       };
 
   public static final PIDGains GAINS =
       switch (Constants.getRobotType()) {
         case COMP -> new PIDGains(2, 0, 0, 0, 0.08, 0.002, 0.35);
-        case PROG -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
-        case ALPHA -> new PIDGains(2, 0, 0.2, 0, 0.09, 0, .34);
-        case SIM -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
+        default -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
       };
 
   public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new MotionMagicConfig(500, 100, 0);
-        case PROG -> new MotionMagicConfig(0, 0, 0);
-        case ALPHA -> new MotionMagicConfig(50, 50, 0);
-        case SIM -> new MotionMagicConfig(0, 0, 0);
+        default -> new MotionMagicConfig(0, 0, 0);
       };
 
-  public record ElevatorConfig(int motorID, Optional<Integer> motorID2, double reduction) {}
+  public record ElevatorConfig(int motorID, int motorID2, double reduction) {}
 
   public record PIDGains(
       double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
@@ -42,14 +36,12 @@ public class ElevatorConstants {
 
   public static final boolean INVERT_MOTOR = true;
 
-  public static final Optional<Boolean> OPOSE_MOTOR = Optional.of(true);
+  public static final boolean OPOSE_MOTOR = true;
 
   public static final double POSITION_TARGET_EPSILON = 1;
 
   // SOFT LIMITS
-  public static final Optional<Double> UPPER_EXTENSION_LIMIT =
-      Optional.of(32.5); // top limit is 121 rotations
-  public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
+  public static final double UPPER_EXTENSION_LIMIT = 32.5; 
 
   // CURRENT LIMITS
   public static final double UPPER_VOLT_LIMIT = 10;
