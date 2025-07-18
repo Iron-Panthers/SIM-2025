@@ -26,7 +26,7 @@ import java.util.Optional;
 
 public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   protected final TalonFX talon;
-  protected Optional<TalonFX> talon2;
+  protected Optional<TalonFX> talon2 = Optional.empty();
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
