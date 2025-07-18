@@ -1,10 +1,19 @@
 package frc.robot.subsystems.superstructure.elevator;
 
-import java.util.Optional;
+import static frc.robot.utility.UnitConversions.inchesToMeters;
+
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.subsystems.superstructure.GenericSuperstructure;
+import frc.robot.utility.LoggableMechanism3d;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator {
-  public enum ElevatorTarget {
+public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
+    implements LoggableMechanism3d {
+  public enum ElevatorTarget implements GenericSuperstructure.PositionTarget {
     BOTTOM(0.6),
     L1(11),
     L2(20),
@@ -36,101 +45,56 @@ public class Elevator {
     }
   }
 
-  public enum ControlMode {
-    POSITION,
-    POSITION_MANUAL,
-    STOP;
+  private final LinearFilter supplyCurrentFilter;
+  private double filteredSupplyCurrentAmps = 0;
+
+  private boolean zeroing = false;
+
+  public Elevator(ElevatorIO io) {
+    super("Elevator", io);
+    setPositionTarget(ElevatorTarget.INTAKE);
+    setControlMode(ControlMode.STOP);
+
+    // setup the linear filter
+    supplyCurrentFilter = LinearFilter.movingAverage(30);
   }
 
-  private ControlMode controlMode = ControlMode.POSITION;
-
-  private final ElevatorIO elevatorIO;
-
-  private Optional<Double> positionTargetManual = Optional.empty();
-
-  private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
-  private ElevatorTarget positionTarget;
-
-  private final String name;
-
-  public Elevator(ElevatorIO elevatorIO) {
-    this.name = "Elevator";
-    this.elevatorIO = elevatorIO;
-    this.positionTarget = ElevatorTarget.TOP; // Default target
-  }
-
+  @Override
   public void periodic() {
-    // Process inputs
-    elevatorIO.updateInputs(inputs);
-    Logger.processInputs(name, inputs);
 
-    // Process control mode
-    switch (controlMode) {
-      case POSITION -> {
-        elevatorIO.runPosition(positionTarget.getPosition());
-      }
-      case POSITION_MANUAL -> {
-        positionTargetManual.ifPresent(elevatorIO::runPosition);
-      }
-      case STOP -> {
-        elevatorIO.stop();
-      }
+    super.periodic();
+
+    // for zeroing
+    // calculate our new filtered supply current for the elevator
+    filteredSupplyCurrentAmps = supplyCurrentFilter.calculate(getSupplyCurrentAmps());
+    if (zeroing) {
+      superstructureIO.runCharacterization();
     }
-    elevatorIO.runPosition(10.0);
-
-    Logger.recordOutput("Superstructure/" + name + "/Target", positionTarget.toString());
-    Logger.recordOutput("Superstructure/" + name + "/Control Mode", controlMode.toString());
-    Logger.recordOutput("Superstructure/" + name + "/Reached target", reachedTarget());
     Logger.recordOutput(
-        "Superstructure/" + name + "/Target Position", positionTarget.getPosition());
+        "Superstructure/" + name + "/Filtered supply current amps", getFilteredSupplyCurrentAmps());
   }
 
-  public ElevatorTarget getPositionTarget() {
-    return positionTarget;
+  public double getFilteredSupplyCurrentAmps() {
+    return filteredSupplyCurrentAmps;
   }
 
-  public void setPositionTarget(ElevatorTarget positionTarget) {
-    setControlMode(ControlMode.POSITION);
-    this.positionTarget = positionTarget;
+  public boolean aboveSafeHeightForPivot() {
+    return this.getPosition() > ElevatorConstants.MIN_SAFE_HEIGHT_FOR_PIVOT;
   }
 
-  public void setPositionTargetManual(double position) {
-    setControlMode(ControlMode.POSITION_MANUAL);
-    positionTargetManual = Optional.of(position);
+  public void setZeroing(boolean zeroing) {
+    this.zeroing = zeroing;
   }
 
-  public ControlMode getControlMode() {
-    return controlMode;
+  public boolean isZeroing() {
+    return zeroing;
   }
 
-  public void setControlMode(ControlMode controlMode) {
-    if (controlMode == ControlMode.POSITION_MANUAL) {
-      positionTargetManual = Optional.of(inputs.positionRotations);
-    } else {
-      positionTargetManual = Optional.empty();
-    }
-    this.controlMode = controlMode;
-  }
-
-  public void setOffset() {
-    elevatorIO.setOffset();
-  }
-
-  public double getSupplyCurrentAmps() {
-    return inputs.supplyCurrentAmps;
-  }
-
-  public double getPosition() {
-    return inputs.positionRotations;
-  }
-
-  /**
-   * This function returns whether or not the subsystem has reached its position target
-   *
-   * @return whether the subsystem has reached its position target
-   */
-  public boolean reachedTarget() {
-    return Math.abs(inputs.positionRotations - (positionTarget.getPosition()))
-        <= positionTarget.getEpsilon();
+  @Override
+  public Pose3d getDisplayPose3d(Pose3d parentPose3d) {
+    return parentPose3d.plus(
+        new Transform3d(
+            new Translation3d(inchesToMeters(0), inchesToMeters(0), inchesToMeters(getPosition())),
+            new Rotation3d(0, 0, 0))); // Placeholder, replace with actual pose logic
   }
 }
