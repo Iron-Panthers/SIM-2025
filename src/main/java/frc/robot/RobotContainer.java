@@ -29,6 +29,10 @@ import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
+import frc.robot.subsystems.superstructure.pivot.Pivot;
+import frc.robot.subsystems.superstructure.pivot.PivotIO;
+import frc.robot.subsystems.superstructure.tongue.Tongue;
+import frc.robot.subsystems.superstructure.tongue.TongueIO;
 import frc.robot.subsystems.swerve.Drive;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.GyroIO;
@@ -69,6 +73,8 @@ public class RobotContainer {
   private RollerSensorsIO rollerSensors;
   private Rollers rollers;
   private Elevator elevator;
+  private Pivot pivot;
+  private Tongue tongue;
   private Superstructure superstructure;
   private RGB rgb;
   private CANWatchdog canWatchdog;
@@ -157,11 +163,13 @@ public class RobotContainer {
     if (elevator == null) {
       elevator = new Elevator(new ElevatorIO() {});
     }
-    // if (pivot == null) {
-    // pivot = new Pivot(new PivotIO() {
-    // });
-    // }
-    superstructure = new Superstructure(elevator);
+    if (pivot == null) {
+      pivot = new Pivot(new PivotIO() {});
+    }
+    if (tongue == null) {
+      tongue = new Tongue(new TongueIO() {});
+    }
+    superstructure = new Superstructure(elevator, pivot, tongue);
 
     if (canWatchdog == null) {
       canWatchdog = new CANWatchdog(new CANWatchdogIO() {}, rgb);
@@ -170,12 +178,6 @@ public class RobotContainer {
     if (rgb == null) {
       rgb = new RGB(new RGBIO() {});
     }
-
-    // if (tongue == null) {
-    // tongue = new Tongue(new TongueIO() {
-    // });
-    // }
-    // superstructure = new Superstructure(elevator, pivot, tongue);
 
     // if (climb == null) {
     // climb = new Climb(new ClimbOTalonFX());

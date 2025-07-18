@@ -6,66 +6,79 @@ import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.Optional;
 
 public class ElevatorConstants {
-    public static final ElevatorConfig ELEVATOR_CONFIG = switch (Constants.getRobotType()) {
+
+  public static final ElevatorConfig ELEVATOR_CONFIG =
+      switch (Constants.getRobotType()) {
         case COMP -> new ElevatorConfig(
-                CAN.at(43, "Elevator 1"), Optional.of(CAN.at(44, "Elevator 2")), (58.0 / 14.0) / 6);
+            CAN.at(43, "Elevator 1"), Optional.of(CAN.at(44, "Elevator 2")), (58.0 / 14.0) / 6);
         case PROG -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
         case ALPHA -> new ElevatorConfig(CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0);
         case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
-    };
+      };
 
-    public static final PIDGains GAINS = switch (Constants.getRobotType()) {
+  public static final PIDGains GAINS =
+      switch (Constants.getRobotType()) {
         case COMP -> new PIDGains(2, 0, 0, 0, 0.08, 0.002, 0.35);
         case PROG -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
         case ALPHA -> new PIDGains(2, 0, 0.2, 0, 0.09, 0, .34);
         case SIM -> new PIDGains(2, 0, 0, 0, 0.08, 0.002, 0.35);
-    };
+      };
 
-    public static final MotionMagicConfig MOTION_MAGIC_CONFIG = switch (Constants.getRobotType()) {
+  public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
+      switch (Constants.getRobotType()) {
         case COMP -> new MotionMagicConfig(500, 100, 0);
         case PROG -> new MotionMagicConfig(0, 0, 0);
         case ALPHA -> new MotionMagicConfig(50, 50, 0);
         case SIM -> new MotionMagicConfig(500, 100, 0);
-    };
+      };
 
-    public record ElevatorConfig(int motorID, Optional<Integer> motorID2, double reduction) {
-    }
+  public record ElevatorConfig(int motorID, Optional<Integer> motorID2, double reduction) {}
 
-    public record PIDGains(
-            double kP, double kI, double kD, double kS, double kV, double kA, double kG) {
-    }
+  public record PIDGains(
+      double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
 
-    public record MotionMagicConfig(double acceleration, double cruiseVelocity, double jerk) {
-    }
+  public record MotionMagicConfig(double acceleration, double cruiseVelocity, double jerk) {}
 
-    public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Elevator_Static;
+  public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Elevator_Static;
 
-    public static final boolean INVERT_MOTOR = true;
+  public static final boolean INVERT_MOTOR = true;
 
-    public static final Optional<Boolean> OPOSE_MOTOR = Optional.of(true);
+  public static final Optional<Boolean> OPOSE_MOTOR = Optional.of(true);
 
-    public static final double POSITION_TARGET_EPSILON = 1;
+  public static final double POSITION_TARGET_EPSILON = 1;
 
-    // SOFT LIMITS
-    public static final Optional<Double> UPPER_EXTENSION_LIMIT = Optional.of(32.5); // top limit is 121 rotations
-    public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
+  // SOFT LIMITS
+  public static final Optional<Double> UPPER_EXTENSION_LIMIT = Optional.of(32.5); // top
+  // limit
+  // is
+  // 121
+  // rotations
 
-    // CURRENT LIMITS
-    public static final double UPPER_VOLT_LIMIT = 10;
-    public static final double LOWER_VOLT_LIMIT = -7;
-    public static final double SUPPLY_CURRENT_LIMIT = 30;
-    public static final int ZEROING_CURRENT_LIMIT = 20;
+  public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
 
-    // ZEROING CONSTANTS
-    public static final double ZEROING_VOLTS = -1;
-    public static final double ZEROING_OFFSET = 0; // offset in inches
-    public static final double ZEROING_VOLTAGE_THRESHOLD = 4;
+  // CURRENT LIMITS
+  public static final double UPPER_VOLT_LIMIT = 10;
 
-    // MIN HEIGHT TO MOVE PIVOT WITHOUT HITTING INTAKE
-    public static final double MIN_SAFE_HEIGHT_FOR_PIVOT = 15;
+  public static final double LOWER_VOLT_LIMIT = -7;
 
-    // PHYSICAL CONSTANTS
-    public static final double DRUM_RADIUS_METERS = 2.125000 / 2.0; // radius of the drum in meters
-    public static final double ELEVATOR_MASS_KG = 0.453592; // mass of the elevator carriage in kg
-    public static final double MAX_HEIGHT_METERS = 1.5; // max height of the elevator in meters
+  public static final double SUPPLY_CURRENT_LIMIT = 30;
+
+  public static final int ZEROING_CURRENT_LIMIT = 20;
+
+  // ZEROING CONSTANTS
+  public static final double ZEROING_VOLTS = -1;
+
+  public static final double ZEROING_OFFSET = 0; // offset in inches
+
+  public static final double ZEROING_VOLTAGE_THRESHOLD = 4;
+
+  // MIN HEIGHT TO MOVE PIVOT WITHOUT HITTING INTAKE
+  public static final double MIN_SAFE_HEIGHT_FOR_PIVOT = 15;
+
+  // PHYSICAL CONSTANTS
+  public static final double DRUM_RADIUS_METERS = 2.125000 / 2.0; // radius of the drum in meters
+
+  public static final double ELEVATOR_MASS_KG = 4.0120245; // mass of the elevator carriage in kg
+
+  public static final double MAX_HEIGHT_METERS = 1.5; // max height of the elevator in meters
 }

@@ -41,66 +41,45 @@ public class Superstructure extends SubsystemBase {
   /**
    * Options for transitioning between superstructure states.
    *
-   * @param defaultState           The default state to transition to.
-   * @param stateTransitions       Map of possible state transitions for each
-   *                               state. (key: next state,
-   *                               target states that can be reached by going to
-   *                               that state)
-   * @param elevatorTarget         Optional target for the elevator mechanism.
-   * @param pivotTarget            Optional target for the pivot mechanism.
-   * @param tongueTarget           Optional target for the tongue mechanism.
-   * @param targetChangeConditions Map of mechanism types to conditions that must
-   *                               be met for target
-   *                               changes.
+   * @param defaultState The default state to transition to.
+   * @param stateTransitions Map of possible state transitions for each state. (key: next state,
+   *     target states that can be reached by going to that state)
+   * @param elevatorTarget Optional target for the elevator mechanism.
+   * @param pivotTarget Optional target for the pivot mechanism.
+   * @param tongueTarget Optional target for the tongue mechanism.
+   * @param targetChangeConditions Map of mechanism types to conditions that must be met for target
+   *     changes.
    */
   private record StateTransitionOptions(
-      ElevatorTarget elevatorTarget, PivotTarget pivotTarget, TongueTarget tongueTarget) {
-  }
+      ElevatorTarget elevatorTarget, PivotTarget pivotTarget, TongueTarget tongueTarget) {}
 
   public enum SuperstructureState {
     L1(
         new StateTransitionOptions(
-            ElevatorTarget.L1,
-            PivotTarget.L1,
-            TongueTarget.L1)), // Scoring in the trough
+            ElevatorTarget.L1, PivotTarget.L1, TongueTarget.L1)), // Scoring in the trough
     L2(
         new StateTransitionOptions(
-            ElevatorTarget.L2,
-            PivotTarget.L2,
-            TongueTarget.L2)), // Scoring in L2
+            ElevatorTarget.L2, PivotTarget.L2, TongueTarget.L2)), // Scoring in L2
     SETUP_L3(
         new StateTransitionOptions(
-            ElevatorTarget.L3,
-            null /* PivotTarget.SETUP_L3 */,
-            TongueTarget.L3)),
+            ElevatorTarget.L3, null /* PivotTarget.SETUP_L3 */, TongueTarget.L3)),
     SCORE_L3(
         new StateTransitionOptions(
-            ElevatorTarget.L3,
-            PivotTarget.SCORE_L3,
-            TongueTarget.L3)), // Scoring in L3
+            ElevatorTarget.L3, PivotTarget.SCORE_L3, TongueTarget.L3)), // Scoring in L3
     PREVENT_TIPPING(), // null because it has its own logic
     SETUP_L4(), // Setting up in L4 - has its own logic
     SCORE_L4(
         new StateTransitionOptions(
-            ElevatorTarget.SCORE_L4,
-            PivotTarget.SCORE_L4,
-            TongueTarget.STOW)), // Scoring
+            ElevatorTarget.SCORE_L4, PivotTarget.SCORE_L4, TongueTarget.STOW)), // Scoring
     // in L4
     TOP(
         new StateTransitionOptions(
-            ElevatorTarget.TOP,
-            null /* PivotTarget.TOP */,
-            TongueTarget.TOP)), // Apex
+            ElevatorTarget.TOP, null /* PivotTarget.TOP */, TongueTarget.TOP)), // Apex
     STOW(
         new StateTransitionOptions(
-            null /* ElevatorTarget.BOTTOM */,
-            PivotTarget.STOW,
-            TongueTarget.STOW)),
+            null /* ElevatorTarget.BOTTOM */, PivotTarget.STOW, TongueTarget.STOW)),
     INTAKE(
-        new StateTransitionOptions(
-            ElevatorTarget.INTAKE,
-            PivotTarget.INTAKE,
-            TongueTarget.INTAKE)),
+        new StateTransitionOptions(ElevatorTarget.INTAKE, PivotTarget.INTAKE, TongueTarget.INTAKE)),
     CLIMB(
         new StateTransitionOptions(
             ElevatorTarget.CLIMB, null /* PivotTarget.CLIMB */, TongueTarget.CLIMB)),
@@ -122,10 +101,12 @@ public class Superstructure extends SubsystemBase {
       L2.transitions = Set.of(L1, STOW, CLIMB, TOP);
       SETUP_L3.transitions = Set.of(SCORE_L3, DESCORE_HIGH, DESCORE_LOW, PREVENT_TIPPING, TOP);
       SCORE_L3.transitions = Set.of(SETUP_L3);
-      PREVENT_TIPPING.transitions = Set.of(SETUP_L4, DESCORE_HIGH, DESCORE_LOW, TOP); // Use diff logic
+      PREVENT_TIPPING.transitions =
+          Set.of(SETUP_L4, DESCORE_HIGH, DESCORE_LOW, TOP); // Use diff logic
       SETUP_L4.transitions = Set.of(SCORE_L4, PREVENT_TIPPING); // Use diff logic
       SCORE_L4.transitions = Set.of(SETUP_L4, PREVENT_TIPPING);
-      TOP.transitions = Set.of(PREVENT_TIPPING, CLIMB, L2, L1, DESCORE_HIGH, DESCORE_LOW, SETUP_L3, STOW);
+      TOP.transitions =
+          Set.of(PREVENT_TIPPING, CLIMB, L2, L1, DESCORE_HIGH, DESCORE_LOW, SETUP_L3, STOW);
       STOW.transitions = Set.of(INTAKE, L1, L2, CLIMB, TOP);
       INTAKE.transitions = Set.of(STOW, L1, L2, CLIMB, TOP);
       CLIMB.transitions = Set.of(L1, STOW, L2, TOP);
@@ -190,31 +171,31 @@ public class Superstructure extends SubsystemBase {
     mechanism2d = new LoggedMechanism2d(1, 5);
     mechanismRoot2d = mechanism2d.getRoot("Superstructure", inchesToMeters(20), 0);
 
-    elevatorLigament2d = mechanismRoot2d.append(
-        new LoggedMechanismLigament2d(
-            "elevator",
-            ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
-                * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
-            90,
-            6,
-            new Color8Bit(Color.kRed)));
-    pivotLigament2d = elevatorLigament2d.append(
-        new LoggedMechanismLigament2d(
-            "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
+    elevatorLigament2d =
+        mechanismRoot2d.append(
+            new LoggedMechanismLigament2d(
+                "elevator",
+                ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
+                    * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
+                90,
+                6,
+                new Color8Bit(Color.kRed)));
+    pivotLigament2d =
+        elevatorLigament2d.append(
+            new LoggedMechanismLigament2d(
+                "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
 
     elevatorPose3d = Pose3d.kZero;
     pivotPose3d = Pose3d.kZero;
   }
 
   /**
-   * Finds a path from the start state to the goal state using breadth-first
-   * search.
+   * Finds a path from the start state to the goal state using breadth-first search.
    *
    * @param start The starting SuperstructureState.
-   * @param goal  The goal SuperstructureState.
-   * @return A list of SuperstructureStates representing the path from start to
-   *         goal, or null if no
-   *         path is found.
+   * @param goal The goal SuperstructureState.
+   * @return A list of SuperstructureStates representing the path from start to goal, or null if no
+   *     path is found.
    */
   public static List<SuperstructureState> findPath(
       SuperstructureState start, SuperstructureState goal) {
@@ -248,14 +229,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   /**
-   * Iterates the current state of the superstructure, updating subsystem targets
-   * and handling state
-   * transitions. If a direct transition to the target state is not available,
-   * attempts to find a
+   * Iterates the current state of the superstructure, updating subsystem targets and handling state
+   * transitions. If a direct transition to the target state is not available, attempts to find a
    * path using findPath.
    *
-   * <p>
-   * Use this method after other logic in the periodic method to modify it
+   * <p>Use this method after other logic in the periodic method to modify it
    */
   private void iterateState() {
     if (currentState.transitionOptions != null) {
@@ -298,7 +276,7 @@ public class Superstructure extends SubsystemBase {
     currentState = bufferCurrentState;
     if (!stop) {
       switch (currentState) { // switch on the target state
-        // Completely overridden states (don't call iterateState)
+          // Completely overridden states (don't call iterateState)
         case ZERO -> {
           // zeroing system for not killing the robot on zero
           // set our pivot pos
@@ -318,7 +296,8 @@ public class Superstructure extends SubsystemBase {
           }
 
           // check if we have have hit our hardstop, if so we can zero the elevator
-          if (elevator.getFilteredSupplyCurrentAmps() > ElevatorConstants.ZEROING_VOLTAGE_THRESHOLD) {
+          if (elevator.getFilteredSupplyCurrentAmps()
+              > ElevatorConstants.ZEROING_VOLTAGE_THRESHOLD) {
             // check if the elevator is done zeroing and set offsets accordingly
             elevator.setOffset();
             elevator.setControlMode(ControlMode.POSITION);
@@ -369,7 +348,8 @@ public class Superstructure extends SubsystemBase {
           if (currentState != targetState
               && elevator.reachedTarget()
               && (Math.abs(
-                  pivot.getPositionTarget().getPosition() / 360d - pivot.getPosition() / 360d) < 0.05)) {
+                      pivot.getPositionTarget().getPosition() / 360d - pivot.getPosition() / 360d)
+                  < 0.05)) {
             switch (targetState) {
               case SETUP_L4, SCORE_L4 -> setCurrentState(SuperstructureState.SETUP_L4);
               case DESCORE_HIGH -> setCurrentState(SuperstructureState.DESCORE_HIGH);
@@ -394,7 +374,7 @@ public class Superstructure extends SubsystemBase {
             }
           }
         }
-        // slightly altered states (still call iterateState)
+          // slightly altered states (still call iterateState)
         case SETUP_L3 -> {
           if (elevator.getPosition() > 32) {
             pivot.setPositionTarget(PivotTarget.SETUP_L3);
@@ -502,10 +482,8 @@ public class Superstructure extends SubsystemBase {
           System.out.println("Setting superstructure state to: " + superstructureState);
           setTargetState(superstructureState);
         },
-        () -> {
-        },
-        (e) -> {
-        },
+        () -> {},
+        (e) -> {},
         () -> {
           return currentState == targetState && superstructureReachedTarget();
         },
@@ -549,8 +527,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   /**
-   * @return a boolean that says whether or not both of our mechanisms have
-   *         finished zeroing
+   * @return a boolean that says whether or not both of our mechanisms have finished zeroing
    */
   public boolean notZeroing() {
     return !elevator.isZeroing();
@@ -560,10 +537,11 @@ public class Superstructure extends SubsystemBase {
    * @return if both subsystems in the superstructure have reached their target
    */
   public boolean superstructureReachedTarget() {
-    boolean output = (elevator.reachedTarget()
-        && pivot.reachedTarget()
-        && currentState != SuperstructureState.ZERO)
-        || overrideIsAtTarget;
+    boolean output =
+        (elevator.reachedTarget()
+                && pivot.reachedTarget()
+                && currentState != SuperstructureState.ZERO)
+            || overrideIsAtTarget;
 
     overrideIsAtTarget = false;
     return output;
