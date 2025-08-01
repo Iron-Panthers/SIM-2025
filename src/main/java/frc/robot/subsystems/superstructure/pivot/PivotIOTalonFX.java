@@ -2,25 +2,27 @@ package frc.robot.subsystems.superstructure.pivot;
 
 import static frc.robot.subsystems.superstructure.pivot.PivotConstants.*;
 
+import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 
 public class PivotIOTalonFX extends GenericSuperstructureIOTalonFX implements PivotIO {
 
   public PivotIOTalonFX() {
     super(
-        PIVOT_CONFIG.motorID(),
-        INVERT_MOTOR,
-        SUPPLY_CURRENT_LIMIT,
-        PIVOT_CONFIG.reduction(),
-        UPPER_VOLT_LIMIT,
-        LOWER_VOLT_LIMIT,
-        ZEROING_VOLTS,
-        ZEROING_OFFSET,
-        ZEROING_VOLTAGE_THRESHOLD);
-
-    setCanCoderConfigs(PIVOT_CONFIG.canCoderID(), PIVOT_CONFIG.canCoderOffset(), SENSOR_DIRECTION);
-
-    setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);
+        new GenericSuperstructureConfiguration()
+            .withID(PIVOT_CONFIG.motorID())
+            .withMotorDirection(MOTOR_DIRECTION)
+            .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+            .withReduction(PIVOT_CONFIG.reduction())
+            .withUpperVoltageLimit(UPPER_VOLT_LIMIT)
+            .withLowerVoltageLimit(LOWER_VOLT_LIMIT)
+            .withZeroingVolts(ZEROING_VOLTS)
+            .withZeroingOffset(ZEROING_OFFSET)
+            .withZeroingVoltageThreshold(ZEROING_VOLTAGE_THRESHOLD)
+            .withCANCoderID(PIVOT_CONFIG.canCoderID())
+            .withCANCoderOffset(PIVOT_CONFIG.canCoderOffset())
+            .withCANCoderDirection(CANCODER_DIRECTION)
+            .withUpperExtensionLimit(UPPER_EXTENSION_LIMIT));
 
     setSlot0(
         GAINS.kP(),

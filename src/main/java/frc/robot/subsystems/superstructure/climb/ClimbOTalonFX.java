@@ -3,27 +3,27 @@ package frc.robot.subsystems.superstructure.climb;
 import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
 
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
   public ClimbOTalonFX() {
+
     super(
-        CLIMB_CONFIG.motorID(),
-        INVERT_MOTOR,
-        SUPPLY_CURRENT_LIMIT,
-        CLIMB_CONFIG.reduction(),
-        UPPER_VOLT_LIMIT,
-        LOWER_VOLT_LIMIT,
-        ZEROING_VOLTS,
-        ZEROING_OFFSET,
-        ZEROING_VOLTAGE_THRESHOLD);
-
-    setCanCoderConfigs(
-        CLIMB_CONFIG.canCoderID(), CLIMB_CONFIG.canCoderOffset(), CANCODER_DIRECTION);
-
-    setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);
+        new GenericSuperstructureConfiguration()
+            .withID(CLIMB_CONFIG.motorID())
+            .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+            .withReduction(CLIMB_CONFIG.reduction())
+            .withUpperVoltageLimit(UPPER_VOLT_LIMIT)
+            .withLowerVoltageLimit(LOWER_VOLT_LIMIT)
+            .withZeroingVolts(ZEROING_VOLTS)
+            .withZeroingOffset(ZEROING_OFFSET)
+            .withZeroingVoltageThreshold(ZEROING_VOLTAGE_THRESHOLD)
+            .withCANCoderID(CLIMB_CONFIG.canCoderID())
+            .withCANCoderDirection(CANCODER_DIRECTION)
+            .withUpperExtensionLimit(UPPER_EXTENSION_LIMIT));
 
     setSlot0(
         GAINS.kP(),

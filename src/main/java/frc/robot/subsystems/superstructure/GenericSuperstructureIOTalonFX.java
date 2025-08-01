@@ -14,9 +14,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -51,51 +49,54 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
   private final NeutralOut neutralOutput = new NeutralOut();
   private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0).withUpdateFreqHz(0);
 
-  /**
-   * Constructs a new GenericSuperstructureIOTalonFX.
-   *
-   * @param id The ID of the TalonFX motor
-   * @param inverted Whether the motor is inverted.
-   * @param supplyCurrentLimit The supply current limit for the motor.
-   * @param reduction The reduction ratio between the sensor and mechanism.
-   * @param upperVoltLimit The upper voltage limit for the motor.
-   * @param lowerVoltLimit The lower voltage limit for the motor.
-   * @param zeroingVolts The voltage to apply during zeroing.
-   * @param zeroingOffset The offset to set after zeroing.
-   * @param zeroingVoltageThreshold The voltage threshold to determine if the mechanism has reached
-   *     the zeroing position.
-   */
-  public GenericSuperstructureIOTalonFX(
-      int id,
-      boolean inverted,
-      double supplyCurrentLimit,
-      double reduction,
-      double upperVoltLimit,
-      double lowerVoltLimit,
-      double zeroingVolts,
-      double zeroingOffset,
-      double zeroingVoltageThreshold) {
-
+  /** Constructs a new GenericSuperstructureIOTalonFX. */
+  public GenericSuperstructureIOTalonFX(GenericSuperstructureConfiguration superstructureConfig) {
     // set the zeroing values such tha when the robot zeros it will apply the
     // zeroing volts and
     // when it reaches a resistance from part of the mechanism, it sets the position
     // to the zeroing
     // Offset
-    this.zeroingVolts = zeroingVolts;
-    this.zeroingOffset = zeroingOffset;
-    this.zeroingVoltageThreshold = zeroingVoltageThreshold;
+    this.zeroingVolts = superstructureConfig.zeroingVolts;
+    this.zeroingOffset = superstructureConfig.zeroingOffset;
+    this.zeroingVoltageThreshold = superstructureConfig.zeroingVoltageThreshold;
 
     // VOLTAGE, LIMITS AND RATIO CONFIG
-    config.MotorOutput.Inverted =
-        inverted ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-    config.CurrentLimits.SupplyCurrentLimit = supplyCurrentLimit;
+    config.MotorOutput.Inverted = superstructureConfig.motorDirection;
+    config.CurrentLimits.SupplyCurrentLimit = superstructureConfig.supplyCurrentLimit;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    config.Voltage.withPeakForwardVoltage(upperVoltLimit);
-    config.Voltage.withPeakReverseVoltage(lowerVoltLimit);
-    config.Feedback.withSensorToMechanismRatio(reduction);
+    config.Voltage.withPeakForwardVoltage(superstructureConfig.upperVoltLimit);
+    config.Voltage.withPeakReverseVoltage(superstructureConfig.lowerExtensionLimit);
+    config.Feedback.withSensorToMechanismRatio(superstructureConfig.reduction);
 
-    talon = new TalonFX(id);
+    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
+        superstructureConfig.lowerExtensionLimit);
+    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
+        superstructureConfig.upperExtensionLimit);
+
+    talon = new TalonFX(superstructureConfig.id);
+
+    if (superstructureConfig.id2 != 0) {
+      talon2.get().getConfigurator().apply(config);
+      talon2.get().setNeutralMode(NeutralModeValue.Brake);
+      talon2.get().setControl(new Follower(talon.getDeviceID(), superstructureConfig.oposeFirst));
+    }
+
+    if (superstructureConfig.canCoderID != 0) {
+      CANcoder canCoder = new CANcoder(superstructureConfig.canCoderID);
+      canCoder
+          .getConfigurator()
+          .apply(
+              new CANcoderConfiguration()
+                  .withMagnetSensor(
+                      new MagnetSensorConfigs()
+                          .withAbsoluteSensorDiscontinuityPoint(0.5)
+                          .withSensorDirection(superstructureConfig.canCoderDirection)
+                          .withMagnetOffset(superstructureConfig.canCoderOffset)));
+      config.Feedback.withRemoteCANcoder(canCoder);
+    }
 
     talon.getConfigurator().apply(config);
     setOffset();
@@ -213,45 +214,5 @@ public class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
 
     talon.getConfigurator().apply(gainsConfig);
     talon.getConfigurator().apply(motionMagicConfig);
-  }
-
-  @Override
-  public void setCanCoderConfigs(
-      int canCoderID, double canCoderOffset, SensorDirectionValue direction) {
-    CANcoder canCoder = new CANcoder(canCoderID);
-    canCoder
-        .getConfigurator()
-        .apply(
-            new CANcoderConfiguration()
-                .withMagnetSensor(
-                    new MagnetSensorConfigs()
-                        .withAbsoluteSensorDiscontinuityPoint(0.5)
-                        .withSensorDirection(direction)
-                        .withMagnetOffset(canCoderOffset)));
-
-    config.Feedback.withRemoteCANcoder(canCoder);
-    talon.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setSecondMotorConfigs(int id2, boolean opposeFirst) {
-    talon2.get().getConfigurator().apply(config);
-    talon2.get().setNeutralMode(NeutralModeValue.Brake);
-    talon2.get().setControl(new Follower(talon.getDeviceID(), opposeFirst));
-    talon.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setUpperExtensionLimit(double upperLimit) {
-    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
-    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(upperLimit);
-    talon.getConfigurator().apply(config);
-  }
-
-  @Override
-  public void setLowerExtensionLimit(double lowerLimit) {
-    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
-    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(lowerLimit);
-    talon.getConfigurator().apply(config);
   }
 }

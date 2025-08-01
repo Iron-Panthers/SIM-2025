@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure.pivot;
 import static frc.robot.utility.UnitConversions.inchesToMeters;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -40,9 +41,9 @@ public class PivotConstants {
 
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
-  public static final boolean INVERT_MOTOR = true;
+  public static final InvertedValue MOTOR_DIRECTION = InvertedValue.CounterClockwise_Positive;
 
-  public static final SensorDirectionValue SENSOR_DIRECTION =
+  public static final SensorDirectionValue CANCODER_DIRECTION =
       SensorDirectionValue.Clockwise_Positive;
 
   public static final double POSITION_TARGET_EPSILON = 0.01;

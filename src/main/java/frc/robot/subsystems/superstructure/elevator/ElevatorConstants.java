@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure.elevator;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 
@@ -33,7 +34,7 @@ public class ElevatorConstants {
 
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Elevator_Static;
 
-  public static final boolean INVERT_MOTOR = true;
+  public static final InvertedValue MOTOR_DIRECTION = InvertedValue.CounterClockwise_Positive;
 
   public static final boolean OPOSE_MOTOR = true;
 

@@ -2,25 +2,27 @@ package frc.robot.subsystems.superstructure.elevator;
 
 import static frc.robot.subsystems.superstructure.elevator.ElevatorConstants.*;
 
+import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 
 public class ElevatorIOTalonFX extends GenericSuperstructureIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX() {
+
     super(
-        ELEVATOR_CONFIG.motorID(),
-        INVERT_MOTOR,
-        SUPPLY_CURRENT_LIMIT,
-        ELEVATOR_CONFIG.reduction(),
-        UPPER_VOLT_LIMIT,
-        LOWER_VOLT_LIMIT,
-        ZEROING_VOLTS,
-        ZEROING_OFFSET,
-        ZEROING_VOLTAGE_THRESHOLD);
-
-    setSecondMotorConfigs(ELEVATOR_CONFIG.motorID2(), OPOSE_MOTOR);
-
-    setUpperExtensionLimit(UPPER_EXTENSION_LIMIT);
+        new GenericSuperstructureConfiguration()
+            .withID(ELEVATOR_CONFIG.motorID())
+            .withMotorDirection(MOTOR_DIRECTION)
+            .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+            .withReduction(ELEVATOR_CONFIG.reduction())
+            .withUpperVoltageLimit(UPPER_VOLT_LIMIT)
+            .withLowerVoltageLimit(LOWER_VOLT_LIMIT)
+            .withZeroingVolts(ZEROING_VOLTS)
+            .withZeroingOffset(ZEROING_OFFSET)
+            .withZeroingVoltageThreshold(ZEROING_VOLTAGE_THRESHOLD)
+            .withSecondaryMotorID(ELEVATOR_CONFIG.motorID2())
+            .withSecondaryMotorDirection(OPOSE_MOTOR)
+            .withUpperExtensionLimit(UPPER_EXTENSION_LIMIT));
 
     setSlot0(
         GAINS.kP(),
