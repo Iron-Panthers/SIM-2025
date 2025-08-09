@@ -37,7 +37,7 @@ public class ElevatorIOSim extends GenericSuperstructureIOSim implements Elevato
     double drumRadiusMeters = 0.02; // radius of the drum
     double gearing = 10.0; // gear reduction
     double minHeightMeters = -1.0;
-    double maxHeightMeters = 1.5;
+    double maxHeightMeters = 20.5;
     boolean simulateGravity = true;
 
     elevatorSim =

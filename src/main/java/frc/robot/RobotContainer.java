@@ -26,11 +26,13 @@ import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
 import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.superstructure.pivot.Pivot;
 import frc.robot.subsystems.superstructure.pivot.PivotIO;
+import frc.robot.subsystems.superstructure.pivot.PivotIOSim;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.TongueIO;
 import frc.robot.subsystems.swerve.Drive;
@@ -135,6 +137,7 @@ public class RobotContainer {
           // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
           // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
           elevator = new Elevator(new ElevatorIOSim());
+          pivot = new Pivot(new PivotIOSim());
         }
       }
     }
@@ -153,6 +156,7 @@ public class RobotContainer {
     }
 
     if (intake == null) {
+
       intake = new Intake(new IntakeIO() {});
     }
     if (rollerSensors == null) {
@@ -242,6 +246,8 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+    driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
 
     // FIXME:: TEMPORARY DISABLED
     // -----Driver Controls-----

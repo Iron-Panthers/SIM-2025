@@ -27,9 +27,6 @@ public abstract class GenericSuperstructureIOSim implements GenericSuperstructur
   }
 
   @Override
-  public void updateInputs(GenericSuperstructureIOInputs inputs) {}
-
-  @Override
   public void runPosition(double rotations) {
     talon.setControl(positionControl.withPosition(rotations));
   }
