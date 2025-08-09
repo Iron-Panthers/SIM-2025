@@ -6,14 +6,12 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOSim;
 
 public class ElevatorIOSim extends GenericSuperstructureIOSim implements ElevatorIO {
-  private static final double DEFAULT_GEAR_RATIO = 10.0;
 
   private final ElevatorSim elevatorSim;
+
   private final double reduction;
 
   public ElevatorIOSim() {
-    // int id,
-    // boolean inverted,
     // double supplyCurrentLimit,
     // Optional<Integer> canCoderID,
     // Optional<Double> canCoderOffset,
@@ -28,27 +26,17 @@ public class ElevatorIOSim extends GenericSuperstructureIOSim implements Elevato
     // double zeroingOffset,
     // double zeroingVoltageThreshold) {
     super(ElevatorConstants.ELEVATOR_CONFIG.motorID());
-
-    boolean inverted = ElevatorConstants.INVERT_MOTOR;
     this.reduction = ElevatorConstants.ELEVATOR_CONFIG.reduction();
-
-    // Example parameters
-    double massKg = 5.0; // mass of the elevator carriage
-    double drumRadiusMeters = 0.02; // radius of the drum
-    double gearing = 10.0; // gear reduction
-    double minHeightMeters = -1.0;
-    double maxHeightMeters = 20.5;
-    boolean simulateGravity = true;
 
     elevatorSim =
         new ElevatorSim(
-            DCMotor.getKrakenX60Foc(1),
+            DCMotor.getKrakenX60Foc(2),
             reduction,
-            massKg,
-            drumRadiusMeters,
-            minHeightMeters,
-            maxHeightMeters,
-            simulateGravity,
+            ElevatorConstants.PHYSICAL_CONSTANTS.elevatorMassKg(),
+            ElevatorConstants.PHYSICAL_CONSTANTS.drumRadiusMeters(),
+            ElevatorConstants.PHYSICAL_CONSTANTS.minHeightMeters(),
+            ElevatorConstants.PHYSICAL_CONSTANTS.maxHeightMeters(),
+            ElevatorConstants.PHYSICAL_CONSTANTS.simulateGravity(),
             0);
     setOffset();
     setSlot0(
@@ -76,12 +64,19 @@ public class ElevatorIOSim extends GenericSuperstructureIOSim implements Elevato
     elevatorSim.setInputVoltage(appliedVoltage);
     elevatorSim.update(0.02);
 
-    // Convert position and velocity from meters to rotations for the TalonFX sensor
-    double drumRadiusMeters = 0.02; // Must match your sim config
+    // Convert position and velocity from meters to rotations for the
+    // TalonFX sensor
+    // Correct unit conversion: meters to rotations
     double rotations =
-        elevatorSim.getPositionMeters() / (2 * Math.PI * drumRadiusMeters) * reduction;
+        elevatorSim.getPositionMeters()
+            / (2 * Math.PI * ElevatorConstants.PHYSICAL_CONSTANTS.drumRadiusMeters())
+            * reduction;
+
+    // Correct unit conversion: meters/s to rotations/s
     double velocityRPS =
-        elevatorSim.getVelocityMetersPerSecond() / (2 * Math.PI * drumRadiusMeters) * reduction;
+        elevatorSim.getVelocityMetersPerSecond()
+            / (2 * Math.PI * ElevatorConstants.PHYSICAL_CONSTANTS.drumRadiusMeters())
+            * reduction;
 
     talon.getSimState().setRawRotorPosition(rotations);
     talon.getSimState().setRotorVelocity(velocityRPS);

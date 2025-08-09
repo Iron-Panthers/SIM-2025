@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.subsystems.superstructure.GenericSuperstructure;
 import frc.robot.utility.LoggableMechanism3d;
+import org.littletonrobotics.junction.Logger;
 
 public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements LoggableMechanism3d {
   public enum PivotTarget implements GenericSuperstructure.PositionTarget {
@@ -49,6 +50,13 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
     super("Pivot", io);
     setPositionTarget(PivotTarget.STOW);
     setControlMode(ControlMode.STOP);
+  }
+
+  @Override
+  public void periodic() {
+    super.periodic();
+    Logger.recordOutput(
+        "Superstructure/Pivot/PositionTargetRotations", getPositionTarget().getPosition() / 360d);
   }
 
   /**

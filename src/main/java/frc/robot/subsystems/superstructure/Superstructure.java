@@ -539,7 +539,7 @@ public class Superstructure extends SubsystemBase {
   public boolean superstructureReachedTarget() {
     boolean output =
         (elevator.reachedTarget()
-                && pivot.reachedTarget()
+                // && pivot.reachedTarget()
                 && currentState != SuperstructureState.ZERO)
             || overrideIsAtTarget;
 

@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     implements LoggableMechanism3d {
+
   public enum ElevatorTarget implements GenericSuperstructure.PositionTarget {
     BOTTOM(0.6),
     L1(11),
@@ -30,6 +31,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     SAFE_MIDWAY(11.5);
 
     private double position = 0;
+
     private static final double EPSILON = ElevatorConstants.POSITION_TARGET_EPSILON;
 
     private ElevatorTarget(double position) {
@@ -46,6 +48,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
   }
 
   private final LinearFilter supplyCurrentFilter;
+
   private double filteredSupplyCurrentAmps = 0;
 
   private boolean zeroing = false;
@@ -95,6 +98,11 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     return parentPose3d.plus(
         new Transform3d(
             new Translation3d(inchesToMeters(0), inchesToMeters(0), inchesToMeters(getPosition())),
-            new Rotation3d(0, 0, 0))); // Placeholder, replace with actual pose logic
+            new Rotation3d(0, 0, 0))); // Placeholder,
+    // replace
+    // with
+    // actual
+    // pose
+    // logic
   }
 }

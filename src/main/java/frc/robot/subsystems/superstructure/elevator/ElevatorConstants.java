@@ -13,7 +13,7 @@ public class ElevatorConstants {
             CAN.at(43, "Elevator 1"), Optional.of(CAN.at(44, "Elevator 2")), (58.0 / 14.0) / 6);
         case PROG -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
         case ALPHA -> new ElevatorConfig(CAN.at(37, "Elevator 1"), Optional.empty(), 9.0 / 4.0);
-        case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), 1);
+        case SIM -> new ElevatorConfig(CAN.at(0, "Elevator 1"), Optional.empty(), (58.0 / 14.0));
       };
 
   public static final PIDGains GAINS =
@@ -75,10 +75,16 @@ public class ElevatorConstants {
   // MIN HEIGHT TO MOVE PIVOT WITHOUT HITTING INTAKE
   public static final double MIN_SAFE_HEIGHT_FOR_PIVOT = 15;
 
-  // PHYSICAL CONSTANTS
-  public static final double DRUM_RADIUS_METERS = 2.125000 / 2.0; // radius of the drum in meters
+  public static record ElevatorPhysicalConstants(
+      double elevatorMassKg,
+      double drumRadiusMeters,
+      double minHeightMeters,
+      double maxHeightMeters,
+      boolean simulateGravity) {}
 
-  public static final double ELEVATOR_MASS_KG = 4.0120245; // mass of the elevator carriage in kg
-
-  public static final double MAX_HEIGHT_METERS = 1.5; // max height of the elevator in meters
+  public static final ElevatorPhysicalConstants PHYSICAL_CONSTANTS =
+      switch (Constants.getRobotType()) {
+        case SIM -> new ElevatorPhysicalConstants(4.0120245, 0.048874 / 2.0, 0, 1.5, true);
+        case COMP, PROG, ALPHA -> new ElevatorPhysicalConstants(0, 0, 0, 0, false);
+      };
 }
