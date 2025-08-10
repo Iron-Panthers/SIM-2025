@@ -39,7 +39,7 @@ public class PivotIOSim extends GenericSuperstructureIOSim implements PivotIO {
             PivotConstants.PHYSICAL_CONSTANTS.minAngleRads(),
             PivotConstants.PHYSICAL_CONSTANTS.maxAngleRads(),
             PivotConstants.PHYSICAL_CONSTANTS.simulateGravity(),
-            Math.PI / 2);
+            0);
     setOffset();
     setSlot0(
         PivotConstants.GAINS.kP(),

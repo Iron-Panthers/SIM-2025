@@ -35,6 +35,7 @@ import frc.robot.subsystems.superstructure.pivot.PivotIO;
 import frc.robot.subsystems.superstructure.pivot.PivotIOSim;
 import frc.robot.subsystems.superstructure.tongue.Tongue;
 import frc.robot.subsystems.superstructure.tongue.TongueIO;
+import frc.robot.subsystems.superstructure.tongue.TongueIOSim;
 import frc.robot.subsystems.swerve.Drive;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.GyroIO;
@@ -138,6 +139,7 @@ public class RobotContainer {
           // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
           elevator = new Elevator(new ElevatorIOSim());
           pivot = new Pivot(new PivotIOSim());
+          tongue = new Tongue(new TongueIOSim());
         }
       }
     }
