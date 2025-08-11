@@ -25,8 +25,13 @@ import frc.robot.subsystems.rollers.RollerSensorsIO;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
+import frc.robot.subsystems.superstructure.ClimbController;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
+import frc.robot.subsystems.superstructure.climb.Climb;
+import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
+import frc.robot.subsystems.superstructure.climb.ClimbIO;
+import frc.robot.subsystems.superstructure.climb.ClimbIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
@@ -82,6 +87,8 @@ public class RobotContainer {
   private RGB rgb;
   private CANWatchdog canWatchdog;
   private ApproachReef approachReef;
+  private Climb climb;
+  private ClimbController climbController;
 
   public RobotContainer() {
     intake = null;
@@ -140,6 +147,7 @@ public class RobotContainer {
           elevator = new Elevator(new ElevatorIOSim());
           pivot = new Pivot(new PivotIOSim());
           tongue = new Tongue(new TongueIOSim());
+          climb = new Climb(new ClimbIOSim());
         }
       }
     }
@@ -185,10 +193,10 @@ public class RobotContainer {
       rgb = new RGB(new RGBIO() {});
     }
 
-    // if (climb == null) {
-    // climb = new Climb(new ClimbOTalonFX());
-    // }
-    // climbController = new ClimbController(climb);
+    if (climb == null) {
+      climb = new Climb(new ClimbIO() {});
+    }
+    climbController = new ClimbController(climb);
 
     nameCommands();
 
@@ -250,6 +258,7 @@ public class RobotContainer {
   private void configureBindings() {
     driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
+    driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
 
     // FIXME:: TEMPORARY DISABLED
     // -----Driver Controls-----

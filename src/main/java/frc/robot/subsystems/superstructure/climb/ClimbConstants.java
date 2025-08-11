@@ -11,7 +11,7 @@ public class ClimbConstants {
         case COMP -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201));
         case PROG -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
         case ALPHA -> new ClimbConfig(0, 0, Optional.empty(), Optional.empty());
-        case SIM -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
+        case SIM -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201));
       };
 
   public static final PIDGains GAINS =
@@ -19,7 +19,7 @@ public class ClimbConstants {
         case COMP -> new PIDGains(600, 0, 0, 0, 66.5, 5.714, 0);
         case PROG -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
         case ALPHA -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
-        case SIM -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
+        case SIM -> new PIDGains(600, 0, 0, 0, 66.5, 5.714, 0);
       };
 
   public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
@@ -27,7 +27,7 @@ public class ClimbConstants {
         case COMP -> new MotionMagicConfig(2, 1, 0);
         case PROG -> new MotionMagicConfig(0, 0, 0);
         case ALPHA -> new MotionMagicConfig(0, 0, 0);
-        case SIM -> new MotionMagicConfig(0, 0, 0);
+        case SIM -> new MotionMagicConfig(2, 1, 0);
       };
 
   public record ClimbConfig(
@@ -69,4 +69,18 @@ public class ClimbConstants {
 
   // INDUCTION SENSOR
   public static final int INDUCTION_PORT_NUMBER = 6;
+
+  // PHYSICAL CONSTANTS
+  public static record ClimbPhysicalConstants(
+      double momentOfInertia,
+      double lengthMeters,
+      double minAngleRads,
+      double maxAngleRads,
+      boolean simulateGravity) {}
+
+  public static final ClimbPhysicalConstants PHYSICAL_CONSTANTS =
+      switch (Constants.getRobotType()) {
+        case SIM -> new ClimbPhysicalConstants(0.1, 0.5, -1000.0, 1000, false);
+        case COMP, ALPHA, PROG -> new ClimbPhysicalConstants(0.1, 0, 0, 0, false);
+      };
 }
