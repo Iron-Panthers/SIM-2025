@@ -4,8 +4,12 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.util.FlippingUtil;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -45,12 +49,17 @@ import frc.robot.subsystems.swerve.Drive;
 import frc.robot.subsystems.swerve.DriveConstants;
 import frc.robot.subsystems.swerve.GyroIO;
 import frc.robot.subsystems.swerve.GyroIOPigeon2;
+import frc.robot.subsystems.swerve.GyroIOSim;
 import frc.robot.subsystems.swerve.ModuleIO;
-import frc.robot.subsystems.swerve.ModuleIOTalonFX;
+import frc.robot.subsystems.swerve.ModuleIOTalonFXReal;
+import frc.robot.subsystems.swerve.ModuleIOTalonFXSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import java.util.function.BooleanSupplier;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -90,6 +99,8 @@ public class RobotContainer {
   private Climb climb;
   private ClimbController climbController;
 
+  private SwerveDriveSimulation driveSimulation = null;
+
   public RobotContainer() {
     intake = null;
 
@@ -99,10 +110,10 @@ public class RobotContainer {
           swerve =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[0]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[1]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[2]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[3]));
           // vision = new Vision(new VisionIOPhotonvision(4), new
           // VisionIOPhotonvision(5));
           // intake = new Intake(new IntakeIOTalonFX());
@@ -117,10 +128,10 @@ public class RobotContainer {
           swerve =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[0]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[1]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[2]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[3]));
           // intake = new Intake(new IntakeIOTalonFX());
           // elevator = new Elevator(new ElevatorIOTalonFX());
           // pivot = new Pivot(new PivotIOTalonFX());
@@ -129,15 +140,30 @@ public class RobotContainer {
           swerve =
               new Drive(
                   new GyroIOPigeon2(),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
-                  new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[0]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[1]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[2]),
+                  new ModuleIOTalonFXReal(DriveConstants.MODULE_CONFIGS[3]));
           // intake = new Intake(new IntakeIOTalonFX());
           // pivot = new Pivot(new PivotIOTalonFX());
           // elevator = new Elevator(new ElevatorIOTalonFX());
         }
         case SIM -> {
+          driveSimulation =
+              new SwerveDriveSimulation(
+                  DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+          SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+          swerve =
+              new Drive(
+                  new GyroIOSim(driveSimulation.getGyroSimulation()),
+                  new ModuleIOTalonFXSim(
+                      DriveConstants.MODULE_CONFIGS[0], driveSimulation.getModules()[0]),
+                  new ModuleIOTalonFXSim(
+                      DriveConstants.MODULE_CONFIGS[1], driveSimulation.getModules()[1]),
+                  new ModuleIOTalonFXSim(
+                      DriveConstants.MODULE_CONFIGS[2], driveSimulation.getModules()[2]),
+                  new ModuleIOTalonFXSim(
+                      DriveConstants.MODULE_CONFIGS[3], driveSimulation.getModules()[3]));
           // swerve = new Drive(
           // new GyroIOPigeon2(),
           // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
@@ -262,83 +288,84 @@ public class RobotContainer {
 
     // FIXME:: TEMPORARY DISABLED
     // -----Driver Controls-----
-    // swerve.setDefaultCommand(
-    // swerve
-    // .run(
-    // () -> {
-    // swerve.driveTeleopController(
-    // -driverA.getLeftY(),
-    // -driverA.getLeftX(),
-    // driverA.getLeftTriggerAxis() - driverA.getRightTriggerAxis(),
-    // superstructure.getElevatorPosition() > 3
-    // ? 3
-    // : DriveConstants.DRIVE_CONFIG.maxLinearAcceleration());
-    // if (Math.abs(driverA.getLeftTriggerAxis()) > 0.1
-    // || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
-    // swerve.clearHeadingControl();
-    // } else if (autoAngle) {
-    // // Station snaps
-    // if (RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .getDistance(DriveConstants.RIGHT_CORNER) < 3) {
-    // swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)));
-    // } else if (RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .getDistance(DriveConstants.LEFT_CORNER) < 3) {
-    // swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)));
-    // // close up reef snaps
-    // } else if (RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .getDistance(DriveConstants.REEF_TRANSLATION2D) < 2) {
-    // swerve.setTargetHeading(
-    // DriverStation.getAlliance().isPresent()
-    // && DriverStation.getAlliance().get() == Alliance.Red
-    // ? calculateSnapTargetHeading(
-    // RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .minus(DriveConstants.REEF_TRANSLATION2D)
-    // .getAngle())
-    // : FlippingUtil.flipFieldRotation(
-    // calculateSnapTargetHeading(
-    // RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .minus(DriveConstants.REEF_TRANSLATION2D)
-    // .getAngle())));
-    // // climb snaps
-    // } else if (MathUtil.isNear(
-    // DriveConstants.CLIMB_ZONE_CENTER.getX(),
-    // RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
-    // 2)
-    // && MathUtil.isNear(
-    // DriveConstants.CLIMB_ZONE_CENTER.getY(),
-    // RobotState.getInstance().getEstimatedPose().getTranslation()
-    // .getY(),
-    // 2)
-    // && superstructure.getTargetState() == SuperstructureState.CLIMB) {
-    // swerve.setTargetHeading(new Rotation2d(Math.PI / 2));
-    // // default gradual far from reef snaps
-    // } else {
-    // swerve.setTargetHeading(
-    // RobotState.getInstance()
-    // .getEstimatedPose()
-    // .getTranslation()
-    // .minus(DriveConstants.REEF_TRANSLATION2D)
-    // .getAngle()
-    // .minus(
-    // DriverStation.getAlliance().isPresent()
-    // && DriverStation.getAlliance()
-    // .get() == Alliance.Red
-    // ? Rotation2d.kPi
-    // : Rotation2d.kZero));
-    // }
-    // }
-    // })
-    // .withName("Drive Teleop"));
+    swerve.setDefaultCommand(
+        swerve
+            .run(
+                () -> {
+                  swerve.driveTeleopController(
+                      -driverA.getLeftY(),
+                      -driverA.getLeftX(),
+                      driverA.getLeftTriggerAxis() - driverA.getRightTriggerAxis(),
+                      superstructure.getElevatorPosition() > 3
+                          ? 3
+                          : DriveConstants.DRIVE_CONFIG.maxLinearAcceleration());
+                  if (Math.abs(driverA.getLeftTriggerAxis()) > 0.1
+                      || Math.abs(driverA.getRightTriggerAxis()) > 0.1) {
+                    swerve.clearHeadingControl();
+                  } else if (autoAngle) {
+                    // Station snaps
+                    if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.RIGHT_CORNER)
+                        < 3) {
+                      swerve.setTargetHeading(new Rotation2d(Math.toRadians(232)));
+                    } else if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.LEFT_CORNER)
+                        < 3) {
+                      swerve.setTargetHeading(new Rotation2d(Math.toRadians(128)));
+                      // close up reef snaps
+                    } else if (RobotState.getInstance()
+                            .getEstimatedPose()
+                            .getTranslation()
+                            .getDistance(DriveConstants.REEF_TRANSLATION2D)
+                        < 2) {
+                      swerve.setTargetHeading(
+                          DriverStation.getAlliance().isPresent()
+                                  && DriverStation.getAlliance().get() == Alliance.Red
+                              ? calculateSnapTargetHeading(
+                                  RobotState.getInstance()
+                                      .getEstimatedPose()
+                                      .getTranslation()
+                                      .minus(DriveConstants.REEF_TRANSLATION2D)
+                                      .getAngle())
+                              : FlippingUtil.flipFieldRotation(
+                                  calculateSnapTargetHeading(
+                                      RobotState.getInstance()
+                                          .getEstimatedPose()
+                                          .getTranslation()
+                                          .minus(DriveConstants.REEF_TRANSLATION2D)
+                                          .getAngle())));
+                      // climb snaps
+                    } else if (MathUtil.isNear(
+                            DriveConstants.CLIMB_ZONE_CENTER.getX(),
+                            RobotState.getInstance().getEstimatedPose().getTranslation().getX(),
+                            2)
+                        && MathUtil.isNear(
+                            DriveConstants.CLIMB_ZONE_CENTER.getY(),
+                            RobotState.getInstance().getEstimatedPose().getTranslation().getY(),
+                            2)
+                        && superstructure.getTargetState() == SuperstructureState.CLIMB) {
+                      swerve.setTargetHeading(new Rotation2d(Math.PI / 2));
+                      // default gradual far from reef snaps
+                    } else {
+                      swerve.setTargetHeading(
+                          RobotState.getInstance()
+                              .getEstimatedPose()
+                              .getTranslation()
+                              .minus(DriveConstants.REEF_TRANSLATION2D)
+                              .getAngle()
+                              .minus(
+                                  DriverStation.getAlliance().isPresent()
+                                          && DriverStation.getAlliance().get() == Alliance.Red
+                                      ? Rotation2d.kPi
+                                      : Rotation2d.kZero));
+                    }
+                  }
+                })
+            .withName("Drive Teleop"));
     //
     // new Trigger(
     // () -> (Math.abs(driverA.getRightY()) > 0.2) || (Math.abs(driverA.getRightX())
@@ -819,5 +846,17 @@ public class RobotContainer {
       }
     }
     return new Rotation2d(Math.toRadians(closest));
+  }
+
+  public void updateSimulation() {
+    if (Constants.getRobotMode() != Constants.Mode.SIM) return;
+
+    SimulatedArena.getInstance().simulationPeriodic();
+    Logger.recordOutput(
+        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }

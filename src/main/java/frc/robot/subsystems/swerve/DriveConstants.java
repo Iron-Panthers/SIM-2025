@@ -1,5 +1,9 @@
 package frc.robot.subsystems.swerve;
 
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.*;
 
 import com.pathplanner.lib.config.PIDConstants;
@@ -15,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -22,6 +27,9 @@ import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.ArrayList;
 import java.util.List;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 public class DriveConstants {
   // measures in meters (per sec) and radians (per sec)
@@ -135,10 +143,29 @@ public class DriveConstants {
               CAN.at(9, "BL Drive"), CAN.at(10, "BL Steer"), 4, new Rotation2d(-1.8392), true, true)
         };
         case SIM -> new ModuleConfig[] {
-          new ModuleConfig(0, 0, 0, new Rotation2d(0), true, false),
-          new ModuleConfig(0, 0, 0, new Rotation2d(0), true, true),
-          new ModuleConfig(0, 0, 0, new Rotation2d(0), true, false),
-          new ModuleConfig(0, 0, 0, new Rotation2d(0), true, true)
+          new ModuleConfig(
+              CAN.at(19, "FL Drive"),
+              CAN.at(18, "FL Steer"),
+              2,
+              new Rotation2d(-1.148),
+              true,
+              false),
+          new ModuleConfig(
+              CAN.at(17, "FR Drive"),
+              CAN.at(16, "FR Steer"),
+              1,
+              new Rotation2d(-0.405),
+              true,
+              true),
+          new ModuleConfig(
+              CAN.at(21, "BL Drive"),
+              CAN.at(20, "BLSteer"),
+              3,
+              new Rotation2d(1.0139),
+              true,
+              false),
+          new ModuleConfig(
+              CAN.at(23, "BR Drive"), CAN.at(22, "BRSteer"), 4, new Rotation2d(-2.8148), true, true)
         };
       };
 
@@ -151,7 +178,14 @@ public class DriveConstants {
             (45.0 / 15) * (17.0 / 27) * (50.0 / 16), // MK4i L2.5 16 tooth
             150.0 / 7,
             3.125);
-        case PROG, SIM -> new ModuleConstants(
+        case SIM -> new ModuleConstants(
+            new Gains(0.25, 2.26, 0, 50, 0, 0),
+            new MotionProfileGains(4, 64, 640),
+            new Gains(0.16, 0.67, 0, 1.5, 0, 0),
+            (45.0 / 15) * (17.0 / 27) * (50.0 / 16), // MK4i L2.5 16 tooth
+            150.0 / 7,
+            3.125);
+        case PROG -> new ModuleConstants(
             new Gains(0.25, 2.26, 0, 50, 0, 0), // revisit kP
             new MotionProfileGains(4, 64, 640), // revisit all
             new Gains(0.3, 0.63, 0, 1.5, 0, 0), // FIXME placeholder, to do
@@ -166,6 +200,22 @@ public class DriveConstants {
             21.428571428571427,
             3.125);
       };
+  public static final DriveTrainSimulationConfig mapleSimConfig =
+      DriveTrainSimulationConfig.Default()
+          .withRobotMass(Kilograms.of(54.4311))
+          .withCustomModuleTranslations(MODULE_TRANSLATIONS)
+          .withGyro(COTS.ofPigeon2())
+          .withSwerveModule(
+              new SwerveModuleSimulationConfig(
+                  DCMotor.getKrakenX60(1),
+                  DCMotor.getKrakenX60(1),
+                  MODULE_CONSTANTS.driveReduction,
+                  MODULE_CONSTANTS.steerReduction,
+                  Volts.of(0.2),
+                  Volts.of(0.2),
+                  Meters.of(0.0550418), // FIXME: Need more accurate vals
+                  KilogramSquareMeters.of(0.004),
+                  1.2));
 
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
@@ -185,7 +235,7 @@ public class DriveConstants {
 
   public static final double[] REEF_SNAP_ANGLES = {-120, -60, 0, 60, 120, 180};
 
-  public static final Pose2d INITAL_POSE = new Pose2d(2.9, 3.8, new Rotation2d());
+  public static final Pose2d INITAL_POSE = new Pose2d(2.9, 3.8, new Rotation2d(1, 0));
 
   public static final PPHolonomicDriveController HOLONOMIC_DRIVE_CONTROLLER =
       new PPHolonomicDriveController(

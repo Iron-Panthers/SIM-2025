@@ -25,10 +25,10 @@ import frc.robot.subsystems.swerve.DriveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.DriveConstants.MotionProfileGains;
 import java.util.function.Supplier;
 
-public class ModuleIOTalonFX implements ModuleIO {
-  private final TalonFX driveTalon;
-  private final TalonFX steerTalon;
-  private final CANcoder encoder;
+public abstract class ModuleIOTalonFX implements ModuleIO {
+  protected final TalonFX driveTalon;
+  protected final TalonFX steerTalon;
+  protected final CANcoder encoder;
 
   private final StatusSignal<Angle> drivePosition;
   private final StatusSignal<AngularVelocity> driveVelocity;
