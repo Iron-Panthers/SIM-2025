@@ -14,6 +14,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
     super(
         new GenericSuperstructureConfiguration()
             .withID(CLIMB_CONFIG.motorID())
+            .withMotorDirection(MOTOR_DIRECTION)
             .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
             .withReduction(CLIMB_CONFIG.reduction())
             .withUpperVoltageLimit(UPPER_VOLT_LIMIT)
@@ -23,6 +24,7 @@ public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements Cli
             .withZeroingVoltageThreshold(ZEROING_VOLTAGE_THRESHOLD)
             .withCANCoderID(CLIMB_CONFIG.canCoderID())
             .withCANCoderDirection(CANCODER_DIRECTION)
+            .withCANCoderOffset(CLIMB_CONFIG.canCoderOffset())
             .withUpperExtensionLimit(UPPER_EXTENSION_LIMIT));
 
     setSlot0(

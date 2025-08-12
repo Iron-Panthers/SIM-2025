@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure.climb;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
@@ -32,7 +33,7 @@ public class ClimbConstants {
 
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
-  public static final boolean INVERT_MOTOR = false;
+  public static final InvertedValue MOTOR_DIRECTION = InvertedValue.CounterClockwise_Positive;
   public static final SensorDirectionValue CANCODER_DIRECTION =
       SensorDirectionValue.CounterClockwise_Positive;
 
