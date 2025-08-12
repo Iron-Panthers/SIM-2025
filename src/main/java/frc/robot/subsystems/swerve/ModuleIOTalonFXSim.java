@@ -7,20 +7,20 @@ import frc.robot.utility.PhoenixUtil;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
-    private final SwerveModuleSimulation simulation;
+  private final SwerveModuleSimulation simulation;
 
-    public ModuleIOTalonFXSim(ModuleConfig constants, SwerveModuleSimulation simulation) {
-        super(constants);
+  public ModuleIOTalonFXSim(ModuleConfig constants, SwerveModuleSimulation simulation) {
+    super(constants);
 
-        this.simulation = simulation;
-        simulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveTalon));
+    this.simulation = simulation;
+    simulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveTalon));
 
-        simulation.useSteerMotorController(
-                new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(steerTalon, encoder));
-    }
+    simulation.useSteerMotorController(
+        new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(steerTalon, encoder));
+  }
 
-    @Override
-    public void updateInputs(ModuleIOInputs inputs) {
-        super.updateInputs(inputs);
-    }
+  @Override
+  public void updateInputs(ModuleIOInputs inputs) {
+    super.updateInputs(inputs);
+  }
 }

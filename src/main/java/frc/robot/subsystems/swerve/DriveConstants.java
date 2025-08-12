@@ -43,7 +43,15 @@ public class DriveConstants {
             4.5,
             10,
             6);
-        case PROG, SIM -> new DrivebaseConfig(
+        case SIM -> new DrivebaseConfig(
+            Units.inchesToMeters(1.925),
+            Units.inchesToMeters(22.5),
+            Units.inchesToMeters(34),
+            Units.inchesToMeters(34),
+            4.5,
+            10,
+            6);
+        case PROG -> new DrivebaseConfig(
             Units.inchesToMeters(2),
             Units.inchesToMeters(22.5),
             Units.inchesToMeters(38.5),
@@ -213,14 +221,15 @@ public class DriveConstants {
                   MODULE_CONSTANTS.steerReduction,
                   Volts.of(0.2),
                   Volts.of(0.2),
-                  Meters.of(0.0550418), // FIXME: Need more accurate vals
-                  KilogramSquareMeters.of(0.004),
+                  Meters.of(DRIVE_CONFIG.wheelRadius()),
+                  KilogramSquareMeters.of(0.02),
                   1.2));
 
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
       switch (getRobotType()) {
         case COMP -> new TrajectoryFollowerConstants(
             new PIDConstants(8, 0), new PIDConstants(4, 0));
+        case SIM -> new TrajectoryFollowerConstants(new PIDConstants(8, 0), new PIDConstants(4, 0));
         case ALPHA -> new TrajectoryFollowerConstants(
             new PIDConstants(13, 0), new PIDConstants(11, 0));
         default -> new TrajectoryFollowerConstants(new PIDConstants(0, 0), new PIDConstants(0, 0));
@@ -229,6 +238,7 @@ public class DriveConstants {
   public static final HeadingControllerConstants HEADING_CONTROLLER_CONSTANTS =
       switch (getRobotType()) {
         case COMP -> new HeadingControllerConstants(6, 0, 5, 200, 0.002);
+        case SIM -> new HeadingControllerConstants(6, 0, 5, 200, 0.002);
         case ALPHA -> new HeadingControllerConstants(3, 0, 5, 200, 0.002);
         default -> new HeadingControllerConstants(0, 0, 0, 0, 0);
       };

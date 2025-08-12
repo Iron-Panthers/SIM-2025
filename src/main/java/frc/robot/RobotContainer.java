@@ -6,7 +6,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -151,7 +150,8 @@ public class RobotContainer {
         case SIM -> {
           driveSimulation =
               new SwerveDriveSimulation(
-                  DriveConstants.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+                  DriveConstants.mapleSimConfig, RobotState.getInstance().getEstimatedPose());
+          ;
           SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
           swerve =
               new Drive(

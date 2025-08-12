@@ -9,7 +9,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
-import org.ironmaple.simulation.motorsims.SimulatedBattery;
+import edu.wpi.first.wpilibj.RobotController;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public final class PhoenixUtil {
@@ -33,7 +33,7 @@ public final class PhoenixUtil {
         AngularVelocity encoderVelocity) {
       talonFXSimState.setRawRotorPosition(encoderAngle);
       talonFXSimState.setRotorVelocity(encoderVelocity);
-      talonFXSimState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage());
+      talonFXSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
       return talonFXSimState.getMotorVoltageMeasure();
     }
   }
