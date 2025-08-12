@@ -47,15 +47,6 @@ public interface GenericSuperstructureIO {
       double jerk,
       GravityTypeValue gravityTypeValue) {}
 
-  default void setCanCoderConfigs(
-      int canCoderID, double canCoderOffset, SensorDirectionValue direction) {}
-
-  default void setSecondMotorConfigs(int id2, boolean opposeFirst) {}
-
-  default void setUpperExtensionLimit(double upperLimit) {}
-
-  default void setLowerExtensionLimit(double lowerLimit) {}
-
   default void stop() {}
 
   default void setOffset() {}
