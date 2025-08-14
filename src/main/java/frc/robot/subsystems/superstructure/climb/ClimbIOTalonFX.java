@@ -7,10 +7,9 @@ import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
 import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import org.littletonrobotics.junction.AutoLogOutput;
 
-public class ClimbOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
+public class ClimbIOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
-  public ClimbOTalonFX() {
-
+  public ClimbIOTalonFX() {
     super(
         new GenericSuperstructureConfiguration()
             .withID(CLIMB_CONFIG.motorID())

@@ -15,7 +15,7 @@ public class PivotConstants {
   public static final PivotConfig PIVOT_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new PivotConfig(CAN.at(8, "Pivot"), CAN.at(28, "Pivot Encoder"), -0.278, 1);
-        case ALPHA -> new PivotConfig(15, 0, 0, 21.6 / 360);
+        case SIM -> new PivotConfig(1, Optional.empty(), Optional.empty(), 12 * 0.3750);
         default -> new PivotConfig(0, 0, 0, 1);
       };
 
@@ -23,12 +23,14 @@ public class PivotConstants {
       switch (Constants.getRobotType()) {
         case COMP -> new PIDGains(40, 0, 0, 0, 3.6144, 0.1807, 0.53);
         case ALPHA -> new PIDGains(1.5, 0, 0.01, 0.03, 0.09, 0, 0.51);
+        case SIM -> new PIDGains(40, 0, 0, 0, 3.6144, 0.1807, 0.53);
         default -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
       };
 
   public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new MotionMagicConfig(7.5, 10); // 3, 10
+        case SIM -> new MotionMagicConfig(7.5, 10); // 3, 10
         default -> new MotionMagicConfig(0, 0);
       };
 
@@ -62,11 +64,26 @@ public class PivotConstants {
   public static final double ZEROING_OFFSET = 0; // offset in degrees
   public static final double ZEROING_VOLTAGE_THRESHOLD = 5;
   public static final double ZEROING_HIGH_THRESHOLD =
-      -70.0; // the position where if the pivot is over, the pivot will go up before zeroing
+      -70.0; // the position where if the pivot is over, the pivot
+  // will go up before zeroing
 
   // PIVOT POSITION CONSTANTS
   public static final Transform3d ELEVATOR_TO_PIVOT_TRANSFORM =
       new Transform3d(
           new Translation3d(inchesToMeters(-3.5), inchesToMeters(0d), inchesToMeters(33.875)),
           new Rotation3d(0, 0, 0));
+
+  // PHYSICAL CONSTANTS
+  public static record PivotPhysicalConstants(
+      double momentOfInertia,
+      double lengthMeters,
+      double minAngleRads,
+      double maxAngleRads,
+      boolean simulateGravity) {}
+
+  public static final PivotPhysicalConstants PHYSICAL_CONSTANTS =
+      switch (Constants.getRobotType()) {
+        case SIM -> new PivotPhysicalConstants(0.02, 0.706747, -1000.0, 1000, true);
+        case COMP, ALPHA, PROG -> new PivotPhysicalConstants(0.1, 0, 0, 0, false);
+      };
 }
