@@ -222,7 +222,7 @@ public class DriveConstants {
                   Volts.of(0.2),
                   Volts.of(0.2),
                   Meters.of(DRIVE_CONFIG.wheelRadius()),
-                  KilogramSquareMeters.of(0.01),
+                  KilogramSquareMeters.of(0.04),
                   1.2));
 
   public static final TrajectoryFollowerConstants TRAJECTORY_CONFIG =
