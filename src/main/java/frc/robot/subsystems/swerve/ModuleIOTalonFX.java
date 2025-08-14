@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import static frc.robot.subsystems.swerve.DriveConstants.DRIVE_CONFIG;
 import static frc.robot.subsystems.swerve.DriveConstants.MODULE_CONSTANTS;
+import static frc.robot.utility.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -25,10 +26,10 @@ import frc.robot.subsystems.swerve.DriveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.DriveConstants.MotionProfileGains;
 import java.util.function.Supplier;
 
-public class ModuleIOTalonFX implements ModuleIO {
-  private final TalonFX driveTalon;
-  private final TalonFX steerTalon;
-  private final CANcoder encoder;
+public abstract class ModuleIOTalonFX implements ModuleIO {
+  protected final TalonFX driveTalon;
+  protected final TalonFX steerTalon;
+  protected final CANcoder encoder;
 
   private final StatusSignal<Angle> drivePosition;
   private final StatusSignal<AngularVelocity> driveVelocity;
@@ -56,20 +57,25 @@ public class ModuleIOTalonFX implements ModuleIO {
     steerTalon = new TalonFX(config.steerID());
     encoder = new CANcoder(config.encoderID());
 
-    // config
-    encoderConfig.MagnetSensor.MagnetOffset = -config.absoluteEncoderOffset().getRotations();
-
+    // Drive Config
     driveConfig.CurrentLimits.StatorCurrentLimit = 80; // FIXME
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    steerConfig.CurrentLimits.StatorCurrentLimit = 50; // FIXME
-    steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-
+    driveConfig.Feedback.SensorToMechanismRatio = MODULE_CONSTANTS.driveReduction();
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted =
         config.driveInverted()
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
+
+    setDriveGains(MODULE_CONSTANTS.driveGains());
+
+    tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
+    tryUntilOk(5, () -> driveTalon.setPosition(0.0, 0.25));
+
+    // Steer Config
+    steerConfig.CurrentLimits.StatorCurrentLimit = 50; // FIXME
+    steerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
     steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     steerConfig.MotorOutput.Inverted =
@@ -77,16 +83,16 @@ public class ModuleIOTalonFX implements ModuleIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
 
-    driveConfig.Feedback.SensorToMechanismRatio = MODULE_CONSTANTS.driveReduction();
     steerConfig.ClosedLoopGeneral.ContinuousWrap = true;
     steerConfig.Feedback.FeedbackRemoteSensorID = config.encoderID();
     steerConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
 
-    setDriveGains(MODULE_CONSTANTS.driveGains());
     setSteerGains(MODULE_CONSTANTS.steerGains(), MODULE_CONSTANTS.steerMotionGains());
 
-    driveTalon.getConfigurator().apply(driveConfig);
-    steerTalon.getConfigurator().apply(steerConfig);
+    tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerConfig, 0.25));
+
+    // Encoder Config
+    encoderConfig.MagnetSensor.MagnetOffset = -config.absoluteEncoderOffset().getRotations();
     encoder.getConfigurator().apply(encoderConfig);
 
     // canbus optimization

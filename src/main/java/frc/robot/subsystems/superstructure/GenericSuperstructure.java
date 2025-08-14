@@ -3,7 +3,7 @@ package frc.robot.subsystems.superstructure;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
-public class GenericSuperstructure<G extends GenericSuperstructure.PositionTarget> {
+public abstract class GenericSuperstructure<G extends GenericSuperstructure.PositionTarget> {
   public interface PositionTarget {
     double getPosition();
 

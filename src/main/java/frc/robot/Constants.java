@@ -26,7 +26,7 @@ public final class Constants {
 
   public static final Pose3d MECHANISM_ROOT_POSE = Pose3d.kZero;
 
-  public static RobotType ROBOT_TYPE = RobotType.COMP;
+  public static RobotType ROBOT_TYPE = RobotType.SIM;
 
   /* running mode of robot */
   public static Mode getRobotMode() {
