@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-public abstract class GenericRollersIOTalonFX implements GenericRollersIO {
+public abstract class GenericRollersIOSim implements GenericRollersIO {
     private final TalonFX talon;
 
     private final StatusSignal<Angle> position;
@@ -27,7 +27,7 @@ public abstract class GenericRollersIOTalonFX implements GenericRollersIO {
 
     private final double mechanismReduction;
 
-    public GenericRollersIOTalonFX(
+    public GenericRollersIOSim(
             int id, int currentLimitAmps, boolean inverted, boolean brake, double reduction) {
         talon = new TalonFX(id);
 
