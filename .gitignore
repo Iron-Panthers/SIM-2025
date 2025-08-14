@@ -138,6 +138,7 @@ $RECYCLE.BIN/
 ### Gradle ###
 .gradle
 /build/
+/ctre_sim/
 
 # Ignore Gradle GUI config
 gradle-app.setting
