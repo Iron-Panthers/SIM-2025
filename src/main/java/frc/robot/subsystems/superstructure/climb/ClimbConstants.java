@@ -11,7 +11,7 @@ public class ClimbConstants {
   public static final ClimbConfig CLIMB_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new ClimbConfig(CAN.at(37, "Climb Motor"), 2.5, 45, 0.201);
-        case SIM -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201));
+        case SIM -> new ClimbConfig(37, 2.5, 45, 0.201);
         default -> new ClimbConfig(0, 1, 0, 0d);
       };
 

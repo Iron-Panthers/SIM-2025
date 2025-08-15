@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -32,6 +33,12 @@ public abstract class GenericSuperstructureIOTalonFX implements GenericSuperstru
   private final StatusSignal<Voltage> appliedVolts;
   private final StatusSignal<Current> supplyCurrent;
   private final StatusSignal<Temperature> temp;
+
+  private final StatusSignal<Angle> positionRotations2;
+  private final StatusSignal<AngularVelocity> velocityRPS2;
+  private final StatusSignal<Voltage> appliedVolts2;
+  private final StatusSignal<Current> supplyCurrent2;
+  private final StatusSignal<Temperature> temp2;
 
   // zeroing stuff
   private final double zeroingVolts;
@@ -104,6 +111,23 @@ public abstract class GenericSuperstructureIOTalonFX implements GenericSuperstru
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50, positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp);
+
+    if (talon2.isPresent()) {
+      velocityRPS2 = talon2.get().getVelocity();
+      appliedVolts2 = talon2.get().getMotorVoltage();
+      supplyCurrent2 = talon2.get().getSupplyCurrent();
+      temp2 = talon2.get().getDeviceTemp();
+      positionRotations2 = talon2.get().getPosition();
+
+      BaseStatusSignal.setUpdateFrequencyForAll(
+          50, positionRotations2, velocityRPS2, appliedVolts2, supplyCurrent2, temp2);
+    } else {
+      velocityRPS2 = null;
+      appliedVolts2 = null;
+      supplyCurrent2 = null;
+      temp2 = null;
+      positionRotations2 = null;
+    }
   }
 
   @Override

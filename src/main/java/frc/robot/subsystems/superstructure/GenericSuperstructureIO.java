@@ -1,7 +1,6 @@
 package frc.robot.subsystems.superstructure;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GenericSuperstructureIO {
