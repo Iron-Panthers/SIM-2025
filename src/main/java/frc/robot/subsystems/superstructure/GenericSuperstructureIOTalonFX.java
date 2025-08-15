@@ -23,190 +23,145 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.Optional;
 
 public abstract class GenericSuperstructureIOTalonFX implements GenericSuperstructureIO {
-  protected final TalonFX talon;
-  protected Optional<TalonFX> talon2 = Optional.empty();
+    protected final TalonFX talon;
 
-  private final TalonFXConfiguration config = new TalonFXConfiguration();
+    protected final TalonFXConfiguration config = new TalonFXConfiguration();
 
-  private final StatusSignal<Angle> positionRotations;
-  private final StatusSignal<AngularVelocity> velocityRPS;
-  private final StatusSignal<Voltage> appliedVolts;
-  private final StatusSignal<Current> supplyCurrent;
-  private final StatusSignal<Temperature> temp;
+    private final StatusSignal<Angle> positionRotations;
+    private final StatusSignal<AngularVelocity> velocityRPS;
+    private final StatusSignal<Voltage> appliedVolts;
+    private final StatusSignal<Current> supplyCurrent;
+    private final StatusSignal<Temperature> temp;
 
-  private final StatusSignal<Angle> positionRotations2;
-  private final StatusSignal<AngularVelocity> velocityRPS2;
-  private final StatusSignal<Voltage> appliedVolts2;
-  private final StatusSignal<Current> supplyCurrent2;
-  private final StatusSignal<Temperature> temp2;
+    // zeroing stuff
+    private final double zeroingVolts;
+    private final double zeroingOffset;
+    private final double zeroingVoltageThreshold;
 
-  // zeroing stuff
-  private final double zeroingVolts;
-  private final double zeroingOffset;
-  private final double zeroingVoltageThreshold;
+    protected final VoltageOut voltageOutput = new VoltageOut(0).withUpdateFreqHz(0);
+    private final NeutralOut neutralOutput = new NeutralOut();
+    private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0).withUpdateFreqHz(0);
 
-  protected final VoltageOut voltageOutput = new VoltageOut(0).withUpdateFreqHz(0);
-  private final NeutralOut neutralOutput = new NeutralOut();
-  private final MotionMagicVoltage positionControl = new MotionMagicVoltage(0).withUpdateFreqHz(0);
+    /** Constructs a new GenericSuperstructureIOTalonFX. */
+    public GenericSuperstructureIOTalonFX(GenericSuperstructureConfiguration superstructureConfig) {
+        // set the zeroing values such tha when the robot zeros it will apply the
+        // zeroing volts and
+        // when it reaches a resistance from part of the mechanism, it sets the position
+        // to the zeroing
+        // Offset
+        this.zeroingVolts = superstructureConfig.zeroingVolts;
+        this.zeroingOffset = superstructureConfig.zeroingOffset;
+        this.zeroingVoltageThreshold = superstructureConfig.zeroingVoltageThreshold;
 
-  /** Constructs a new GenericSuperstructureIOTalonFX. */
-  public GenericSuperstructureIOTalonFX(GenericSuperstructureConfiguration superstructureConfig) {
-    // set the zeroing values such tha when the robot zeros it will apply the
-    // zeroing volts and
-    // when it reaches a resistance from part of the mechanism, it sets the position
-    // to the zeroing
-    // Offset
-    this.zeroingVolts = superstructureConfig.zeroingVolts;
-    this.zeroingOffset = superstructureConfig.zeroingOffset;
-    this.zeroingVoltageThreshold = superstructureConfig.zeroingVoltageThreshold;
+        // VOLTAGE, LIMITS AND RATIO CONFIG
+        config.MotorOutput.Inverted = superstructureConfig.motorDirection;
+        config.CurrentLimits.SupplyCurrentLimit = superstructureConfig.supplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    // VOLTAGE, LIMITS AND RATIO CONFIG
-    config.MotorOutput.Inverted = superstructureConfig.motorDirection;
-    config.CurrentLimits.SupplyCurrentLimit = superstructureConfig.supplyCurrentLimit;
-    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+        config.Voltage.withPeakForwardVoltage(superstructureConfig.upperVoltLimit);
+        config.Voltage.withPeakReverseVoltage(superstructureConfig.lowerExtensionLimit);
+        config.Feedback.withSensorToMechanismRatio(superstructureConfig.reduction);
 
-    config.Voltage.withPeakForwardVoltage(superstructureConfig.upperVoltLimit);
-    config.Voltage.withPeakReverseVoltage(superstructureConfig.lowerExtensionLimit);
-    config.Feedback.withSensorToMechanismRatio(superstructureConfig.reduction);
+        config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+        config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
+                superstructureConfig.lowerExtensionLimit);
+        config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
+        config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
+                superstructureConfig.upperExtensionLimit);
 
-    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
-    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
-        superstructureConfig.lowerExtensionLimit);
-    config.SoftwareLimitSwitch.withReverseSoftLimitEnable(true);
-    config.SoftwareLimitSwitch.withReverseSoftLimitThreshold(
-        superstructureConfig.upperExtensionLimit);
+        talon = new TalonFX(superstructureConfig.id);
 
-    talon = new TalonFX(superstructureConfig.id);
+        if (superstructureConfig.canCoderID != 0) {
+            CANcoder canCoder = new CANcoder(superstructureConfig.canCoderID);
+            canCoder
+                    .getConfigurator()
+                    .apply(
+                            new CANcoderConfiguration()
+                                    .withMagnetSensor(
+                                            new MagnetSensorConfigs()
+                                                    .withAbsoluteSensorDiscontinuityPoint(0.5)
+                                                    .withSensorDirection(superstructureConfig.canCoderDirection)
+                                                    .withMagnetOffset(superstructureConfig.canCoderOffset)));
+            config.Feedback.withRemoteCANcoder(canCoder);
+        }
 
-    if (superstructureConfig.id2 != 0) {
-      talon2.get().getConfigurator().apply(config);
-      talon2.get().setNeutralMode(NeutralModeValue.Brake);
-      talon2.get().setControl(new Follower(talon.getDeviceID(), superstructureConfig.oposeFirst));
+        talon.getConfigurator().apply(config);
+        setOffset();
+        talon.setNeutralMode(NeutralModeValue.Brake);
+
+        // STATUS SIGNALS
+        velocityRPS = talon.getVelocity();
+        appliedVolts = talon.getMotorVoltage();
+        supplyCurrent = talon.getSupplyCurrent();
+        temp = talon.getDeviceTemp();
+        positionRotations = talon.getPosition();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                50, positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp);
+
     }
 
-    if (superstructureConfig.canCoderID != 0) {
-      CANcoder canCoder = new CANcoder(superstructureConfig.canCoderID);
-      canCoder
-          .getConfigurator()
-          .apply(
-              new CANcoderConfiguration()
-                  .withMagnetSensor(
-                      new MagnetSensorConfigs()
-                          .withAbsoluteSensorDiscontinuityPoint(0.5)
-                          .withSensorDirection(superstructureConfig.canCoderDirection)
-                          .withMagnetOffset(superstructureConfig.canCoderOffset)));
-      config.Feedback.withRemoteCANcoder(canCoder);
-    }
-
-    talon.getConfigurator().apply(config);
-    setOffset();
-    talon.setNeutralMode(NeutralModeValue.Brake);
-
-    // STATUS SIGNALS
-    velocityRPS = talon.getVelocity();
-    appliedVolts = talon.getMotorVoltage();
-    supplyCurrent = talon.getSupplyCurrent();
-    temp = talon.getDeviceTemp();
-    positionRotations = talon.getPosition();
-
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50, positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp);
-
-    if (talon2.isPresent()) {
-      velocityRPS2 = talon2.get().getVelocity();
-      appliedVolts2 = talon2.get().getMotorVoltage();
-      supplyCurrent2 = talon2.get().getSupplyCurrent();
-      temp2 = talon2.get().getDeviceTemp();
-      positionRotations2 = talon2.get().getPosition();
-
-      BaseStatusSignal.setUpdateFrequencyForAll(
-          50, positionRotations2, velocityRPS2, appliedVolts2, supplyCurrent2, temp2);
-    } else {
-      velocityRPS2 = null;
-      appliedVolts2 = null;
-      supplyCurrent2 = null;
-      temp2 = null;
-      positionRotations2 = null;
-    }
-  }
-
-  @Override
-  public void updateInputs(GenericSuperstructureIOInputs inputs) {
-    inputs.connected =
-        BaseStatusSignal.refreshAll(
+    @Override
+    public void updateInputs(GenericSuperstructureIOInputs inputs) {
+        inputs.connected = BaseStatusSignal.refreshAll(
                 positionRotations, velocityRPS, appliedVolts, supplyCurrent, temp)
-            .isOK();
-    inputs.positionRotations = positionRotations.getValueAsDouble();
-    inputs.velocityRotPerSec = velocityRPS.getValueAsDouble();
-    inputs.appliedVolts = appliedVolts.getValueAsDouble();
-    inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
-    inputs.tempCelsius = temp.getValueAsDouble();
-  }
-
-  @Override
-  public void updateSecondaryInputs(GenericSuperstructureIOInputsMotor2 inputs) {
-    if (talon2.isPresent()) {
-      inputs.connected2 =
-          BaseStatusSignal.refreshAll(
-                  positionRotations2, velocityRPS2, appliedVolts2, supplyCurrent2, temp2)
-              .isOK();
-      inputs.positionRotations2 = positionRotations2.getValueAsDouble();
-      inputs.velocityRotPerSec2 = velocityRPS2.getValueAsDouble();
-      inputs.appliedVolts2 = appliedVolts2.getValueAsDouble();
-      inputs.supplyCurrentAmps2 = supplyCurrent2.getValueAsDouble();
-      inputs.tempCelsius2 = temp2.getValueAsDouble();
+                .isOK();
+        inputs.positionRotations = positionRotations.getValueAsDouble();
+        inputs.velocityRotPerSec = velocityRPS.getValueAsDouble();
+        inputs.appliedVolts = appliedVolts.getValueAsDouble();
+        inputs.supplyCurrentAmps = supplyCurrent.getValueAsDouble();
+        inputs.tempCelsius = temp.getValueAsDouble();
     }
-  }
 
-  @Override
-  public void runPosition(double rotations) {
-    talon.setControl(positionControl.withPosition(rotations));
-  }
+    @Override
+    public void runPosition(double rotations) {
+        talon.setControl(positionControl.withPosition(rotations));
+    }
 
-  @Override
-  public void runCharacterization() {
-    talon.setControl(voltageOutput.withOutput(zeroingVolts));
-  }
+    @Override
+    public void runCharacterization() {
+        talon.setControl(voltageOutput.withOutput(zeroingVolts));
+    }
 
-  @Override
-  public void stop() {
-    talon.setControl(neutralOutput);
-  }
+    @Override
+    public void stop() {
+        talon.setControl(neutralOutput);
+    }
 
-  @Override
-  public void setOffset() {
-    talon.getConfigurator().setPosition(zeroingOffset);
-  }
+    @Override
+    public void setOffset() {
+        talon.getConfigurator().setPosition(zeroingOffset);
+    }
 
-  @Override
-  public void setSlot0(
-      double kP,
-      double kI,
-      double kD,
-      double kS,
-      double kV,
-      double kA,
-      double kG,
-      double motionMagicAcceleration,
-      double motionMagicCruiseVelocity,
-      double motionMagicJerk,
-      GravityTypeValue gravityTypeValue) {
-    Slot0Configs gainsConfig = new Slot0Configs();
-    gainsConfig.kP = kP;
-    gainsConfig.kI = kI;
-    gainsConfig.kD = kD;
-    gainsConfig.kS = kS;
-    gainsConfig.kV = kV;
-    gainsConfig.kA = kA;
-    gainsConfig.kG = kG;
-    gainsConfig.GravityType = gravityTypeValue;
+    @Override
+    public void setSlot0(
+            double kP,
+            double kI,
+            double kD,
+            double kS,
+            double kV,
+            double kA,
+            double kG,
+            double motionMagicAcceleration,
+            double motionMagicCruiseVelocity,
+            double motionMagicJerk,
+            GravityTypeValue gravityTypeValue) {
+        Slot0Configs gainsConfig = new Slot0Configs();
+        gainsConfig.kP = kP;
+        gainsConfig.kI = kI;
+        gainsConfig.kD = kD;
+        gainsConfig.kS = kS;
+        gainsConfig.kV = kV;
+        gainsConfig.kA = kA;
+        gainsConfig.kG = kG;
+        gainsConfig.GravityType = gravityTypeValue;
 
-    MotionMagicConfigs motionMagicConfig = new MotionMagicConfigs();
-    motionMagicConfig.MotionMagicAcceleration = motionMagicAcceleration;
-    motionMagicConfig.MotionMagicCruiseVelocity = motionMagicCruiseVelocity;
-    motionMagicConfig.MotionMagicJerk = motionMagicJerk;
+        MotionMagicConfigs motionMagicConfig = new MotionMagicConfigs();
+        motionMagicConfig.MotionMagicAcceleration = motionMagicAcceleration;
+        motionMagicConfig.MotionMagicCruiseVelocity = motionMagicCruiseVelocity;
+        motionMagicConfig.MotionMagicJerk = motionMagicJerk;
 
-    talon.getConfigurator().apply(gainsConfig);
-    talon.getConfigurator().apply(motionMagicConfig);
-  }
+        talon.getConfigurator().apply(gainsConfig);
+        talon.getConfigurator().apply(motionMagicConfig);
+    }
 }
