@@ -34,6 +34,7 @@ import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
+import frc.robot.subsystems.rollers.intake.IntakeIOSim;
 import frc.robot.subsystems.superstructure.ClimbController;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
@@ -180,6 +181,7 @@ public class RobotContainer {
           pivot = new Pivot(new PivotIOSim());
           tongue = new Tongue(new TongueIOSim());
           climb = new Climb(new ClimbIOSim());
+          intake = new Intake(new IntakeIOSim());
         }
       }
     }
