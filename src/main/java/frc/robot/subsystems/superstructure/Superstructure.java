@@ -164,8 +164,6 @@ public class Superstructure extends SubsystemBase {
     this.pivot = pivot;
     this.tongue = tongue;
 
-    elevator.enableSecondaryMotorLogging();
-
     pivot.setPositionTarget(PivotTarget.STOW);
     elevator.setPositionTarget(ElevatorTarget.BOTTOM);
     tongue.setPositionTarget(TongueTarget.STOW);

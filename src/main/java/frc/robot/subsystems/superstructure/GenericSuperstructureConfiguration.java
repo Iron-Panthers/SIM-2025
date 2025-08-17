@@ -24,25 +24,46 @@ public class GenericSuperstructureConfiguration {
      * @return itself
      */
     public GenericSuperstructureConfiguration withID(int id) {
-        this.id = id;
-        return this;
-    }
+    this.id = id;
+    return this;
+  }
 
-    /**
-     * The absolute maximum amount of supply current allowed.
-     *
-     * <p>
-     * Supply current limits commonly range from 20-80 A depending on the breaker
-     * used.
-     *
-     * <ul>
-     * <li><b>Minimum Value:</b> 0.0
-     * <li><b>Maximum Value:</b> 800.0
-     * <li><b>Default Value:</b> 70
-     * <li><b>Units:</b> A
-     * </ul>
-     */
-    public double supplyCurrentLimit = 70;
+  /**
+   * Direction of the motor when it is moving in the positive direction, as seen from the front
+   *
+   * <ul>
+   *   <li><b>Default Value:</b> Clockwise_Positive
+   * </ul>
+   */
+  public InvertedValue motorDirection = InvertedValue.Clockwise_Positive;
+
+  /**
+   * Direction of the motor when it is moving in the positive direction, as seen from the front
+   *
+   * <ul>
+   *   <li><b>Default Value:</b> Clockwise_Positive
+   * </ul>
+   *
+   * @return itself
+   */
+  public GenericSuperstructureConfiguration withMotorDirection(InvertedValue motorDirection) {
+    this.motorDirection = motorDirection;
+    return this;
+  }
+
+  /**
+   * The absolute maximum amount of supply current allowed.
+   *
+   * <p>Supply current limits commonly range from 20-80 A depending on the breaker used.
+   *
+   * <ul>
+   *   <li><b>Minimum Value:</b> 0.0
+   *   <li><b>Maximum Value:</b> 800.0
+   *   <li><b>Default Value:</b> 70
+   *   <li><b>Units:</b> A
+   * </ul>
+   */
+  public double supplyCurrentLimit = 70;
 
     /**
      * The absolute maximum amount of supply current allowed.
