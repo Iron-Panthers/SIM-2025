@@ -51,7 +51,8 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
 
   private double filteredSupplyCurrentAmps = 0;
 
-  private GenericSuperstructureIOInputsMotor2AutoLogged inputs2 = null;
+  private GenericSuperstructureIOInputsMotor2AutoLogged inputs2 =
+      new GenericSuperstructureIOInputsMotor2AutoLogged();
 
   private boolean zeroing = false;
 

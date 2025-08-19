@@ -170,12 +170,6 @@ public class RobotContainer {
                       DriveConstants.MODULE_CONFIGS[2], driveSimulation.getModules()[2]),
                   new ModuleIOTalonFXSim(
                       DriveConstants.MODULE_CONFIGS[3], driveSimulation.getModules()[3]));
-          // swerve = new Drive(
-          // new GyroIOPigeon2(),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
           elevator = new Elevator(new ElevatorIOSim());
           pivot = new Pivot(new PivotIOSim());
           tongue = new Tongue(new TongueIOSim());
