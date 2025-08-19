@@ -1,5 +1,5 @@
 package frc.robot.subsystems.superstructure.pivot;
 
-import frc.robot.subsystems.superstructure.GenericSuperstructureIO;
+import frc.robot.lib.generic_subsystems.superstructure.*;
 
 public interface PivotIO extends GenericSuperstructureIO {}

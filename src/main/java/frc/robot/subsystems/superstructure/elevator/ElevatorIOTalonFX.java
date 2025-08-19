@@ -13,8 +13,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
+import frc.robot.lib.generic_subsystems.superstructure.*;
 
 public class ElevatorIOTalonFX extends GenericSuperstructureIOTalonFX implements ElevatorIO {
     private final StatusSignal<Angle> positionRotations2;
