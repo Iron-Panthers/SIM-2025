@@ -1,4 +1,4 @@
-package frc.robot.subsystems.superstructure;
+package frc.robot.lib.generic_subsystems.superstructure;
 
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;

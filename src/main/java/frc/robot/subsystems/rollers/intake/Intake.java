@@ -1,6 +1,6 @@
 package frc.robot.subsystems.rollers.intake;
 
-import frc.robot.subsystems.rollers.GenericRollers;
+import frc.robot.lib.generic_subsystems.rollers.*;
 
 public class Intake extends GenericRollers<Intake.Target> {
   public enum Target implements GenericRollers.VoltageTarget {

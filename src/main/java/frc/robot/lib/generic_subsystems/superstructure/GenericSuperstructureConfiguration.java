@@ -1,4 +1,4 @@
-package frc.robot.subsystems.superstructure;
+package frc.robot.lib.generic_subsystems.superstructure;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;

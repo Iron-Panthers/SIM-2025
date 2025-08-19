@@ -1,4 +1,4 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.rollers.sensors;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -8,5 +8,5 @@ public interface RollerSensorsIO {
     public boolean intakeDetected = false;
   }
 
-  default void updateInputs(RollerSensorsIOInputs inputs) {}
+  public void updateInputs(RollerSensorsIOInputs inputs);
 }
