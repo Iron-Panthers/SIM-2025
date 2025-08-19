@@ -3,12 +3,11 @@ package frc.robot.subsystems.rollers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.lib.generic_subsystems.rollers.*;
 import frc.robot.subsystems.rollers.intake.Intake;
+import frc.robot.subsystems.rollers.sensors.*;
 import org.littletonrobotics.junction.Logger;
 
-import frc.robot.subsystems.rollers.sensors.*;
-
-import frc.robot.lib.generic_subsystems.rollers.*;
 public class Rollers extends SubsystemBase {
 
   public enum RollerState {

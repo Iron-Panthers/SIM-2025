@@ -1,10 +1,10 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb.climb_motor;
 
-import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
+import static frc.robot.subsystems.climb.climb_motor.ClimbConstants.*;
 
 import com.ctre.phoenix6.configs.VoltageConfigs;
-import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureConfiguration;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimbIOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {

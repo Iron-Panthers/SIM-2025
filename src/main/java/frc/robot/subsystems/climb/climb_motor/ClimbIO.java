@@ -1,5 +1,5 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb.climb_motor;
 
-import frc.robot.subsystems.superstructure.GenericSuperstructureIO;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureIO;
 
 public interface ClimbIO extends GenericSuperstructureIO {}

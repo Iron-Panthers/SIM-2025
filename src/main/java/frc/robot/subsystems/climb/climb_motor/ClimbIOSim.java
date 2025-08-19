@@ -1,9 +1,9 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb.climb_motor;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOSim;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureIOSim;
 
 public class ClimbIOSim extends GenericSuperstructureIOSim implements ClimbIO {
 
