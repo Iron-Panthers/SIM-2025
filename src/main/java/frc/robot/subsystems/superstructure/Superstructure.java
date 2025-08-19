@@ -163,6 +163,7 @@ public class Superstructure extends SubsystemBase {
     this.elevator = elevator;
     this.pivot = pivot;
     this.tongue = tongue;
+
     pivot.setPositionTarget(PivotTarget.STOW);
     elevator.setPositionTarget(ElevatorTarget.BOTTOM);
     tongue.setPositionTarget(TongueTarget.STOW);
@@ -175,7 +176,7 @@ public class Superstructure extends SubsystemBase {
         mechanismRoot2d.append(
             new LoggedMechanismLigament2d(
                 "elevator",
-                ElevatorConstants.UPPER_EXTENSION_LIMIT.orElse(0.0)
+                ElevatorConstants.UPPER_EXTENSION_LIMIT
                     * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
                 90,
                 6,
@@ -539,7 +540,7 @@ public class Superstructure extends SubsystemBase {
   public boolean superstructureReachedTarget() {
     boolean output =
         (elevator.reachedTarget()
-                // && pivot.reachedTarget()
+                && pivot.reachedTarget()
                 && currentState != SuperstructureState.ZERO)
             || overrideIsAtTarget;
 

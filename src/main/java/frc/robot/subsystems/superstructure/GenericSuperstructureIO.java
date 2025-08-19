@@ -15,7 +15,19 @@ public interface GenericSuperstructureIO {
     public boolean zeroing = false;
   }
 
+  @AutoLog
+  class GenericSuperstructureIOInputsMotor2 {
+    public boolean connected2 = true;
+    public double positionRotations2 = 0;
+    public double velocityRotPerSec2 = 0;
+    public double appliedVolts2 = 0;
+    public double supplyCurrentAmps2 = 0;
+    public double tempCelsius2 = 0;
+  }
+
   default void updateInputs(GenericSuperstructureIOInputs inputs) {}
+
+  default void updateSecondaryInputs(GenericSuperstructureIOInputsMotor2 inputs) {}
 
   default void runPosition(double position) {}
 
