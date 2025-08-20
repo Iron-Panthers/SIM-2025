@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import frc.robot.subsystems.superstructure.GenericSuperstructure;
+import frc.robot.lib.generic_subsystems.superstructure.*;
 import frc.robot.utility.LoggableMechanism3d;
 import org.littletonrobotics.junction.Logger;
 
@@ -51,6 +51,9 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
 
   private double filteredSupplyCurrentAmps = 0;
 
+  private GenericSuperstructureIOInputsMotor2AutoLogged inputs2 =
+      new GenericSuperstructureIOInputsMotor2AutoLogged();
+
   private boolean zeroing = false;
 
   public Elevator(ElevatorIO io) {
@@ -64,6 +67,8 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
 
   @Override
   public void periodic() {
+    superstructureIO.updateSecondaryInputs(inputs2);
+    Logger.processInputs(name, inputs2);
 
     super.periodic();
 

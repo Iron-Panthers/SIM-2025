@@ -1,8 +1,8 @@
-# 2025-offseason
-This is FRC-5026's robot code for the 2025 onseason ("REEFSCAPE").
+# SIM-2025
+This is FRC 5026's simulation development repository for all things robotics simulation
 
 ## Set-up
-- Clone the repo: ``git clone git@github.com:Iron-Panthers/2025-onseason``
+- Clone the repo: ``git clone git@github.com:Iron-Panthers/SIM-2025``
 - Install JDK-17
     - Windows: [https://www.oracle.com/java/technologies/downloads/](https://www.oracle.com/java/technologies/downloads/)
     - Linux: package manager of choice (pacman, apt, etc.)

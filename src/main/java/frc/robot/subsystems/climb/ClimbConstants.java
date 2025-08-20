@@ -1,49 +1,44 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import frc.robot.Constants;
+import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 import java.util.Optional;
 
 public class ClimbConstants {
   public static final ClimbConfig CLIMB_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201));
-        case PROG -> new ClimbConfig(0, 1, Optional.empty(), Optional.empty());
-        case ALPHA -> new ClimbConfig(0, 0, Optional.empty(), Optional.empty());
-        case SIM -> new ClimbConfig(37, 2.5, Optional.of(45), Optional.of(0.201));
+        case COMP -> new ClimbConfig(CAN.at(37, "Climb Motor"), 2.5, 45, 0.201);
+        case SIM -> new ClimbConfig(37, 2.5, 45, 0.201);
+        default -> new ClimbConfig(0, 1, 0, 0d);
       };
 
   public static final PIDGains GAINS =
       switch (Constants.getRobotType()) {
         case COMP -> new PIDGains(600, 0, 0, 0, 66.5, 5.714, 0);
-        case PROG -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
-        case ALPHA -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
         case SIM -> new PIDGains(600, 0, 0, 0, 66.5, 5.714, 0);
+        default -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
       };
 
   public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new MotionMagicConfig(2, 1, 0);
-        case PROG -> new MotionMagicConfig(0, 0, 0);
-        case ALPHA -> new MotionMagicConfig(0, 0, 0);
         case SIM -> new MotionMagicConfig(2, 1, 0);
+        default -> new MotionMagicConfig(0, 0, 0);
       };
 
-  public record ClimbConfig(
-      int motorID,
-      double reduction,
-      Optional<Integer> canCoderID,
-      Optional<Double> canCoderOffset) {}
+  public record ClimbConfig(int motorID, double reduction, int canCoderID, double canCoderOffset) {}
 
   public record PIDGains(
       double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
 
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
-  public static final boolean INVERT_MOTOR = false;
-  public static final Optional<SensorDirectionValue> CANCODER_DIRECTION =
-      Optional.of(SensorDirectionValue.CounterClockwise_Positive);
+  public static final InvertedValue MOTOR_DIRECTION = InvertedValue.CounterClockwise_Positive;
+  public static final SensorDirectionValue CANCODER_DIRECTION =
+      SensorDirectionValue.CounterClockwise_Positive;
 
   public static final double POSITION_TARGET_EPSILON = 0.03;
 
@@ -52,9 +47,7 @@ public class ClimbConstants {
   public record MotionMagicConfig(double acceleration, double cruiseVelocity, double jerk) {}
 
   // SOFT LIMITS
-  public static final Optional<Double> UPPER_EXTENSION_LIMIT =
-      Optional.of(121d); // top limit is 121 rotations
-  public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
+  public static final double UPPER_EXTENSION_LIMIT = 121d; // top limit is 121 rotations
 
   // CURRENT LIMITS
   public static final double UPPER_VOLT_LIMIT = 12;

@@ -1,11 +1,11 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb;
 
-import static frc.robot.subsystems.superstructure.climb.ClimbConstants.INDUCTION_PORT_NUMBER;
+import static frc.robot.subsystems.climb.ClimbConstants.INDUCTION_PORT_NUMBER;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructure;
 import frc.robot.subsystems.rgb.RGB.RGBMessages;
-import frc.robot.subsystems.superstructure.GenericSuperstructure;
 import org.littletonrobotics.junction.Logger;
 
 public class Climb extends GenericSuperstructure<Climb.ClimbTarget> {

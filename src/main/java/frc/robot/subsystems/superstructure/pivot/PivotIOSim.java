@@ -3,7 +3,7 @@ package frc.robot.subsystems.superstructure.pivot;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOSim;
+import frc.robot.lib.generic_subsystems.superstructure.*;
 
 public class PivotIOSim extends GenericSuperstructureIOSim implements PivotIO {
 
@@ -11,21 +11,6 @@ public class PivotIOSim extends GenericSuperstructureIOSim implements PivotIO {
   private final double reduction;
 
   public PivotIOSim() {
-    // int id,
-    // boolean inverted,
-    // double supplyCurrentLimit,
-    // Optional<Integer> canCoderID,
-    // Optional<Double> canCoderOffset,
-    // Optional<com.ctre.phoenix6.signals.SensorDirectionValue> direction,
-    // Optional<Double> sensorDiscontinuityPoint,
-    // double reduction,
-    // Optional<Double> upperLimit,
-    // Optional<Double> lowerLimit,
-    // double upperVoltLimit,
-    // double lowerVoltLimit,
-    // double zeroingVolts,
-    // double zeroingOffset,
-    // double zeroingVoltageThreshold) {
     super(PivotConstants.PIVOT_CONFIG.motorID());
 
     this.reduction = PivotConstants.PIVOT_CONFIG.reduction();
