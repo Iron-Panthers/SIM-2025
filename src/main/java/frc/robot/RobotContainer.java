@@ -179,6 +179,8 @@ public class RobotContainer {
           tongue = new Tongue(new TongueIOSim());
           climb = new Climb(new ClimbIOSim());
           intake = new Intake(new IntakeIOSim());
+
+          SimulatedArena.getInstance().resetFieldForAuto();
         }
       }
     }
@@ -228,14 +230,6 @@ public class RobotContainer {
       climb = new Climb(new ClimbIO() {});
     }
     climbController = new ClimbController(climb);
-
-    SimulatedArena.getInstance()
-        .addGamePiece(
-            new ReefscapeCoralOnField(
-                // We must specify a heading since the coral is a tube
-                new Pose2d(2, 2, Rotation2d.fromDegrees(90))));
-
-    SimulatedArena.getInstance().addGamePiece(new ReefscapeAlgaeOnField(new Translation2d(2, 2)));
 
     nameCommands();
 
