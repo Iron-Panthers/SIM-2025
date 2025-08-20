@@ -138,7 +138,6 @@ $RECYCLE.BIN/
 ### Gradle ###
 .gradle
 /build/
-/ctre_sim/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -182,3 +181,5 @@ src/main/java/frc/robot/BuildConstants.java
 .vscode/
 
 gradle.properties
+
+ctre_sim/
