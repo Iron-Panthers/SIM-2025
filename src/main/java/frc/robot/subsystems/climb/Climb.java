@@ -1,6 +1,6 @@
-package frc.robot.subsystems.climb.climb_motor;
+package frc.robot.subsystems.climb;
 
-import static frc.robot.subsystems.climb.climb_motor.ClimbConstants.INDUCTION_PORT_NUMBER;
+import static frc.robot.subsystems.climb.ClimbConstants.INDUCTION_PORT_NUMBER;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

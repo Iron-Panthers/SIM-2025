@@ -1,6 +1,6 @@
-package frc.robot.subsystems.climb.climb_motor;
+package frc.robot.subsystems.climb;
 
-import static frc.robot.subsystems.climb.climb_motor.ClimbConstants.*;
+import static frc.robot.subsystems.climb.ClimbConstants.*;
 
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureConfiguration;
