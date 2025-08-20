@@ -26,22 +26,22 @@ import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
 import frc.robot.subsystems.canWatchdog.CANWatchdog;
 import frc.robot.subsystems.canWatchdog.CANWatchdogIO;
+import frc.robot.subsystems.climb.ClimbController;
+import frc.robot.subsystems.climb.climb_motor.Climb;
+import frc.robot.subsystems.climb.climb_motor.Climb.ClimbTarget;
+import frc.robot.subsystems.climb.climb_motor.ClimbIO;
+import frc.robot.subsystems.climb.climb_motor.ClimbIOSim;
 import frc.robot.subsystems.rgb.RGB;
 import frc.robot.subsystems.rgb.RGB.RGBMessages;
 import frc.robot.subsystems.rgb.RGBIO;
-import frc.robot.subsystems.rollers.RollerSensorsIO;
 import frc.robot.subsystems.rollers.Rollers;
 import frc.robot.subsystems.rollers.Rollers.RollerState;
 import frc.robot.subsystems.rollers.intake.Intake;
 import frc.robot.subsystems.rollers.intake.IntakeIO;
 import frc.robot.subsystems.rollers.intake.IntakeIOSim;
-import frc.robot.subsystems.superstructure.ClimbController;
+import frc.robot.subsystems.rollers.sensors.RollerSensorsIO;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.Superstructure.SuperstructureState;
-import frc.robot.subsystems.superstructure.climb.Climb;
-import frc.robot.subsystems.superstructure.climb.Climb.ClimbTarget;
-import frc.robot.subsystems.superstructure.climb.ClimbIO;
-import frc.robot.subsystems.superstructure.climb.ClimbIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIO;
 import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
@@ -158,7 +158,6 @@ public class RobotContainer {
           driveSimulation =
               new SwerveDriveSimulation(
                   DriveConstants.mapleSimConfig, RobotState.getInstance().getEstimatedPose());
-          ;
           SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
           swerve =
               new Drive(
@@ -171,12 +170,6 @@ public class RobotContainer {
                       DriveConstants.MODULE_CONFIGS[2], driveSimulation.getModules()[2]),
                   new ModuleIOTalonFXSim(
                       DriveConstants.MODULE_CONFIGS[3], driveSimulation.getModules()[3]));
-          // swerve = new Drive(
-          // new GyroIOPigeon2(),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[0]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[1]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[2]),
-          // new ModuleIOTalonFX(DriveConstants.MODULE_CONFIGS[3]));
           elevator = new Elevator(new ElevatorIOSim());
           pivot = new Pivot(new PivotIOSim());
           tongue = new Tongue(new TongueIOSim());

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.superstructure;
+package frc.robot.lib.generic_subsystems.superstructure;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -30,6 +30,9 @@ public abstract class GenericSuperstructureIOSim implements GenericSuperstructur
   public void runPosition(double rotations) {
     talon.setControl(positionControl.withPosition(rotations));
   }
+
+  @Override
+  public abstract void updateInputs(GenericSuperstructureIOInputs inputs);
 
   @Override
   public void runCharacterization() {

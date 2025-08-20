@@ -6,7 +6,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.subsystems.rollers.GenericRollersIOSim;
+import frc.robot.lib.generic_subsystems.rollers.*;
 
 public class IntakeIOSim extends GenericRollersIOSim implements IntakeIO {
 

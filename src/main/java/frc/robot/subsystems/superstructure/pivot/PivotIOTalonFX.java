@@ -2,8 +2,7 @@ package frc.robot.subsystems.superstructure.pivot;
 
 import static frc.robot.subsystems.superstructure.pivot.PivotConstants.*;
 
-import frc.robot.subsystems.superstructure.GenericSuperstructureConfiguration;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
+import frc.robot.lib.generic_subsystems.superstructure.*;
 
 public class PivotIOTalonFX extends GenericSuperstructureIOTalonFX implements PivotIO {
 

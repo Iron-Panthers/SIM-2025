@@ -1,4 +1,4 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.lib.generic_subsystems.rollers;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -32,6 +32,9 @@ public abstract class GenericRollersIOSim implements GenericRollersIO {
 
     talon.optimizeBusUtilization();
   }
+
+  @Override
+  public abstract void updateInputs(GenericRollersIOInputs inputs);
 
   @Override
   public void runVolts(double volts) {
