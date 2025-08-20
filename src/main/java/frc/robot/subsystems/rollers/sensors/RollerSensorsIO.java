@@ -8,5 +8,5 @@ public interface RollerSensorsIO {
     public boolean intakeDetected = false;
   }
 
-  default void updateInputs(RollerSensorsIOInputs inputs) {}
+  public default void updateInputs(RollerSensorsIOInputs inputs) {}
 }
