@@ -1,33 +1,31 @@
-package frc.robot.subsystems.superstructure.climb;
+package frc.robot.subsystems.climb.climb_motor;
 
-import static frc.robot.subsystems.superstructure.climb.ClimbConstants.*;
+import static frc.robot.subsystems.climb.climb_motor.ClimbConstants.*;
 
 import com.ctre.phoenix6.configs.VoltageConfigs;
-import frc.robot.subsystems.superstructure.GenericSuperstructureIOTalonFX;
-import java.util.Optional;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureConfiguration;
+import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureIOTalonFX;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ClimbIOTalonFX extends GenericSuperstructureIOTalonFX implements ClimbIO {
 
   public ClimbIOTalonFX() {
     super(
-        CLIMB_CONFIG.motorID(),
-        Optional.empty(),
-        INVERT_MOTOR,
-        Optional.empty(),
-        SUPPLY_CURRENT_LIMIT,
-        CLIMB_CONFIG.canCoderID(),
-        CLIMB_CONFIG.canCoderOffset(),
-        CANCODER_DIRECTION,
-        SENSOR_DISCONTINUITY_POINT,
-        CLIMB_CONFIG.reduction(),
-        UPPER_EXTENSION_LIMIT,
-        LOWER_EXTENSION_LIMIT,
-        UPPER_VOLT_LIMIT,
-        LOWER_VOLT_LIMIT,
-        ZEROING_VOLTS,
-        ZEROING_OFFSET,
-        ZEROING_VOLTAGE_THRESHOLD);
+        new GenericSuperstructureConfiguration()
+            .withID(CLIMB_CONFIG.motorID())
+            .withMotorDirection(MOTOR_DIRECTION)
+            .withSupplyCurrentLimit(SUPPLY_CURRENT_LIMIT)
+            .withReduction(CLIMB_CONFIG.reduction())
+            .withUpperVoltageLimit(UPPER_VOLT_LIMIT)
+            .withLowerVoltageLimit(LOWER_VOLT_LIMIT)
+            .withZeroingVolts(ZEROING_VOLTS)
+            .withZeroingOffset(ZEROING_OFFSET)
+            .withZeroingVoltageThreshold(ZEROING_VOLTAGE_THRESHOLD)
+            .withCANCoderID(CLIMB_CONFIG.canCoderID())
+            .withCANCoderDirection(CANCODER_DIRECTION)
+            .withCANCoderOffset(CLIMB_CONFIG.canCoderOffset())
+            .withUpperExtensionLimit(UPPER_EXTENSION_LIMIT));
+
     setSlot0(
         GAINS.kP(),
         GAINS.kI(),

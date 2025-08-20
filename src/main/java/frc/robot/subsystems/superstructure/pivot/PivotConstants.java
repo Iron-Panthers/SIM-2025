@@ -3,43 +3,39 @@ package frc.robot.subsystems.superstructure.pivot;
 import static frc.robot.utility.UnitConversions.inchesToMeters;
 
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
-import java.util.Optional;
 
 public class PivotConstants {
   public static final PivotConfig PIVOT_CONFIG =
       switch (Constants.getRobotType()) {
-        case COMP -> new PivotConfig(
-            CAN.at(8, "Pivot"), Optional.of(CAN.at(28, "Pivot Encoder")), Optional.of(-0.278), 1);
-        case ALPHA -> new PivotConfig(15, Optional.empty(), Optional.empty(), 21.6 / 360);
-        case PROG -> new PivotConfig(0, Optional.empty(), Optional.empty(), 1);
-        case SIM -> new PivotConfig(1, Optional.empty(), Optional.empty(), 12 * 0.3750);
+        case COMP -> new PivotConfig(CAN.at(8, "Pivot"), CAN.at(28, "Pivot Encoder"), -0.278, 1);
+        case SIM -> new PivotConfig(
+            CAN.at(8, "Pivot"), CAN.at(28, "Pivot Encoder"), 0, 12 * 0.3750);
+        default -> new PivotConfig(0, 0, 0, 1);
       };
+
   public static final PIDGains GAINS =
       switch (Constants.getRobotType()) {
         case COMP -> new PIDGains(40, 0, 0, 0, 3.6144, 0.1807, 0.53);
         case ALPHA -> new PIDGains(1.5, 0, 0.01, 0.03, 0.09, 0, 0.51);
-        case PROG -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
         case SIM -> new PIDGains(40, 0, 0, 0, 3.6144, 0.1807, 0.53);
+        default -> new PIDGains(0, 0, 0, 0, 0, 0, 0);
       };
 
   public static final MotionMagicConfig MOTION_MAGIC_CONFIG =
       switch (Constants.getRobotType()) {
         case COMP -> new MotionMagicConfig(7.5, 10); // 3, 10
-        case PROG -> new MotionMagicConfig(0, 0);
-        case ALPHA -> new MotionMagicConfig(0, 0);
         case SIM -> new MotionMagicConfig(7.5, 10); // 3, 10
+        default -> new MotionMagicConfig(0, 0);
       };
 
-  public record PivotConfig(
-      int motorID,
-      Optional<Integer> canCoderID,
-      Optional<Double> canCoderOffset,
-      double reduction) {}
+  public record PivotConfig(int motorID, int canCoderID, double canCoderOffset, double reduction) {}
 
   public record PIDGains(
       double kP, double kI, double kD, double kS, double kV, double kA, double kG) {}
@@ -48,16 +44,16 @@ public class PivotConstants {
 
   public static final GravityTypeValue GRAVITY_TYPE = GravityTypeValue.Arm_Cosine;
 
-  public static final boolean INVERT_MOTOR = true;
+  public static final InvertedValue MOTOR_DIRECTION = InvertedValue.CounterClockwise_Positive;
+
+  public static final SensorDirectionValue CANCODER_DIRECTION =
+      SensorDirectionValue.Clockwise_Positive;
 
   public static final double POSITION_TARGET_EPSILON = 0.01;
   public static final double PIVOT_LENGTH = 25; // inches
 
   // SOFT LIMITS
-  public static final Optional<Double> UPPER_EXTENSION_LIMIT = Optional.of(0.465);
-  public static final Optional<Double> LOWER_EXTENSION_LIMIT = Optional.empty();
-
-  // top limit is 121 rotations
+  public static final double UPPER_EXTENSION_LIMIT = 0.465;
 
   // CURRENT LIMITS
   public static final double UPPER_VOLT_LIMIT = 4;
