@@ -1,4 +1,4 @@
-package frc.robot.subsystems.climb.climb_motor;
+package frc.robot.subsystems.climb;
 
 import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructureIO;
 
