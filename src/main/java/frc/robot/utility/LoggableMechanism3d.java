@@ -2,12 +2,31 @@ package frc.robot.utility;
 
 import edu.wpi.first.math.geometry.Pose3d;
 
+/**
+ * The {@code LoggableMechanism3d} interface represents a mechanism that can be logged and visualized
+ * in a 3D environment. Implementing classes must provide a method of storing the parent object and getting its display position
+ */
 public interface LoggableMechanism3d {
+
   /**
-   * Returns the 3D displayable object's position.
+   * Retrieves the position of the parent mechanism in the 3D scene.
    *
-   * @param parentPose3d the pose of the parent object in the 3D scene (if applicable)
-   * @return the 3D displayable object's position
+   * @return a {@link Pose3d} object representing the position of the parent mechanism.
    */
-  Pose3d getDisplayPose3d(Pose3d parentPose3d);
+  public Pose3d getParentPosition();
+
+  /**
+   * Sets the parent mechanism for this object.
+   *
+   * @param parent the parent mechanism, represented as a {@link LoggableMechanism3d}.
+   */
+  public void setParent(LoggableMechanism3d parent);
+
+  /*
+   * Calculates and returns the position of this mechanism in the 3D scene.
+   *
+   * @param parentPose3d the pose of the parent mechanism in the 3D scene (if applicable).
+   * @return a {@link Pose3d} object representing the position of this mechanism in the 3D scene.
+   */
+  public Pose3d getDisplayPose3d(Pose3d parentPose3d);
 }

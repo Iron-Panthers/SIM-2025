@@ -104,10 +104,17 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
         new Transform3d(
             new Translation3d(inchesToMeters(0), inchesToMeters(0), inchesToMeters(getPosition())),
             new Rotation3d(0, 0, 0))); // Placeholder,
-    // replace
-    // with
-    // actual
-    // pose
-    // logic
+  }
+
+  @Override
+  public Pose3d getParentPosition() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getParentPosition'");
+  }
+
+  @Override
+  public void setParent(LoggableMechanism3d parent) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setParent'");
   }
 }
