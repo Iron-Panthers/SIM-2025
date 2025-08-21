@@ -102,15 +102,20 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
   // ------ LOGGABLE MECHANISM METHODS ------
   @Override
   public Pose3d getDisplayPose3d() {
-    return getParentPosition().plus(ElevatorConstants.ELEVATOR_BASE_3D_OFFSET).plus(
-        new Transform3d(
-            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(getPosition())), // Add the current elevator's extension
-            new Rotation3d(0, 0, 0))); // The elevator doesn't rotate, duh
+    return getParentPosition()
+        .plus(ElevatorConstants.ELEVATOR_BASE_3D_OFFSET)
+        .plus(
+            new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(0),
+                    Units.inchesToMeters(getPosition())), // Add the current elevator's extension
+                new Rotation3d(0, 0, 0))); // The elevator doesn't rotate, duh
   }
 
   @Override
   public Pose3d getParentPosition() {
-    if(loggableMechanism3dParent != null){
+    if (loggableMechanism3dParent != null) {
       return loggableMechanism3dParent.getDisplayPose3d();
     }
     return new Pose3d();
@@ -121,7 +126,7 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     if (parent == null) {
       throw new IllegalArgumentException("Parent cannot be null");
     }
-    if (parent == this){
+    if (parent == this) {
       throw new IllegalArgumentException("Parent cannot be itself");
     }
     this.loggableMechanism3dParent = parent;

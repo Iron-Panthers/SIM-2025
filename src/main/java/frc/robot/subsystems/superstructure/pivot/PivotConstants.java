@@ -69,10 +69,12 @@ public class PivotConstants {
 
   // PIVOT POSITION CONSTANTS
   public static final Transform3d ELEVATOR_TO_PIVOT_TRANSFORM =
-  switch(Constants.getRobotType()){
-      default ->new Transform3d(
-          new Translation3d(Units.inchesToMeters(-3.5), Units.inchesToMeters(0d), Units.inchesToMeters(33.875)),
-          new Rotation3d(0, 0, 0));};
+      switch (Constants.getRobotType()) {
+        default -> new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(-3.5), Units.inchesToMeters(0d), Units.inchesToMeters(33.875)),
+            new Rotation3d(0, 0, 0));
+      };
 
   // PHYSICAL CONSTANTS
   public static record PivotPhysicalConstants(

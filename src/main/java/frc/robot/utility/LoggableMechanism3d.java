@@ -3,8 +3,9 @@ package frc.robot.utility;
 import edu.wpi.first.math.geometry.Pose3d;
 
 /**
- * The {@code LoggableMechanism3d} interface represents a mechanism that can be logged and visualized
- * in a 3D environment. Implementing classes must provide a method of storing the parent object and getting its display position
+ * The {@code LoggableMechanism3d} interface represents a mechanism that can be logged and
+ * visualized in a 3D environment. Implementing classes must provide a method of storing the parent
+ * object and getting its display position
  */
 public interface LoggableMechanism3d {
 

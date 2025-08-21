@@ -1,13 +1,10 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.lib.generic_subsystems.superstructure.GenericSuperstructure.ControlMode;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
 import frc.robot.subsystems.superstructure.elevator.Elevator.ElevatorTarget;
@@ -24,9 +21,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 public class Superstructure extends SubsystemBase {
 
@@ -410,7 +404,8 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput("Superstructure/Elevator reached target", elevator.reachedTarget());
     Logger.recordOutput("Superstructure/Pivot reached target", pivot.reachedTarget());
     Logger.recordOutput("Superstructure/Reached Target", superstructureReachedTarget());
-    Logger.recordOutput("Superstructure/Mechanism Poses/Elevator Pose", elevator.getDisplayPose3d());
+    Logger.recordOutput(
+        "Superstructure/Mechanism Poses/Elevator Pose", elevator.getDisplayPose3d());
     Logger.recordOutput("Superstructure/Mechanism Poses/Pivot Pose", pivot.getDisplayPose3d());
   }
 
