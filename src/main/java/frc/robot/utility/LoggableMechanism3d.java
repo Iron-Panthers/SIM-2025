@@ -25,8 +25,7 @@ public interface LoggableMechanism3d {
   /*
    * Calculates and returns the position of this mechanism in the 3D scene.
    *
-   * @param parentPose3d the pose of the parent mechanism in the 3D scene (if applicable).
    * @return a {@link Pose3d} object representing the position of this mechanism in the 3D scene.
    */
-  public Pose3d getDisplayPose3d(Pose3d parentPose3d);
+  public Pose3d getDisplayPose3d();
 }

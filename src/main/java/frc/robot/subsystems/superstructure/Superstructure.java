@@ -147,12 +147,6 @@ public class Superstructure extends SubsystemBase {
   private final Pivot pivot;
   private final Tongue tongue;
 
-  // For mechanism display
-  private final LoggedMechanism2d mechanism2d;
-  private final LoggedMechanismRoot2d mechanismRoot2d;
-  private final LoggedMechanismLigament2d elevatorLigament2d;
-  private final LoggedMechanismLigament2d pivotLigament2d;
-
   private Pose3d elevatorPose3d;
   private Pose3d pivotPose3d;
 
@@ -168,23 +162,7 @@ public class Superstructure extends SubsystemBase {
     elevator.setPositionTarget(ElevatorTarget.BOTTOM);
     tongue.setPositionTarget(TongueTarget.STOW);
 
-    // setup the mechanism2d for visualization
-    mechanism2d = new LoggedMechanism2d(1, 5);
-    mechanismRoot2d = mechanism2d.getRoot("Superstructure", inchesToMeters(20), 0);
-
-    elevatorLigament2d =
-        mechanismRoot2d.append(
-            new LoggedMechanismLigament2d(
-                "elevator",
-                ElevatorConstants.UPPER_EXTENSION_LIMIT
-                    * ElevatorConstants.ELEVATOR_CONFIG.reduction(),
-                90,
-                6,
-                new Color8Bit(Color.kRed)));
-    pivotLigament2d =
-        elevatorLigament2d.append(
-            new LoggedMechanismLigament2d(
-                "pivot", inchesToMeters(26.33), 90, 6, new Color8Bit(Color.kBlue)));
+    pivot.setParent(elevator);
 
     elevatorPose3d = Pose3d.kZero;
     pivotPose3d = Pose3d.kZero;
@@ -429,14 +407,10 @@ public class Superstructure extends SubsystemBase {
     pivot.periodic();
     tongue.periodic();
 
-    // updating the mechanism display
-    elevatorLigament2d.setLength(inchesToMeters(elevator.getPosition() + 41.375));
-    pivotLigament2d.setAngle(pivot.getPosition() - 90d);
-
     // updating the pose data
     // translating it up by the correct position
-    elevatorPose3d = elevator.getDisplayPose3d(Constants.MECHANISM_ROOT_POSE);
-    pivotPose3d = pivot.getDisplayPose3d(elevatorPose3d);
+    elevatorPose3d = elevator.getDisplayPose3d();
+    pivotPose3d = pivot.getDisplayPose3d();
 
     Logger.recordOutput("Superstructure/TargetState", targetState);
     Logger.recordOutput("Superstructure/CurrentState", currentState);

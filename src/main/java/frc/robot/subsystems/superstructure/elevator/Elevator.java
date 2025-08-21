@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.lib.generic_subsystems.superstructure.*;
 import frc.robot.utility.LoggableMechanism3d;
 import org.littletonrobotics.junction.Logger;
@@ -48,6 +49,8 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
   }
 
   private final LinearFilter supplyCurrentFilter;
+
+  private LoggableMechanism3d loggableMechanism3dParent = null;
 
   private double filteredSupplyCurrentAmps = 0;
 
@@ -98,23 +101,31 @@ public class Elevator extends GenericSuperstructure<Elevator.ElevatorTarget>
     return zeroing;
   }
 
+  // ------ LOGGABLE MECHANISM METHODS ------
   @Override
-  public Pose3d getDisplayPose3d(Pose3d parentPose3d) {
-    return parentPose3d.plus(
+  public Pose3d getDisplayPose3d() {
+    return getParentPosition().plus(ElevatorConstants.ELEVATOR_BASE_3D_OFFSET).plus(
         new Transform3d(
-            new Translation3d(inchesToMeters(0), inchesToMeters(0), inchesToMeters(getPosition())),
-            new Rotation3d(0, 0, 0))); // Placeholder,
+            new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(getPosition())), // Add the current elevator's extension
+            new Rotation3d(0, 0, 0))); // The elevator doesn't rotate, duh
   }
 
   @Override
   public Pose3d getParentPosition() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getParentPosition'");
+    if(loggableMechanism3dParent != null){
+      return loggableMechanism3dParent.getDisplayPose3d();
+    }
+    return new Pose3d();
   }
 
   @Override
   public void setParent(LoggableMechanism3d parent) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setParent'");
+    if (parent == null) {
+      throw new IllegalArgumentException("Parent cannot be null");
+    }
+    if (parent == this){
+      throw new IllegalArgumentException("Parent cannot be itself");
+    }
+    this.loggableMechanism3dParent = parent;
   }
 }
