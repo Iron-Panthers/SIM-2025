@@ -34,6 +34,21 @@ public class VisionConstants {
           // arducam-5 (back left)
           new Transform3d(-0.17, 0.298, 0.3651, new Rotation3d(0, 0, -Math.PI + Math.toRadians(12)))
         };
+        case SIM -> new Transform3d[] {
+          // arducam-1 (front left)
+          new Transform3d(
+              0.299, 0.2744, 0.3464, new Rotation3d(0, -Math.toRadians(35), Math.toRadians(55))),
+          // arducam-2 (front center)
+          new Transform3d(0.3017, 0, 0.3373, new Rotation3d(0, -Math.toRadians(35), 0)),
+          // arducam-3 (front right)
+          new Transform3d(
+              0.299, -0.2744, 0.3464, new Rotation3d(0, -Math.toRadians(35), -Math.toRadians(55))),
+          // arducam-4 (back right)
+          new Transform3d(
+              -0.17, -0.298, 0.3651, new Rotation3d(0, 0, Math.PI - Math.toRadians(12))),
+          // arducam-5 (back left)
+          new Transform3d(-0.17, 0.298, 0.3651, new Rotation3d(0, 0, -Math.PI + Math.toRadians(12)))
+        };
         case ALPHA -> new Transform3d[] {};
         default -> new Transform3d[0];
       };
@@ -54,7 +69,8 @@ public class VisionConstants {
                 new UnitDeviationParams(0.25, 0.07, 0.25), new UnitDeviationParams(0.15, 1, 1.5)));
       };
 
-  public static final int[] IGNORE_TAGS = {1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
+  // public static final int[] IGNORE_TAGS = {1, 2, 3, 4, 5, 12, 13, 14, 15, 16};
+  public static final int[] IGNORE_TAGS = {}; // removed
 
   public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);

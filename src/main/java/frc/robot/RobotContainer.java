@@ -6,9 +6,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -63,11 +61,10 @@ import frc.robot.subsystems.swerve.ModuleIOTalonFXReal;
 import frc.robot.subsystems.swerve.ModuleIOTalonFXSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonvisionSim;
 import java.util.function.BooleanSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnField;
-import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -174,6 +171,10 @@ public class RobotContainer {
                       DriveConstants.MODULE_CONFIGS[2], driveSimulation.getModules()[2]),
                   new ModuleIOTalonFXSim(
                       DriveConstants.MODULE_CONFIGS[3], driveSimulation.getModules()[3]));
+          vision =
+              new Vision(
+                  new VisionIOPhotonvisionSim(4, driveSimulation::getSimulatedDriveTrainPose),
+                  new VisionIOPhotonvisionSim(5, driveSimulation::getSimulatedDriveTrainPose));
           elevator = new Elevator(new ElevatorIOSim());
           pivot = new Pivot(new PivotIOSim());
           tongue = new Tongue(new TongueIOSim());

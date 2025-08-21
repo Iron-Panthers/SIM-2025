@@ -12,7 +12,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class VisionIOPhotonvision implements VisionIO {
-  private final PhotonCamera camera;
+  protected final PhotonCamera camera;
   private final PhotonPoseEstimator estimator;
 
   public VisionIOPhotonvision(int index) {
