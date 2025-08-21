@@ -1,13 +1,12 @@
 package frc.robot.subsystems.superstructure.pivot;
 
-import static frc.robot.utility.UnitConversions.inchesToMeters;
-
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.subsystems.canWatchdog.CANWatchdogConstants.CAN;
 
@@ -70,9 +69,10 @@ public class PivotConstants {
 
   // PIVOT POSITION CONSTANTS
   public static final Transform3d ELEVATOR_TO_PIVOT_TRANSFORM =
-      new Transform3d(
-          new Translation3d(inchesToMeters(-3.5), inchesToMeters(0d), inchesToMeters(33.875)),
-          new Rotation3d(0, 0, 0));
+  switch(Constants.getRobotType()){
+      default ->new Transform3d(
+          new Translation3d(Units.inchesToMeters(-3.5), Units.inchesToMeters(0d), Units.inchesToMeters(33.875)),
+          new Rotation3d(0, 0, 0));};
 
   // PHYSICAL CONSTANTS
   public static record PivotPhysicalConstants(

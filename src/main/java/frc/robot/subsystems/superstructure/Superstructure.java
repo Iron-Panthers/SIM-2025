@@ -1,7 +1,5 @@
 package frc.robot.subsystems.superstructure;
 
-import static frc.robot.utility.UnitConversions.*;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -407,19 +405,13 @@ public class Superstructure extends SubsystemBase {
     pivot.periodic();
     tongue.periodic();
 
-    // updating the pose data
-    // translating it up by the correct position
-    elevatorPose3d = elevator.getDisplayPose3d();
-    pivotPose3d = pivot.getDisplayPose3d();
-
     Logger.recordOutput("Superstructure/TargetState", targetState);
     Logger.recordOutput("Superstructure/CurrentState", currentState);
     Logger.recordOutput("Superstructure/Elevator reached target", elevator.reachedTarget());
     Logger.recordOutput("Superstructure/Pivot reached target", pivot.reachedTarget());
     Logger.recordOutput("Superstructure/Reached Target", superstructureReachedTarget());
-    Logger.recordOutput("Superstructure/Mechanism", mechanism2d);
-    Logger.recordOutput("Superstructure/Elevator Pose", elevatorPose3d);
-    Logger.recordOutput("Superstructure/Pivot Pose", pivotPose3d);
+    Logger.recordOutput("Superstructure/Mechanism Poses/Elevator Pose", elevator.getDisplayPose3d());
+    Logger.recordOutput("Superstructure/Mechanism Poses/Pivot Pose", pivot.getDisplayPose3d());
   }
 
   // Target state getter and setter
