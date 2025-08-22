@@ -2,6 +2,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
@@ -21,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
@@ -65,6 +68,7 @@ import frc.robot.subsystems.vision.VisionIOPhotonvisionSim;
 import java.util.function.BooleanSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -290,9 +294,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
-    driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
-    driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
 
     // FIXME:: TEMPORARY DISABLED
     // -----Driver Controls-----
@@ -755,6 +756,28 @@ public class RobotContainer {
                                 levelOffsets == LevelOffsets.L4_OFFSET
                                     ? LevelOffsets.PREP_L4_OFFSET
                                     : levelOffsets)));
+    // Testing
+    driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+    driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
+    driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
+    if (Constants.getRobotType() == RobotType.SIM) {
+      driverA
+          .y()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    SimulatedArena.getInstance()
+                        .addGamePieceProjectile(
+                            new ReefscapeCoralOnFly(
+                                driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+                                superstructure.getCoralEjectPosition().toPose2d().getTranslation(),
+                                driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                                driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+                                Meters.of(superstructure.getCoralEjectPosition().getZ()),
+                                MetersPerSecond.of(1),
+                                Degrees.of(0)));
+                  }));
+    }
   }
 
   private void configureAutos() {

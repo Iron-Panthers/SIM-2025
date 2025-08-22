@@ -520,4 +520,8 @@ public class Superstructure extends SubsystemBase {
   public boolean tonguePoleDetected() {
     return tongue.poleDetected();
   }
+
+  public Pose3d getCoralEjectPosition() {
+    return pivot.getDisplayPose3d().plus(PivotConstants.PIVOT_TO_OUTTAKE_TRANSFORM);
+  }
 }

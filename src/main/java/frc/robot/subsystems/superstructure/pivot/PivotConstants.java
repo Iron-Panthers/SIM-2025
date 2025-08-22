@@ -89,4 +89,14 @@ public class PivotConstants {
         case SIM -> new PivotPhysicalConstants(0.02, 0.706747, -1000.0, 1000, true);
         case COMP, ALPHA, PROG -> new PivotPhysicalConstants(0.1, 0, 0, 0, false);
       };
+
+  public static final Transform3d PIVOT_TO_OUTTAKE_TRANSFORM =
+      switch (Constants.getRobotType()) {
+        default -> new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(22.445),
+                Units.inchesToMeters(0.0),
+                Units.inchesToMeters(-1.742)),
+            new Rotation3d(0, 0, 0));
+      };
 }
