@@ -1,6 +1,9 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -407,6 +410,7 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput(
         "Superstructure/Mechanism Poses/Elevator Pose", elevator.getDisplayPose3d());
     Logger.recordOutput("Superstructure/Mechanism Poses/Pivot Pose", pivot.getDisplayPose3d());
+    Logger.recordOutput("Superstructure/Coral shooting position", getCoralEjectPosition());
   }
 
   // Target state getter and setter
@@ -522,6 +526,17 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Pose3d getCoralEjectPosition() {
-    return pivot.getDisplayPose3d().plus(PivotConstants.PIVOT_TO_OUTTAKE_TRANSFORM);
+    return pivot
+        .getDisplayPose3d()
+        .plus(
+            new Transform3d(
+                Translation3d.kZero,
+                new Rotation3d(
+                    0, Math.toRadians(90), 0))) // Account for the 90 degree offset of the pivot
+        .plus(PivotConstants.PIVOT_TO_OUTTAKE_TRANSFORM)
+        .plus(
+            new Transform3d(
+                Translation3d.kZero,
+                new Rotation3d(0, Math.toRadians(-105), 0))); // kindof arbitrary magic number
   }
 }

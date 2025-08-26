@@ -96,7 +96,7 @@ public class PivotConstants {
             new Translation3d(
                 Units.inchesToMeters(22.445),
                 Units.inchesToMeters(0.0),
-                Units.inchesToMeters(-1.742)),
+                Units.inchesToMeters(1.742)),
             new Rotation3d(0, 0, 0));
       };
 }

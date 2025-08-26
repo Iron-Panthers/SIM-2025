@@ -8,6 +8,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -395,7 +396,8 @@ public class RobotContainer {
 
     driverA.a().onTrue(new InstantCommand(() -> swerve.smartZeroGyro()));
 
-    driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
+    // FIXME:: TEMPORARY DISABLED
+    // driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
 
     // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets =
     // LevelOffsets.L4_OFFSET));
@@ -760,22 +762,25 @@ public class RobotContainer {
     driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
     driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
     driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
+
+    // sim spawn projectile code
     if (Constants.getRobotType() == RobotType.SIM) {
       driverA
           .y()
           .onTrue(
               new InstantCommand(
                   () -> {
+                    Pose3d currentCoralEjectionPose = superstructure.getCoralEjectPosition();
                     SimulatedArena.getInstance()
                         .addGamePieceProjectile(
                             new ReefscapeCoralOnFly(
                                 driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
-                                superstructure.getCoralEjectPosition().toPose2d().getTranslation(),
+                                currentCoralEjectionPose.toPose2d().getTranslation(),
                                 driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
                                 driveSimulation.getSimulatedDriveTrainPose().getRotation(),
-                                Meters.of(superstructure.getCoralEjectPosition().getZ()),
-                                MetersPerSecond.of(1),
-                                Degrees.of(0)));
+                                Meters.of(currentCoralEjectionPose.getZ()),
+                                MetersPerSecond.of(-1),
+                                currentCoralEjectionPose.getRotation().getMeasureY()));
                   }));
     }
   }
