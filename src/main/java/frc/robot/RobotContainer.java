@@ -2,10 +2,13 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.RobotType;
 import frc.robot.commands.ApproachReef;
 import frc.robot.commands.ApproachReef.LevelOffsets;
 import frc.robot.commands.VibrateHIDCommand;
@@ -65,6 +69,7 @@ import frc.robot.subsystems.vision.VisionIOPhotonvisionSim;
 import java.util.function.BooleanSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -290,9 +295,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
-    driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
-    driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
 
     // FIXME:: TEMPORARY DISABLED
     // -----Driver Controls-----
@@ -394,7 +396,8 @@ public class RobotContainer {
 
     driverA.a().onTrue(new InstantCommand(() -> swerve.smartZeroGyro()));
 
-    driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
+    // FIXME:: TEMPORARY DISABLED
+    // driverA.y().onTrue(new InstantCommand(() -> autoAngle = !autoAngle));
 
     // driverA.povUp().onTrue(new InstantCommand(() -> levelOffsets =
     // LevelOffsets.L4_OFFSET));
@@ -755,6 +758,31 @@ public class RobotContainer {
                                 levelOffsets == LevelOffsets.L4_OFFSET
                                     ? LevelOffsets.PREP_L4_OFFSET
                                     : levelOffsets)));
+    // Testing
+    driverA.a().onTrue(superstructure.goToStateCommand(SuperstructureState.SCORE_L4));
+    driverA.b().onTrue(superstructure.goToStateCommand(SuperstructureState.INTAKE));
+    driverA.x().onTrue(climbController.setPositionTargetCommand(ClimbTarget.TOP));
+
+    // sim spawn projectile code
+    if (Constants.getRobotType() == RobotType.SIM) {
+      driverA
+          .y()
+          .onTrue(
+              new InstantCommand(
+                  () -> {
+                    Pose3d currentCoralEjectionPose = superstructure.getCoralEjectPosition();
+                    SimulatedArena.getInstance()
+                        .addGamePieceProjectile(
+                            new ReefscapeCoralOnFly(
+                                driveSimulation.getSimulatedDriveTrainPose().getTranslation(),
+                                currentCoralEjectionPose.toPose2d().getTranslation(),
+                                driveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
+                                driveSimulation.getSimulatedDriveTrainPose().getRotation(),
+                                Meters.of(currentCoralEjectionPose.getZ()),
+                                MetersPerSecond.of(-1),
+                                currentCoralEjectionPose.getRotation().getMeasureY()));
+                  }));
+    }
   }
 
   private void configureAutos() {

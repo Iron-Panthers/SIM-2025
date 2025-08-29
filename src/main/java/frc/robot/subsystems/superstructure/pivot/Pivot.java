@@ -52,6 +52,8 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
     setControlMode(ControlMode.STOP);
   }
 
+  public LoggableMechanism3d loggableMechanism3dParent = null;
+
   @Override
   public void periodic() {
     super.periodic();
@@ -74,8 +76,27 @@ public class Pivot extends GenericSuperstructure<Pivot.PivotTarget> implements L
   }
 
   @Override
-  public Pose3d getDisplayPose3d(Pose3d parentPose3d) {
-    return parentPose3d
+  public Pose3d getParentPosition() {
+    if (loggableMechanism3dParent != null) {
+      return loggableMechanism3dParent.getDisplayPose3d();
+    }
+    return new Pose3d();
+  }
+
+  @Override
+  public void setParent(LoggableMechanism3d parent) {
+    if (parent == null) {
+      throw new IllegalArgumentException("Parent cannot be null");
+    }
+    if (parent == this) {
+      throw new IllegalArgumentException("Parent cannot be itself");
+    }
+    this.loggableMechanism3dParent = parent;
+  }
+
+  @Override
+  public Pose3d getDisplayPose3d() {
+    return getParentPosition()
         .plus(PivotConstants.ELEVATOR_TO_PIVOT_TRANSFORM)
         .plus(
             new Transform3d(
